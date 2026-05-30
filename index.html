@@ -3,635 +3,123 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-<title>Skeld.G — Game Launcher</title>
+<title>Quests — Skeld.G</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
-    --bg: #111111;
-    --surface: #1a1a1a;
-    --surface2: #222222;
-    --surface3: #2a2a2a;
-    --border: rgba(255,255,255,0.07);
-    --text: #f0f0f0;
-    --text-muted: #888888;
-    --text-dim: #555555;
-    --accent: #4ade80;
-    --accent-dark: #16a34a;
-    --red: #f87171;
-    --bean: #e05c3a;
-    --header-h: 60px;
-    --nav-h: 64px;
-    --radius: 16px;
-    --radius-sm: 10px;
+    --bg: #111111; --surface: #1a1a1a; --surface2: #222222; --surface3: #2a2a2a;
+    --border: rgba(255,255,255,0.07); --text: #f0f0f0; --text-muted: #888888; --text-dim: #555555;
+    --accent: #4ade80; --red: #f87171; --bean: #e05c3a;
+    --header-h: 60px; --nav-h: 64px; --radius: 16px; --radius-sm: 10px;
   }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Nunito', sans-serif; min-height: 100vh; overflow-x: hidden; -webkit-tap-highlight-color: transparent; -webkit-font-smoothing: antialiased; }
+  ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: var(--bg); } ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 4px; }
 
-  html, body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Nunito', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-    -webkit-tap-highlight-color: transparent;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 4px; }
-
-  /* ── HEADER ── */
-  #header {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    height: var(--header-h);
-    background: var(--bg);
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0 16px;
-    gap: 8px;
-  }
-  .header-logo {
-    display: flex; align-items: center; gap: 8px;
-    font-family: 'Space Mono', monospace;
-    font-weight: 700; font-size: 15px;
-    color: var(--text);
-    letter-spacing: -0.5px;
-    text-decoration: none;
-    flex-shrink: 0;
-    cursor: pointer;
-  }
+  #header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: var(--header-h); background: var(--bg); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; gap: 8px; }
+  .header-logo { display: flex; align-items: center; gap: 8px; font-family: 'Space Mono', monospace; font-weight: 700; font-size: 15px; color: var(--text); letter-spacing: -0.5px; text-decoration: none; flex-shrink: 0; }
   .header-logo span { color: var(--accent); }
-  .header-title {
-    font-size: 14px; font-weight: 700;
-    color: var(--text-muted);
-    text-align: center;
-    flex: 1;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .header-right {
-    display: flex; align-items: center; gap: 8px;
-    flex-shrink: 0;
-  }
-  .beans-badge {
-    display: flex; align-items: center; gap: 5px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 4px 10px 4px 6px;
-    font-size: 13px; font-weight: 800;
-    color: var(--bean);
-    cursor: default;
-    transition: transform 0.2s;
-  }
-  .beans-badge.bump { animation: beanBump 0.35s ease; }
-  @keyframes beanBump {
-    0% { transform: scale(1); }
-    40% { transform: scale(1.25); }
-    100% { transform: scale(1); }
-  }
-  .beans-badge .bean-icon { width: 18px; height: 18px; object-fit: contain; }
-  .avatar-btn {
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    background: var(--surface3);
-    border: 2px solid var(--border);
-    overflow: hidden; cursor: pointer;
-    transition: border-color 0.2s, transform 0.15s;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .avatar-btn:hover { border-color: var(--accent); transform: scale(1.05); }
+  .header-title { font-size: 14px; font-weight: 700; color: var(--text-muted); text-align: center; flex: 1; }
+  .header-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .beans-badge { display: flex; align-items: center; gap: 5px; background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 4px 10px 4px 6px; font-size: 13px; font-weight: 800; color: var(--bean); }
+  .beans-badge img { width: 18px; height: 18px; object-fit: contain; }
+  .avatar-btn { width: 32px; height: 32px; border-radius: 50%; background: var(--surface3); border: 2px solid var(--border); overflow: hidden; cursor: pointer; display: flex; align-items: center; justify-content: center; text-decoration: none; }
   .avatar-btn img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
   .avatar-btn svg { width: 18px; height: 18px; fill: var(--text-muted); }
 
-  /* ── PAGES ── */
-  #app {
-    padding-top: var(--header-h);
-    padding-bottom: var(--nav-h);
-    min-height: 100vh;
-  }
-  .page { display: none; animation: fadeIn 0.2s ease; }
-  .page.active { display: block; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  #app { padding: calc(var(--header-h) + 20px) 16px 20px; min-height: 100vh; padding-bottom: calc(var(--nav-h) + 20px); }
 
-  /* ── HOME PAGE ── */
-  #page-home { padding: 20px 16px; }
-  .home-hero {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px;
-    margin-bottom: 24px;
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 12px;
+  /* SUMMARY CARD */
+  .quests-summary {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 18px 20px; margin-bottom: 24px;
+    display: flex; align-items: center; gap: 16px;
   }
-  .home-hero-text h1 {
-    font-size: 28px; font-weight: 900;
-    line-height: 1.1;
-    color: var(--text);
-    margin-bottom: 6px;
-  }
-  .home-hero-text h1 span { color: var(--accent); }
-  .home-hero-text p { font-size: 13px; color: var(--text-muted); line-height: 1.5; max-width: 200px; }
-  .home-hero-icon {
-    flex-shrink: 0; width: 72px; height: 72px;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .home-hero-icon svg { width: 72px; height: 72px; }
+  .qs-left { flex: 1; }
+  .qs-left h2 { font-size: 20px; font-weight: 900; margin-bottom: 4px; }
+  .qs-left p { font-size: 13px; color: var(--text-muted); }
+  .qs-beans { display: flex; align-items: center; gap: 6px; font-size: 22px; font-weight: 900; color: var(--bean); flex-shrink: 0; }
+  .qs-beans img { width: 24px; height: 24px; object-fit: contain; }
 
-  .section-header {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 14px;
-  }
-  .section-header h2 { font-size: 16px; font-weight: 800; }
-  .section-header a { font-size: 12px; color: var(--accent); font-weight: 700; text-decoration: none; cursor: pointer; }
+  /* QUEST CARDS */
+  .section-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; margin-top: 20px; }
 
-  .game-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 12px;
-  }
-  .game-slot {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-    cursor: pointer;
-    transition: transform 0.18s, border-color 0.18s, box-shadow 0.18s;
-    aspect-ratio: 1;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    padding: 12px 8px;
-    gap: 8px;
-    position: relative;
-  }
-  .game-slot:hover { transform: scale(1.04); border-color: rgba(255,255,255,0.15); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
-  .game-slot:active { transform: scale(0.97); }
-  .game-slot-icon {
-    width: 56px; height: 56px;
-    border-radius: 12px;
-    overflow: hidden;
-    background: var(--surface2);
-    flex-shrink: 0;
-  }
-  .game-slot-icon img { width: 100%; height: 100%; object-fit: cover; }
-  .game-slot-name {
-    font-size: 11px; font-weight: 700;
-    text-align: center; line-height: 1.3;
-    color: var(--text);
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  /* ── SEARCH PAGE ── */
-  #page-search { padding: 20px 16px; }
-  .search-bar {
-    display: flex; align-items: center; gap: 10px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 10px 14px;
-    margin-bottom: 20px;
-    transition: border-color 0.2s;
-  }
-  .search-bar:focus-within { border-color: rgba(255,255,255,0.2); }
-  .search-bar svg { width: 18px; height: 18px; stroke: var(--text-muted); flex-shrink: 0; }
-  .search-bar input {
-    background: none; border: none; outline: none;
-    color: var(--text); font-family: 'Nunito', sans-serif;
-    font-size: 14px; font-weight: 600; flex: 1;
-  }
-  .search-bar input::placeholder { color: var(--text-dim); }
-  .search-results { display: flex; flex-direction: column; gap: 10px; }
-  .search-item {
-    display: flex; align-items: center; gap: 12px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 12px;
-    cursor: pointer;
-    transition: border-color 0.18s, transform 0.15s;
-  }
-  .search-item:hover { border-color: rgba(255,255,255,0.15); transform: translateX(3px); }
-  .search-item-icon { width: 44px; height: 44px; border-radius: 10px; overflow: hidden; background: var(--surface2); flex-shrink: 0; }
-  .search-item-icon img { width: 100%; height: 100%; object-fit: cover; }
-  .search-item-info h3 { font-size: 14px; font-weight: 700; }
-  .search-item-info p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-  .search-empty { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 14px; }
-
-  /* ── SHOP PAGE ── */
-  #page-shop { padding: 20px 16px; }
-  .shop-header-row {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 16px;
-  }
-  .shop-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-  }
-  .shop-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-    transition: transform 0.18s, border-color 0.18s;
-  }
-  .shop-card:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.13); }
-  .shop-card-img {
-    width: 100%; aspect-ratio: 1;
-    background: var(--surface2);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 40px;
-  }
-  .shop-card.owned .shop-card-img { opacity: 0.5; }
-  .shop-card-body { padding: 10px 12px 12px; }
-  .shop-card-title { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
-  .shop-card-price {
-    display: flex; align-items: center; gap: 4px;
-    font-size: 13px; font-weight: 800; color: var(--bean);
-    margin-bottom: 8px;
-  }
-  .shop-card-price .bean-icon { width: 14px; height: 14px; object-fit: contain; }
-  .btn-buy {
-    width: 100%;
-    background: var(--surface3);
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-family: 'Nunito', sans-serif;
-    font-size: 12px; font-weight: 700;
-    border-radius: 8px;
-    padding: 7px;
-    cursor: pointer;
-    transition: background 0.18s, border-color 0.18s, transform 0.15s;
-  }
-  .btn-buy:hover:not(:disabled) { background: var(--accent); border-color: var(--accent); color: #111; }
-  .btn-buy:active:not(:disabled) { transform: scale(0.96); }
-  .btn-buy:disabled { opacity: 0.5; cursor: not-allowed; }
-  .btn-buy.owned-btn { background: rgba(74,222,128,0.1); border-color: rgba(74,222,128,0.3); color: var(--accent); }
-
-  /* ── QUESTS PAGE ── */
-  #page-quests { padding: 20px 16px; }
-  .quest-tabs {
-    display: flex; gap: 8px; margin-bottom: 16px;
-  }
-  .quest-tab {
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 12px; font-weight: 700;
-    cursor: pointer;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text-muted);
-    transition: all 0.18s;
-  }
-  .quest-tab.active {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: #111;
-  }
-  .quest-item {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 14px 16px;
-    margin-bottom: 10px;
+  .quest-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px; margin-bottom: 10px;
     display: flex; align-items: center; gap: 14px;
-    transition: border-color 0.2s;
+    position: relative; overflow: hidden;
+    transition: border-color 0.2s, transform 0.15s;
   }
-  .quest-item.completed { border-color: rgba(74,222,128,0.25); background: rgba(74,222,128,0.04); }
-  .quest-icon {
-    width: 40px; height: 40px; border-radius: 10px;
-    background: var(--surface2);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
+  .quest-card:hover { border-color: rgba(255,255,255,0.1); transform: translateY(-1px); }
+  .quest-card.complete { border-color: rgba(74,222,128,0.2); }
+  .quest-card.complete::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(74,222,128,0.04) 0%, transparent 60%); pointer-events: none; }
+  .quest-card.claimed { opacity: 0.6; }
+
+  .quest-icon-wrap {
+    width: 44px; height: 44px; border-radius: 12px; background: var(--surface2);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
-  .quest-icon svg { width: 20px; height: 20px; stroke: var(--accent); }
-  .quest-item.completed .quest-icon svg { stroke: var(--accent); }
-  .quest-info { flex: 1; }
-  .quest-info h3 { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
-  .quest-progress-bar {
-    height: 4px; background: var(--surface3);
-    border-radius: 4px; overflow: hidden; margin-bottom: 4px;
-  }
-  .quest-progress-fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.5s; }
-  .quest-item.completed .quest-progress-fill { background: var(--accent); }
-  .quest-meta { font-size: 11px; color: var(--text-muted); display: flex; justify-content: space-between; }
-  .quest-reward { display: flex; align-items: center; gap: 3px; font-size: 12px; font-weight: 800; color: var(--bean); flex-shrink: 0; flex-direction: column; align-items: flex-end; }
-  .quest-reward .bean-icon { width: 14px; height: 14px; object-fit: contain; }
-  .quest-reward-row { display: flex; align-items: center; gap: 3px; }
+  .quest-icon-wrap svg { width: 22px; height: 22px; stroke: var(--accent); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .quest-icon-wrap.done { background: rgba(74,222,128,0.15); }
+  .quest-icon-wrap.done svg { stroke: var(--accent); }
+
+  .quest-body { flex: 1; min-width: 0; }
+  .quest-title { font-size: 14px; font-weight: 800; margin-bottom: 2px; }
+  .quest-desc { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+  .quest-bar { height: 5px; background: var(--surface3); border-radius: 5px; overflow: hidden; margin-bottom: 5px; }
+  .quest-bar-fill { height: 100%; background: var(--accent); border-radius: 5px; transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1); }
+  .quest-bar-fill.done { background: var(--accent); }
+  .quest-counts { font-size: 11px; color: var(--text-muted); display: flex; justify-content: space-between; }
+
+  .quest-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
+  .quest-reward-badge { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 900; color: var(--bean); }
+  .quest-reward-badge img { width: 14px; height: 14px; object-fit: contain; }
   .btn-claim {
-    margin-top: 4px;
-    background: var(--accent); color: #111;
-    border: none; border-radius: 6px;
-    font-family: 'Nunito', sans-serif;
-    font-size: 10px; font-weight: 800;
-    padding: 3px 8px; cursor: pointer;
-    transition: transform 0.15s;
+    background: var(--accent); color: #111; border: none;
+    font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 900;
+    border-radius: 8px; padding: 6px 12px; cursor: pointer;
+    transition: background 0.18s, transform 0.15s;
+    white-space: nowrap;
   }
+  .btn-claim:hover { background: #22c55e; }
   .btn-claim:active { transform: scale(0.95); }
-  .claimed-badge {
-    font-size: 10px; color: var(--accent); font-weight: 700; margin-top: 2px;
-  }
+  .btn-claimed { background: var(--surface3); color: var(--text-muted); border: 1px solid var(--border); font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 700; border-radius: 8px; padding: 6px 12px; cursor: default; }
 
-  /* ── PROFILE PAGE ── */
-  #page-profile { padding: 20px 16px; }
-  .profile-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 24px 20px;
-    display: flex; flex-direction: column; align-items: center;
-    gap: 10px; margin-bottom: 20px; text-align: center;
-  }
-  .profile-avatar {
-    width: 80px; height: 80px; border-radius: 50%;
-    background: var(--surface3);
-    border: 3px solid var(--border);
-    overflow: hidden;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
-  .profile-avatar svg { width: 40px; height: 40px; fill: var(--text-muted); }
-  .profile-name { font-size: 18px; font-weight: 800; }
-  .profile-email { font-size: 12px; color: var(--text-muted); }
-  .profile-beans-row {
-    display: flex; align-items: center; gap: 6px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 6px 16px;
-    font-size: 15px; font-weight: 800; color: var(--bean);
-  }
-  .profile-beans-row .bean-icon { width: 20px; height: 20px; object-fit: contain; }
-  .stat-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
-    margin-bottom: 20px;
-  }
-  .stat-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 14px 10px;
-    text-align: center;
-  }
-  .stat-card .stat-val { font-size: 20px; font-weight: 900; }
-  .stat-card .stat-label { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-
-  .profile-section-title { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
-  .profile-info-row {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 12px 14px;
-    display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 8px;
-    font-size: 13px;
-  }
-  .profile-info-row span:first-child { color: var(--text-muted); }
-  .profile-info-row span:last-child { font-weight: 700; }
-  .btn-signout {
-    width: 100%;
-    background: rgba(248,113,113,0.1);
-    border: 1px solid rgba(248,113,113,0.3);
-    color: var(--red);
-    font-family: 'Nunito', sans-serif;
-    font-size: 14px; font-weight: 700;
-    border-radius: var(--radius-sm);
-    padding: 13px;
-    cursor: pointer;
-    margin-top: 10px;
-    transition: background 0.2s, border-color 0.2s, transform 0.15s;
-  }
-  .btn-signout:hover { background: rgba(248,113,113,0.2); }
-  .btn-signout:active { transform: scale(0.98); }
-
-  /* ── BOTTOM NAV ── */
-  #bottom-nav {
-    position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
-    height: var(--nav-h);
-    background: var(--bg);
-    border-top: 1px solid var(--border);
-    display: flex; align-items: stretch;
-  }
-  .nav-item {
-    flex: 1; display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    gap: 4px; cursor: pointer;
-    transition: opacity 0.15s;
-    -webkit-tap-highlight-color: transparent;
-    position: relative;
-    padding-bottom: 6px;
-  }
-  .nav-item svg { width: 22px; height: 22px; stroke: var(--text-dim); transition: stroke 0.15s, transform 0.15s; stroke-width: 2; fill: none; }
-  .nav-item span { font-size: 10px; font-weight: 700; color: var(--text-dim); transition: color 0.15s; }
-  .nav-item.active svg { stroke: var(--accent); transform: scale(1.1); }
-  .nav-item.active span { color: var(--accent); }
-  .nav-item.active::after {
-    content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-    width: 20px; height: 2px; background: var(--accent); border-radius: 0 0 2px 2px;
-  }
-  .nav-item:active svg { transform: scale(0.92); }
-
-  /* ── AUTH OVERLAY ── */
-  #auth-overlay {
-    position: fixed; inset: 0; z-index: 200;
-    background: var(--bg);
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    padding: 32px 24px;
-  }
+  /* AUTH OVERLAY */
+  #auth-overlay { position: fixed; inset: 0; z-index: 200; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; padding: 32px 24px; }
   #auth-overlay.hidden { display: none; }
-  .auth-logo {
-    font-family: 'Space Mono', monospace;
-    font-size: 28px; font-weight: 700;
-    color: var(--text);
-    margin-bottom: 8px;
-    letter-spacing: -1px;
-  }
+  .auth-logo { font-family: 'Space Mono', monospace; font-size: 28px; font-weight: 700; color: var(--text); margin-bottom: 8px; letter-spacing: -1px; }
   .auth-logo span { color: var(--accent); }
   .auth-tagline { font-size: 14px; color: var(--text-muted); text-align: center; margin-bottom: 40px; line-height: 1.5; }
-  .auth-art {
-    width: 120px; height: 120px; margin-bottom: 28px;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .btn-google {
-    display: flex; align-items: center; gap: 10px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-family: 'Nunito', sans-serif;
-    font-size: 15px; font-weight: 700;
-    border-radius: var(--radius-sm);
-    padding: 13px 24px;
-    cursor: pointer;
-    transition: background 0.2s, border-color 0.2s, transform 0.15s;
-    width: 100%; max-width: 320px; justify-content: center;
-  }
-  .btn-google:hover { background: var(--surface2); border-color: rgba(255,255,255,0.15); }
+  .auth-art { width: 120px; height: 120px; margin-bottom: 28px; display: flex; align-items: center; justify-content: center; }
+  .btn-google { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--border); color: var(--text); font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 700; border-radius: var(--radius-sm); padding: 13px 24px; cursor: pointer; transition: background 0.2s, transform 0.15s; width: 100%; max-width: 320px; justify-content: center; }
+  .btn-google:hover { background: var(--surface2); }
   .btn-google:active { transform: scale(0.97); }
   .google-icon { width: 20px; height: 20px; }
 
-  /* ── GAME DETAIL MODAL ── */
-  #modal-overlay {
-    position: fixed; inset: 0; z-index: 150;
-    background: rgba(0,0,0,0.75);
-    display: flex; align-items: flex-end; justify-content: center;
-    padding: 0;
-    opacity: 0; pointer-events: none;
-    transition: opacity 0.25s;
-  }
-  #modal-overlay.open { opacity: 1; pointer-events: all; }
-  #modal-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 24px 24px 0 0;
-    width: 100%; max-width: 520px;
-    padding: 24px 20px;
-    transform: translateY(100%);
-    transition: transform 0.28s cubic-bezier(0.32,0.72,0,1);
-    max-height: 88vh;
-    overflow-y: auto;
-  }
-  #modal-overlay.open #modal-card { transform: translateY(0); }
-  .modal-drag-handle {
-    width: 36px; height: 4px; background: var(--surface3);
-    border-radius: 4px; margin: 0 auto 20px;
-  }
-  .modal-top {
-    display: flex; gap: 16px; align-items: flex-start; margin-bottom: 20px;
-  }
-  .modal-icon {
-    width: 80px; height: 80px; border-radius: 18px;
-    overflow: hidden; background: var(--surface2); flex-shrink: 0;
-  }
-  .modal-icon img { width: 100%; height: 100%; object-fit: cover; }
-  .modal-info { flex: 1; }
-  .modal-info h2 { font-size: 20px; font-weight: 900; margin-bottom: 6px; line-height: 1.2; }
-  .modal-meta-chips { display: flex; flex-wrap: wrap; gap: 5px; }
-  .chip {
-    font-size: 10px; font-weight: 700;
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 20px; padding: 3px 8px; color: var(--text-muted);
-  }
-  .modal-desc {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 12px 14px;
-    margin-bottom: 14px;
-  }
-  .modal-desc-label {
-    display: flex; align-items: center; gap: 6px;
-    font-size: 11px; font-weight: 700; color: var(--text-muted);
-    text-transform: uppercase; letter-spacing: 0.08em;
-    margin-bottom: 8px;
-  }
-  .modal-desc-label svg { width: 14px; height: 14px; stroke: var(--text-muted); }
-  .modal-desc p { font-size: 13px; color: var(--text); line-height: 1.6; }
-  .modal-stats-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
-    margin-bottom: 14px;
-  }
-  .modal-stat {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 10px 8px;
-    text-align: center;
-  }
-  .modal-stat-val { font-size: 14px; font-weight: 800; }
-  .modal-stat-label { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
-  .modal-earnings {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 14px 16px;
-    display: flex; align-items: center; gap: 10px;
-    margin-bottom: 14px;
-  }
-  .modal-earnings .bean-icon { width: 28px; height: 28px; object-fit: contain; }
-  .modal-earnings-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
-  .modal-earnings-val { font-size: 28px; font-weight: 900; color: var(--bean); line-height: 1; }
-  .modal-btns { display: flex; gap: 10px; margin-bottom: 10px; }
-  .btn-play {
-    flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
-    background: #4ade80; color: #111;
-    font-family: 'Nunito', sans-serif;
-    font-size: 15px; font-weight: 800;
-    border: none; border-radius: var(--radius-sm);
-    padding: 14px; cursor: pointer;
-    transition: background 0.18s, transform 0.15s;
-  }
-  .btn-play:hover { background: #22c55e; }
-  .btn-play:active { transform: scale(0.97); }
-  .btn-play svg { width: 16px; height: 16px; fill: #111; }
-  .btn-return {
-    flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
-    background: var(--surface3); color: var(--text);
-    font-family: 'Nunito', sans-serif;
-    font-size: 15px; font-weight: 800;
-    border: 1px solid var(--border); border-radius: var(--radius-sm);
-    padding: 14px; cursor: pointer;
-    transition: background 0.18s, transform 0.15s;
-  }
-  .btn-return:hover { background: var(--surface2); }
-  .btn-return:active { transform: scale(0.97); }
-  .btn-return svg { width: 16px; height: 16px; stroke: var(--text); }
-  .btn-quests-row {
-    width: 100%; display: flex; align-items: center; justify-content: space-between;
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); padding: 14px 16px;
-    cursor: pointer;
-    font-family: 'Nunito', sans-serif;
-    font-size: 14px; font-weight: 700; color: var(--text);
-    transition: background 0.18s, border-color 0.18s, transform 0.15s;
-  }
-  .btn-quests-row:hover { background: var(--surface3); border-color: rgba(255,255,255,0.12); }
-  .btn-quests-row:active { transform: scale(0.98); }
-  .btn-quests-row-left { display: flex; align-items: center; gap: 10px; }
-  .btn-quests-row svg.q-icon { width: 18px; height: 18px; stroke: var(--text-muted); }
-  .btn-quests-row svg.arrow { width: 16px; height: 16px; stroke: var(--text-muted); }
+  /* BOTTOM NAV */
+  #bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 100; height: var(--nav-h); background: var(--bg); border-top: 1px solid var(--border); display: flex; align-items: stretch; }
+  .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; -webkit-tap-highlight-color: transparent; position: relative; padding-bottom: 6px; text-decoration: none; }
+  .nav-item svg { width: 22px; height: 22px; stroke: var(--text-dim); transition: stroke 0.15s; stroke-width: 2; fill: none; }
+  .nav-item span { font-size: 10px; font-weight: 700; color: var(--text-dim); transition: color 0.15s; }
+  .nav-item.active svg { stroke: var(--accent); }
+  .nav-item.active span { color: var(--accent); }
+  .nav-item.active::after { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 20px; height: 2px; background: var(--accent); border-radius: 0 0 2px 2px; }
 
-  .spinner {
-    width: 40px; height: 40px;
-    border: 3px solid var(--surface3);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-    margin: 40px auto;
-  }
+  /* Beans earn animation */
+  .beans-earn-pop { position: fixed; z-index: 9999; font-size: 16px; font-weight: 900; color: var(--bean); font-family: 'Nunito', sans-serif; pointer-events: none; animation: beansPop 1.4s ease forwards; }
+  @keyframes beansPop { 0% { opacity: 1; transform: translateY(0) scale(1); } 60% { opacity: 1; transform: translateY(-40px) scale(1.2); } 100% { opacity: 0; transform: translateY(-70px) scale(0.9); } }
+
+  .spinner { width: 40px; height: 40px; border: 3px solid var(--surface3); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 40px auto; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  #toast {
-    position: fixed; bottom: calc(var(--nav-h) + 12px); left: 50%; z-index: 999;
-    transform: translateX(-50%) translateY(20px);
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 10px 18px;
-    font-size: 13px; font-weight: 600;
-    opacity: 0; pointer-events: none;
-    transition: opacity 0.2s, transform 0.2s;
-    white-space: nowrap;
-  }
+  #toast { position: fixed; bottom: calc(var(--nav-h) + 12px); left: 50%; z-index: 999; transform: translateX(-50%) translateY(20px); background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 18px; font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; white-space: nowrap; }
   #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-  @media (min-width: 600px) {
-    .game-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
-    #modal-overlay { align-items: center; }
-    #modal-card { border-radius: 24px; max-width: 480px; max-height: 80vh; }
-  }
-  @media (min-width: 900px) {
-    #app { max-width: 680px; margin: 0 auto; }
-    #header { max-width: none; }
-    .shop-grid { grid-template-columns: repeat(3, 1fr); }
-    .game-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
-  }
+  @media (min-width: 900px) { #app { max-width: 680px; margin: 0 auto; } }
 </style>
 </head>
 <body>
@@ -639,230 +127,80 @@
 <!-- AUTH OVERLAY -->
 <div id="auth-overlay">
   <div class="auth-art">
-    <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <ellipse cx="60" cy="85" rx="30" ry="18" fill="#1a1a1a"/>
-      <rect x="30" y="55" width="60" height="38" rx="14" fill="#4ade80"/>
-      <ellipse cx="60" cy="42" rx="26" ry="28" fill="#4ade80"/>
-      <rect x="36" y="30" width="48" height="22" rx="11" fill="#1a1a1a" opacity="0.9"/>
-      <rect x="38" y="32" width="44" height="18" rx="9" fill="#60a5fa" opacity="0.85"/>
-      <rect x="28" y="72" width="18" height="26" rx="9" fill="#4ade80"/>
-      <rect x="74" y="72" width="18" height="26" rx="9" fill="#4ade80"/>
-    </svg>
+    <svg viewBox="0 0 120 120" fill="none"><ellipse cx="60" cy="85" rx="30" ry="18" fill="#1a1a1a"/><rect x="30" y="55" width="60" height="38" rx="14" fill="#4ade80"/><ellipse cx="60" cy="42" rx="26" ry="28" fill="#4ade80"/><rect x="36" y="30" width="48" height="22" rx="11" fill="#1a1a1a" opacity="0.9"/><rect x="38" y="32" width="44" height="18" rx="9" fill="#60a5fa" opacity="0.85"/><rect x="28" y="72" width="18" height="26" rx="9" fill="#4ade80"/><rect x="74" y="72" width="18" height="26" rx="9" fill="#4ade80"/></svg>
   </div>
   <div class="auth-logo">Skeld<span>.</span>G</div>
-  <div class="auth-tagline">Your Among Us mini-game hub.<br>Sign in to start earning beans.</div>
+  <div class="auth-tagline">Sign in to view your quests.</div>
   <button class="btn-google" id="btn-google-signin" onclick="signInWithGoogle()">
-    <svg class="google-icon" viewBox="0 0 24 24">
-      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-    </svg>
+    <svg class="google-icon" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
     Sign in with Google
   </button>
-  <div id="auth-loading" style="display:none;margin-top:16px;"><div class="spinner" style="margin:0;width:28px;height:28px;"></div></div>
 </div>
 
 <!-- HEADER -->
 <div id="header">
-  <div class="header-logo" onclick="navigateTo('home')"><span>⬡</span> Skeld.G</div>
-  <div class="header-title" id="header-title">Home</div>
+  <a class="header-logo" href="/"><span>⬡</span> Skeld.G</a>
+  <div class="header-title">Quests</div>
   <div class="header-right">
-    <div class="beans-badge" id="beans-badge">
-      <img class="bean-icon" src="bean.png" alt="🫘" onerror="this.outerHTML='<span style=\'font-size:15px\'>🫘</span>'"/>
+    <div class="beans-badge" id="beans-badge-header">
+      <img src="/bean.png" alt="bean" onerror="this.style.display='none';this.nextSibling.style.display='inline'"/>
+      <span style="display:none;font-size:14px;">🫘</span>
       <span id="header-beans">0</span>
     </div>
-    <div class="avatar-btn" id="header-avatar" onclick="navigateTo('profile')">
+    <a class="avatar-btn" id="header-avatar" href="/">
       <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
-    </div>
+    </a>
   </div>
 </div>
 
-<!-- APP -->
 <div id="app">
-
-  <!-- HOME -->
-  <div class="page active" id="page-home">
-    <div class="home-hero">
-      <div class="home-hero-text">
-        <h1>Play &amp;<br/><span>Earn</span> Beans</h1>
-        <p>Mini-games. Compete. Collect rewards.</p>
-      </div>
-      <div class="home-hero-icon">
-        <svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="4" y="18" width="64" height="42" rx="10" fill="#1e1e1e" stroke="#333" stroke-width="2"/>
-          <circle cx="22" cy="39" r="8" fill="#2a2a2a" stroke="#3a3a3a" stroke-width="1.5"/>
-          <path d="M22 35v8M18 39h8" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round"/>
-          <circle cx="52" cy="35" r="3.5" fill="#f87171"/>
-          <circle cx="60" cy="39" r="3.5" fill="#facc15"/>
-          <circle cx="52" cy="43" r="3.5" fill="#4ade80"/>
-          <circle cx="44" cy="39" r="3.5" fill="#60a5fa"/>
-          <rect x="28" y="8" width="16" height="12" rx="4" fill="#1e1e1e" stroke="#333" stroke-width="2"/>
-          <rect x="31" y="4" width="10" height="6" rx="3" fill="#2a2a2a" stroke="#333" stroke-width="1.5"/>
-        </svg>
-      </div>
+  <div class="quests-summary">
+    <div class="qs-left">
+      <h2>Daily Quests</h2>
+      <p id="qs-sub">Loading your progress…</p>
     </div>
-    <div class="section-header">
-      <h2>All Games</h2>
-      <span id="games-count" style="font-size:12px;color:var(--text-muted);font-weight:700;"></span>
-    </div>
-    <div class="game-grid" id="game-grid">
-      <div class="spinner" style="grid-column:1/-1;"></div>
+    <div class="qs-beans">
+      <img src="/bean.png" alt="" onerror="this.style.display='none'"/>
+      <span id="qs-total-reward">0</span>
     </div>
   </div>
-
-  <!-- SEARCH -->
-  <div class="page" id="page-search">
-    <div class="search-bar">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-      </svg>
-      <input type="text" id="search-input" placeholder="Search games &amp; items…" oninput="onSearch(this.value)"/>
-    </div>
-    <div class="search-results" id="search-results">
-      <div class="search-empty">Start typing to search…</div>
-    </div>
-  </div>
-
-  <!-- SHOP -->
-  <div class="page" id="page-shop">
-    <div class="shop-header-row">
-      <h2 style="font-size:16px;font-weight:800;">Shop</h2>
-      <div class="beans-badge">
-        <img class="bean-icon" src="bean.png" alt="🫘" onerror="this.outerHTML='<span style=\'font-size:13px\'>🫘</span>'"/>
-        <span id="shop-beans">0</span>
-      </div>
-    </div>
-    <div class="shop-grid" id="shop-grid"></div>
-  </div>
-
-  <!-- QUESTS -->
-  <div class="page" id="page-quests">
-    <div class="section-header" style="margin-bottom:12px;"><h2>Quests</h2></div>
-    <div class="quest-tabs">
-      <div class="quest-tab active" id="tab-active" onclick="switchQuestTab('active')">Active</div>
-      <div class="quest-tab" id="tab-completed" onclick="switchQuestTab('completed')">Completed</div>
-    </div>
-    <div id="quests-list"></div>
-  </div>
-
-  <!-- PROFILE -->
-  <div class="page" id="page-profile">
-    <div class="profile-card">
-      <div class="profile-avatar" id="profile-avatar-img">
-        <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
-      </div>
-      <div class="profile-name" id="profile-name">—</div>
-      <div class="profile-email" id="profile-email">—</div>
-      <div class="profile-beans-row">
-        <img class="bean-icon" src="bean.png" alt="🫘" onerror="this.outerHTML='<span style=\'font-size:18px\'>🫘</span>'"/>
-        <span id="profile-beans">0</span> Beans
-      </div>
-    </div>
-    <div class="stat-grid">
-      <div class="stat-card"><div class="stat-val" id="stat-games">0</div><div class="stat-label">Games</div></div>
-      <div class="stat-card"><div class="stat-val" id="stat-played">0</div><div class="stat-label">Played</div></div>
-      <div class="stat-card"><div class="stat-val" id="stat-quests">0</div><div class="stat-label">Quests Done</div></div>
-    </div>
-    <div class="profile-section-title">Account Info</div>
-    <div class="profile-info-row"><span>Joined</span><span id="profile-joined">—</span></div>
-    <div class="profile-info-row"><span>Last Login</span><span id="profile-lastlogin">—</span></div>
-    <div class="profile-info-row"><span>UID</span><span id="profile-uid" style="font-size:11px;color:var(--text-muted);font-family:'Space Mono',monospace;">—</span></div>
-    <button class="btn-signout" onclick="signOut()">Sign Out</button>
-  </div>
-
+  <div id="quests-loading"><div class="spinner"></div></div>
+  <div id="quests-container" style="display:none;"></div>
 </div>
 
 <!-- BOTTOM NAV -->
 <nav id="bottom-nav">
-  <div class="nav-item active" id="nav-home" onclick="navigateTo('home')">
+  <a class="nav-item" href="/">
     <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12L12 3l9 9"/><path d="M9 21V12h6v9"/></svg>
     <span>Home</span>
-  </div>
-  <div class="nav-item" id="nav-search" onclick="navigateTo('search')">
+  </a>
+  <a class="nav-item" href="/">
     <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
     <span>Search</span>
-  </div>
-  <div class="nav-item" id="nav-shop" onclick="navigateTo('shop')">
+  </a>
+  <a class="nav-item" href="/shop">
     <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
     <span>Shop</span>
-  </div>
-  <div class="nav-item" id="nav-quests" onclick="navigateTo('quests')">
+  </a>
+  <a class="nav-item active" href="/quests">
     <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h4"/></svg>
     <span>Quests</span>
-  </div>
-  <div class="nav-item" id="nav-profile" onclick="navigateTo('profile')">
+  </a>
+  <a class="nav-item" href="/">
     <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     <span>Profile</span>
-  </div>
+  </a>
 </nav>
 
-<!-- GAME DETAIL MODAL -->
-<div id="modal-overlay" onclick="closeModal(event)">
-  <div id="modal-card">
-    <div class="modal-drag-handle"></div>
-    <div class="modal-top">
-      <div class="modal-icon"><img id="modal-icon" src="" alt=""/></div>
-      <div class="modal-info">
-        <h2 id="modal-title">Game</h2>
-        <div class="modal-meta-chips" id="modal-chips"></div>
-      </div>
-    </div>
-    <div class="modal-desc">
-      <div class="modal-desc-label">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
-        DESCRIPTION
-      </div>
-      <p id="modal-desc-text">—</p>
-    </div>
-    <div class="modal-stats-grid">
-      <div class="modal-stat"><div class="modal-stat-val" id="modal-plays">—</div><div class="modal-stat-label">Total Plays</div></div>
-      <div class="modal-stat"><div class="modal-stat-val" id="modal-active">—</div><div class="modal-stat-label">Active Users</div></div>
-      <div class="modal-stat"><div class="modal-stat-val" id="modal-difficulty">—</div><div class="modal-stat-label">Difficulty</div></div>
-    </div>
-    <div class="modal-earnings">
-      <img class="bean-icon" src="bean.png" alt="🫘" onerror="this.outerHTML='<span style=\'font-size:28px\'>🫘</span>'"/>
-      <div>
-        <div class="modal-earnings-label">Beans per Play</div>
-        <div class="modal-earnings-val" id="modal-earnings">600</div>
-      </div>
-    </div>
-    <div class="modal-btns">
-      <button class="btn-play" id="modal-play-btn" onclick="playGame()">
-        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-        PLAY
-      </button>
-      <button class="btn-return" onclick="closeModal()">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
-        RETURN
-      </button>
-    </div>
-    <button class="btn-quests-row" onclick="navigateTo('quests');closeModal();">
-      <div class="btn-quests-row-left">
-        <svg class="q-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h4"/></svg>
-        VIEW QUESTS
-      </div>
-      <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-    </button>
-  </div>
-</div>
-
-<!-- TOAST -->
 <div id="toast"></div>
 
-<!-- ════════════════════════════════════════════════
-     FIREBASE MODULE
-════════════════════════════════════════════════ -->
+<!-- FIREBASE -->
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-  import {
-    getAuth, GoogleAuthProvider, signInWithPopup,
-    onAuthStateChanged, signOut as fbSignOut
-  } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-  import {
-    getFirestore, doc, getDoc, setDoc, updateDoc,
-    serverTimestamp, increment, arrayUnion
-  } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+  import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged }
+    from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+  import { getFirestore, doc, getDoc, setDoc, updateDoc, increment, serverTimestamp }
+    from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
   const firebaseConfig = {
     apiKey: "AIzaSyCIkS8aU3NyKPH2EWqLNLjKxxg7y7kKu8M",
@@ -878,665 +216,176 @@
   const db = getFirestore(app);
 
   window._auth = auth;
-  window._db = db;
-  window._doc = doc;
-  window._getDoc = getDoc;
-  window._setDoc = setDoc;
-  window._updateDoc = updateDoc;
-  window._serverTimestamp = serverTimestamp;
-  window._increment = increment;
-  window._arrayUnion = arrayUnion;
+  window._db_doc = (path) => doc(db, ...path.split('/'));
+  window._fs_getDoc = getDoc;
+  window._fs_updateDoc = updateDoc;
+  window._fs_increment = increment;
 
-  // ── SIGN IN ──
   window.signInWithGoogle = async () => {
-    const loadEl = document.getElementById('auth-loading');
-    const btnEl = document.getElementById('btn-google-signin');
-    loadEl.style.display = 'block';
-    btnEl.disabled = true;
-    try {
-      const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
-    } catch (e) {
-      console.error(e);
-      loadEl.style.display = 'none';
-      btnEl.disabled = false;
-      showToast('Sign in failed. Try again.');
-    }
+    try { await signInWithPopup(auth, new GoogleAuthProvider()); }
+    catch(e) { showToast('Sign in failed.'); }
   };
 
-  window.signOut = async () => {
-    await fbSignOut(auth);
-    window._userData = null;
-    window._userUid = null;
-    updateAllBeanDisplays(0);
-  };
-
-  // ── AUTH STATE ──
   onAuthStateChanged(auth, async (user) => {
     if (user) {
       document.getElementById('auth-overlay').classList.add('hidden');
-      await ensureUserDoc(user);
-      await loadUserData(user.uid);
+      const ref = doc(db, 'users', user.uid);
+      const snap = await getDoc(ref);
+      if (!snap.exists()) {
+        await setDoc(ref, { displayName: user.displayName || 'Crewmate', photoURL: user.photoURL || '', email: user.email || '', beans: 100, inventory: [], gamesPlayed: 0, questsCompleted: 0, quest_play5: 0, quest_play10: 0, quest_play20: 0, quest_visitShop: 0, quest_login3: 1, claimed_play5: false, claimed_play10: false, claimed_play20: false, claimed_visitShop: false, claimed_login3: false, createdAt: serverTimestamp(), lastLogin: serverTimestamp() });
+      }
+      const data = (await getDoc(ref)).data();
+      window._userData = data;
+      window._userUid = user.uid;
+
+      const av = user.photoURL;
+      if (av) {
+        document.getElementById('header-avatar').innerHTML = `<img src="${av}" alt="avatar"/>`;
+      }
+
+      updateBeansUI(data.beans ?? 0);
+      renderQuests(data);
     } else {
       document.getElementById('auth-overlay').classList.remove('hidden');
     }
   });
 
-  // ── ENSURE USER DOC ──
-  async function ensureUserDoc(user) {
-    const ref = doc(db, 'users', user.uid);
-    const snap = await getDoc(ref);
-    if (!snap.exists()) {
-      await setDoc(ref, {
-        displayName: user.displayName || 'Crewmate',
-        photoURL: user.photoURL || '',
-        email: user.email || '',
-        beans: 100,
-        inventory: [],
-        gamesPlayed: 0,
-        questsCompleted: 0,
-        claimedQuests: [],
-        loginStreak: 1,
-        lastLoginDate: new Date().toDateString(),
-        createdAt: serverTimestamp(),
-        lastLogin: serverTimestamp()
+  window.claimQuest = async function(key) {
+    const uid = window._userUid;
+    if (!uid) return;
+    const QUEST_DEFS = window._QUEST_DEFS;
+    const quest = QUEST_DEFS.find(q => q.key === key);
+    if (!quest) return;
+
+    const data = window._userData;
+    const progress = data[key] ?? 0;
+    const claimedKey = 'claimed_' + key.replace('quest_', '');
+
+    if (progress < quest.max) { showToast('Quest not complete yet!'); return; }
+    if (data[claimedKey]) { showToast('Already claimed!'); return; }
+
+    const ref = window._db_doc(`users/${uid}`);
+    try {
+      await window._fs_updateDoc(ref, {
+        [claimedKey]: true,
+        beans: window._fs_increment(quest.reward),
+        questsCompleted: window._fs_increment(1)
       });
-      showToast('Welcome! You received 100 🫘 beans!');
-    } else {
-      // Update login streak
-      const data = snap.data();
-      const today = new Date().toDateString();
-      const lastDate = data.lastLoginDate;
-      const yesterday = new Date(Date.now() - 86400000).toDateString();
-      let streak = data.loginStreak || 1;
-      if (lastDate !== today) {
-        streak = lastDate === yesterday ? streak + 1 : 1;
-        await updateDoc(ref, {
-          lastLogin: serverTimestamp(),
-          lastLoginDate: today,
-          loginStreak: streak
-        });
-      }
-    }
-  }
+      window._userData[claimedKey] = true;
+      window._userData.beans = (window._userData.beans ?? 0) + quest.reward;
+      window._userData.questsCompleted = (window._userData.questsCompleted ?? 0) + 1;
 
-  // ── LOAD USER DATA ──
-  async function loadUserData(uid) {
-    const ref = doc(db, 'users', uid);
-    const snap = await getDoc(ref);
-    if (!snap.exists()) return;
-    const data = snap.data();
-
-    window._userData = data;
-    window._userUid = uid;
-
-    const beans = data.beans ?? 0;
-    updateAllBeanDisplays(beans);
-
-    document.getElementById('profile-name').textContent = data.displayName || 'Crewmate';
-    document.getElementById('profile-email').textContent = data.email || '';
-    document.getElementById('profile-uid').textContent = uid.substring(0, 16) + '…';
-    document.getElementById('stat-games').textContent = window._gamesData?.length ?? '—';
-    document.getElementById('stat-played').textContent = data.gamesPlayed ?? 0;
-    document.getElementById('stat-quests').textContent = data.questsCompleted ?? 0;
-
-    const createdAt = data.createdAt?.toDate?.();
-    const lastLogin = data.lastLogin?.toDate?.();
-    document.getElementById('profile-joined').textContent = createdAt ? createdAt.toLocaleDateString() : '—';
-    document.getElementById('profile-lastlogin').textContent = lastLogin ? lastLogin.toLocaleDateString() : '—';
-
-    // Avatar
-    const av = auth.currentUser?.photoURL;
-    if (av) {
-      document.getElementById('profile-avatar-img').innerHTML = `<img src="${av}" alt="avatar"/>`;
-      document.getElementById('header-avatar').innerHTML = `<img src="${av}" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"/>`;
-    }
-
-    // Render quests with real data
-    renderQuests(data);
-    // Render shop with inventory
-    renderShop(data.inventory || []);
-  }
-
-  window._loadUserData = loadUserData;
-
-  // ── REFRESH USER FROM FIRESTORE ──
-  window._refreshUser = async () => {
-    const uid = window._userUid;
-    if (!uid) return;
-    await loadUserData(uid);
-  };
-
-  // ── UPDATE BEANS ACROSS ALL DISPLAYS ──
-  window.updateAllBeanDisplays = (beans) => {
-    const val = Number(beans).toLocaleString();
-    document.getElementById('header-beans').textContent = val;
-    document.getElementById('shop-beans').textContent = val;
-    document.getElementById('profile-beans').textContent = val;
-    // Bump animation
-    const badge = document.getElementById('beans-badge');
-    badge.classList.remove('bump');
-    void badge.offsetWidth;
-    badge.classList.add('bump');
-    setTimeout(() => badge.classList.remove('bump'), 400);
-  };
-
-  // ── AWARD BEANS ──
-  window._awardBeans = async (amount, reason) => {
-    const uid = window._userUid;
-    if (!uid) return;
-    try {
-      const ref = doc(db, 'users', uid);
-      await updateDoc(ref, { beans: increment(amount) });
-      const newBeans = (window._userData?.beans || 0) + amount;
-      if (window._userData) window._userData.beans = newBeans;
-      updateAllBeanDisplays(newBeans);
-      showToast(`+${amount} 🫘 ${reason || 'beans earned!'}`);
-    } catch (e) { console.error('Award beans error:', e); }
-  };
-
-  // ── DEDUCT BEANS ──
-  window._deductBeans = async (amount) => {
-    const uid = window._userUid;
-    if (!uid) return false;
-    const currentBeans = window._userData?.beans || 0;
-    if (currentBeans < amount) return false;
-    try {
-      const ref = doc(db, 'users', uid);
-      await updateDoc(ref, { beans: increment(-amount) });
-      const newBeans = currentBeans - amount;
-      if (window._userData) window._userData.beans = newBeans;
-      updateAllBeanDisplays(newBeans);
-      return true;
-    } catch (e) { console.error('Deduct beans error:', e); return false; }
-  };
-
-  // ── UPDATE PLAY COUNT + AWARD BEANS ──
-  window._updatePlayCount = async (gameFolder, beansEarned) => {
-    const uid = window._userUid;
-    if (!uid) return;
-    try {
-      const ref = doc(db, 'users', uid);
-      const snap = await getDoc(ref);
-      if (!snap.exists()) return;
-      const data = snap.data();
-      const played = (data.gamesPlayed || 0) + 1;
-      const earnedBeans = beansEarned || 0;
-      await updateDoc(ref, {
-        gamesPlayed: played,
-        beans: increment(earnedBeans)
-      });
-      if (window._userData) {
-        window._userData.gamesPlayed = played;
-        window._userData.beans = (window._userData.beans || 0) + earnedBeans;
-      }
-      document.getElementById('stat-played').textContent = played;
-      if (earnedBeans > 0) {
-        updateAllBeanDisplays(window._userData.beans);
-        showToast(`+${earnedBeans} 🫘 beans earned!`);
-      }
-      // Check quest progress
-      await checkQuestProgress('gamesPlayed', played);
-    } catch (e) { console.error(e); }
-  };
-
-  // ── CLAIM QUEST ──
-  window._claimQuest = async (questId, reward) => {
-    const uid = window._userUid;
-    if (!uid) return;
-    try {
-      const ref = doc(db, 'users', uid);
-      const snap = await getDoc(ref);
-      if (!snap.exists()) return;
-      const data = snap.data();
-      const claimed = data.claimedQuests || [];
-      if (claimed.includes(questId)) { showToast('Already claimed!'); return; }
-      await updateDoc(ref, {
-        claimedQuests: arrayUnion(questId),
-        beans: increment(reward),
-        questsCompleted: increment(1)
-      });
-      if (window._userData) {
-        window._userData.claimedQuests = [...claimed, questId];
-        window._userData.beans = (window._userData.beans || 0) + reward;
-        window._userData.questsCompleted = (window._userData.questsCompleted || 0) + 1;
-      }
-      updateAllBeanDisplays(window._userData.beans);
-      document.getElementById('stat-quests').textContent = window._userData.questsCompleted;
-      showToast(`+${reward} 🫘 quest reward!`);
+      updateBeansUI(window._userData.beans);
+      showBeansPopup(quest.reward);
+      showToast(`+${quest.reward} beans claimed! 🫘`);
       renderQuests(window._userData);
-    } catch (e) { console.error('Claim quest error:', e); }
+    } catch(e) { showToast('Error claiming reward.'); }
   };
-
-  // ── CHECK QUEST PROGRESS ──
-  async function checkQuestProgress(field, value) {
-    if (!window._userData) return;
-    window._userData[field] = value;
-    renderQuests(window._userData);
-  }
-
-  // ── BUY ITEM ──
-  window.buyItem = async (id, price, name) => {
-    const uid = window._userUid;
-    if (!uid) { showToast('Sign in to buy items!'); return; }
-    const userData = window._userData;
-    if (!userData) return;
-    const inv = userData.inventory || [];
-    if (inv.includes(id)) { showToast('Already owned!'); return; }
-    if ((userData.beans || 0) < price) { showToast('Not enough beans! 🫘'); return; }
-    try {
-      const ref = doc(db, 'users', uid);
-      await updateDoc(ref, {
-        beans: increment(-price),
-        inventory: arrayUnion(id)
-      });
-      if (window._userData) {
-        window._userData.beans = (window._userData.beans || 0) - price;
-        window._userData.inventory = [...inv, id];
-      }
-      updateAllBeanDisplays(window._userData.beans);
-      showToast(`🎉 Bought ${name}!`);
-      // Re-render shop to show owned state
-      renderShop(window._userData.inventory);
-      // Check shop quest
-      await checkQuestProgress('visitedShop', true);
-    } catch(e) { console.error(e); showToast('Purchase failed.'); }
-  };
-
-  // ── LOAD GAMES ──
-  async function loadGames() {
-    try {
-      const res = await fetch('game.json');
-      if (!res.ok) throw new Error('game.json not found');
-      const games = await res.json();
-      window._gamesData = games;
-      renderGameGrid(games);
-      renderSearch(games, '');
-      document.getElementById('games-count').textContent = games.length + ' games';
-      document.getElementById('stat-games').textContent = games.length;
-    } catch (e) {
-      console.error(e);
-      document.getElementById('game-grid').innerHTML = `<p style="color:var(--text-muted);font-size:13px;padding:10px 0;grid-column:1/-1;">No games found. Add a game.json file.</p>`;
-    }
-  }
-  loadGames();
-
 </script>
 
-<!-- ════════════════════════════════════════════════
-     APP LOGIC (non-module)
-════════════════════════════════════════════════ -->
 <script>
-  window._gamesData = [];
-  window._selectedGame = null;
-  window._userData = null;
-  window._userUid = null;
-  window._currentQuestTab = 'active';
-
-  // ─────────────────────────────────────────────
-  // ROUTING — clean URLs, no index.html
-  // ─────────────────────────────────────────────
-  const PAGE_ROUTES = {
-    '':        'home',
-    '/':       'home',
-    '/shop':   'shop',
-    '/search': 'search',
-    '/quests': 'quests',
-    '/profile':'profile',
-  };
-  const ROUTE_PATHS = {
-    home:    '/',
-    shop:    '/shop',
-    search:  '/search',
-    quests:  '/quests',
-    profile: '/profile',
-  };
-
-  function resolvePageFromPath(path) {
-    // Strip trailing slash except root
-    const clean = path.length > 1 ? path.replace(/\/$/, '') : path;
-    return PAGE_ROUTES[clean] || 'home';
-  }
-
-  window.navigateTo = function(page, pushState = true) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    const pageEl = document.getElementById('page-' + page);
-    const navEl = document.getElementById('nav-' + page);
-    if (pageEl) pageEl.classList.add('active');
-    if (navEl) navEl.classList.add('active');
-    const titles = { home:'Home', search:'Search', shop:'Shop', quests:'Quests', profile:'Profile' };
-    document.getElementById('header-title').textContent = titles[page] || '';
-    window.scrollTo(0, 0);
-    if (pushState) {
-      const path = ROUTE_PATHS[page] || '/';
-      history.pushState({ page }, '', path);
-    }
-    // Mark shop visited for quest
-    if (page === 'shop' && window._userData) {
-      window._userData.visitedShop = true;
-      renderQuests(window._userData);
-    }
-  };
-
-  // Handle browser back/forward
-  window.addEventListener('popstate', (e) => {
-    const page = (e.state && e.state.page) || resolvePageFromPath(location.pathname);
-    navigateTo(page, false);
-  });
-
-  // Initial route on load
-  (function initRoute() {
-    const page = resolvePageFromPath(location.pathname);
-    navigateTo(page, false);
-    // Replace state so back button works
-    history.replaceState({ page }, '', location.pathname);
-  })();
-
-  // ─────────────────────────────────────────────
-  // GAME GRID
-  // ─────────────────────────────────────────────
-  function renderGameGrid(games) {
-    const grid = document.getElementById('game-grid');
-    if (!games || games.length === 0) {
-      grid.innerHTML = '<p style="color:var(--text-muted);font-size:13px;padding:10px 0;grid-column:1/-1;">No games available.</p>';
-      return;
-    }
-    grid.innerHTML = games.map((g, i) => `
-      <div class="game-slot" onclick="openGameModal(${i})">
-        <div class="game-slot-icon">
-          <img src="${g.folder}/icon.png" alt="${escHtml(g.name)}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2256%22 height=%2256%22><rect width=%2256%22 height=%2256%22 fill=%22%23222%22/><text x=%2250%25%22 y=%2255%25%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22 font-size=%2222%22 fill=%22%23555%22>?</text></svg>'"/>
-        </div>
-        <div class="game-slot-name">${escHtml(g.name)}</div>
-      </div>
-    `).join('');
-  }
-  window.renderGameGrid = renderGameGrid;
-
-  // ─────────────────────────────────────────────
-  // GAME MODAL
-  // ─────────────────────────────────────────────
-  window.openGameModal = function(idx) {
-    const g = window._gamesData[idx];
-    if (!g) return;
-    window._selectedGame = g;
-    document.getElementById('modal-icon').src = `${g.folder}/icon.png`;
-    document.getElementById('modal-icon').onerror = function(){ this.src = ''; };
-    document.getElementById('modal-title').textContent = g.name;
-    document.getElementById('modal-desc-text').textContent = g.description || 'No description available.';
-    document.getElementById('modal-plays').textContent = g.totalPlays != null ? Number(g.totalPlays).toLocaleString() : '—';
-    document.getElementById('modal-active').textContent = g.activeUsers != null ? Number(g.activeUsers).toLocaleString() : '—';
-    document.getElementById('modal-difficulty').textContent = g.difficulty || '—';
-    document.getElementById('modal-earnings').textContent = g.earnings != null ? Number(g.earnings).toLocaleString() : '600';
-    const chips = document.getElementById('modal-chips');
-    const meta = [];
-    if (g.releaseDate) meta.push(g.releaseDate);
-    if (g.developer) meta.push(g.developer);
-    if (g.tags) meta.push(...(Array.isArray(g.tags) ? g.tags : [g.tags]));
-    chips.innerHTML = meta.map(m => `<span class="chip">${escHtml(String(m))}</span>`).join('');
-    document.getElementById('modal-overlay').classList.add('open');
-    document.body.style.overflow = 'hidden';
-  };
-
-  window.closeModal = function(e) {
-    if (e && e.target !== document.getElementById('modal-overlay')) return;
-    document.getElementById('modal-overlay').classList.remove('open');
-    document.body.style.overflow = '';
-  };
-
-  window.playGame = function() {
-    const g = window._selectedGame;
-    if (!g) return;
-    const beansEarned = g.earnings || 0;
-    if (window._updatePlayCount) window._updatePlayCount(g.folder, beansEarned);
-    // Navigate to game folder without showing index.html
-    const path = `/${g.folder}`;
-    window.location.href = path;
-  };
-
-  // ─────────────────────────────────────────────
-  // SEARCH
-  // ─────────────────────────────────────────────
-  function renderSearch(games, query) {
-    const container = document.getElementById('search-results');
-    const q = query.toLowerCase().trim();
-    if (!q) {
-      container.innerHTML = '<div class="search-empty">Start typing to search…</div>';
-      return;
-    }
-    const filtered = (games || []).filter(g =>
-      g.name.toLowerCase().includes(q) ||
-      (g.description || '').toLowerCase().includes(q) ||
-      (g.developer || '').toLowerCase().includes(q)
-    );
-    if (!filtered.length) {
-      container.innerHTML = '<div class="search-empty">No results found.</div>';
-      return;
-    }
-    container.innerHTML = filtered.map(g => {
-      const origIdx = (window._gamesData || []).indexOf(g);
-      return `
-        <div class="search-item" onclick="openGameModal(${origIdx});navigateTo('home');">
-          <div class="search-item-icon">
-            <img src="${g.folder}/icon.png" alt="${escHtml(g.name)}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2244%22 height=%2244%22><rect width=%2244%22 height=%2244%22 fill=%22%23222%22/><text x=%2250%25%22 y=%2255%25%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22 font-size=%2218%22 fill=%22%23555%22>?</text></svg>'"/>
-          </div>
-          <div class="search-item-info">
-            <h3>${escHtml(g.name)}</h3>
-            <p>${escHtml(g.developer || g.description?.substring(0, 40) || '—')}</p>
-          </div>
-        </div>
-      `;
-    }).join('');
-  }
-  window.renderSearch = renderSearch;
-  window.onSearch = function(val) { renderSearch(window._gamesData, val); };
-
-  // ─────────────────────────────────────────────
-  // SHOP
-  // ─────────────────────────────────────────────
-  const SHOP_ITEMS = [
-    { id: 'hat_crewmate',  name: 'Crewmate Hat',       price: 50,  emoji: '🪖' },
-    { id: 'skin_red',      name: 'Red Skin',            price: 80,  emoji: '🔴' },
-    { id: 'pet_mini',      name: 'Mini Crewmate Pet',   price: 200, emoji: '👶' },
-    { id: 'hat_party',     name: 'Party Hat',           price: 60,  emoji: '🎉' },
-    { id: 'skin_ghost',    name: 'Ghost Skin',          price: 120, emoji: '👻' },
-    { id: 'boost_2x',      name: '2× Bean Boost',       price: 150, emoji: '⚡' },
+  window._QUEST_DEFS = [
+    { key: 'quest_play5',     title: 'Play 5 Games',      max: 5,  reward: 50,  icon: 'play',   desc: 'Play any 5 mini-games', section: 'Gameplay' },
+    { key: 'quest_play10',    title: 'Play 10 Games',     max: 10, reward: 100, icon: 'play',   desc: 'Play any 10 mini-games', section: 'Gameplay' },
+    { key: 'quest_play20',    title: 'Play 20 Games',     max: 20, reward: 250, icon: 'play',   desc: 'Play any 20 mini-games', section: 'Gameplay' },
+    { key: 'quest_visitShop', title: 'Visit the Shop',    max: 1,  reward: 20,  icon: 'shop',   desc: 'Browse the Skeld.G store', section: 'Social' },
+    { key: 'quest_login3',    title: 'Log in 3 Days',     max: 3,  reward: 60,  icon: 'cal',    desc: 'Return on 3 different days', section: 'Social' },
   ];
-  window.SHOP_ITEMS = SHOP_ITEMS;
 
-  function renderShop(inventory) {
-    const inv = inventory || window._userData?.inventory || [];
-    const grid = document.getElementById('shop-grid');
-    grid.innerHTML = SHOP_ITEMS.map(item => {
-      const owned = inv.includes(item.id);
-      return `
-        <div class="shop-card${owned ? ' owned' : ''}">
-          <div class="shop-card-img">${item.emoji}</div>
-          <div class="shop-card-body">
-            <div class="shop-card-title">${escHtml(item.name)}</div>
-            <div class="shop-card-price">
-              <img class="bean-icon" src="bean.png" alt="🫘" onerror="this.outerHTML='<span>🫘</span>'"/>
-              ${item.price}
-            </div>
-            ${owned
-              ? `<button class="btn-buy owned-btn" disabled>✓ Owned</button>`
-              : `<button class="btn-buy" onclick="buyItem('${item.id}', ${item.price}, '${escHtml(item.name)}')">Buy</button>`
-            }
+  function getQuestIcon(icon) {
+    const icons = {
+      play: '<path d="M8 5v14l11-7z"/>',
+      shop: '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>',
+      cal: '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+      trophy: '<path d="M8 21h8M12 17v4M7 4H4a1 1 0 0 0-1 1v2a4 4 0 0 0 4 4h10a4 4 0 0 0 4-4V5a1 1 0 0 0-1-1h-3"/><rect x="7" y="2" width="10" height="12" rx="2"/>',
+    };
+    return icons[icon] || icons.play;
+  }
+
+  function renderQuests(data) {
+    document.getElementById('quests-loading').style.display = 'none';
+    const container = document.getElementById('quests-container');
+    container.style.display = 'block';
+
+    const QUEST_DEFS = window._QUEST_DEFS;
+    let totalPossible = 0;
+    let totalEarnable = 0;
+    let sectionHTML = {};
+
+    QUEST_DEFS.forEach(q => {
+      const progress = data[q.key] ?? 0;
+      const claimedKey = 'claimed_' + q.key.replace('quest_', '');
+      const claimed = data[claimedKey] ?? false;
+      const complete = progress >= q.max;
+      const pct = Math.min(100, (progress / q.max) * 100);
+
+      totalPossible += q.reward;
+      if (!claimed) totalEarnable += q.reward;
+
+      const cardClass = ['quest-card', complete ? 'complete' : '', claimed ? 'claimed' : ''].join(' ').trim();
+      const iconClass = complete ? 'quest-icon-wrap done' : 'quest-icon-wrap';
+
+      const rightHTML = claimed
+        ? `<div class="quest-reward-badge"><img src="/bean.png" alt="" onerror="this.style.display='none'"/>${q.reward}</div><span class="btn-claimed">✓ Done</span>`
+        : complete
+          ? `<div class="quest-reward-badge"><img src="/bean.png" alt="" onerror="this.style.display='none'"/>${q.reward}</div><button class="btn-claim" onclick="claimQuest('${q.key}')">Claim!</button>`
+          : `<div class="quest-reward-badge"><img src="/bean.png" alt="" onerror="this.style.display='none'"/>${q.reward}</div>`;
+
+      const card = `
+        <div class="${cardClass}">
+          <div class="${iconClass}">
+            <svg viewBox="0 0 24 24">${getQuestIcon(q.icon)}</svg>
           </div>
-        </div>
-      `;
-    }).join('');
-  }
-  window.renderShop = renderShop;
-  renderShop([]);
+          <div class="quest-body">
+            <div class="quest-title">${q.title}</div>
+            <div class="quest-desc">${q.desc}</div>
+            <div class="quest-bar"><div class="quest-bar-fill ${complete ? 'done' : ''}" style="width:${pct}%"></div></div>
+            <div class="quest-counts"><span>${claimed ? 'Complete ✓' : `${progress} / ${q.max}`}</span><span>${q.section}</span></div>
+          </div>
+          <div class="quest-right">${rightHTML}</div>
+        </div>`;
 
-  // ─────────────────────────────────────────────
-  // QUESTS — fully dynamic based on user data
-  // ─────────────────────────────────────────────
-  function getQuestDefs(userData) {
-    const gamesPlayed = userData?.gamesPlayed || 0;
-    const beans = userData?.beans || 0;
-    const loginStreak = userData?.loginStreak || 0;
-    const visitedShop = userData?.visitedShop || false;
-    const inventoryCount = (userData?.inventory || []).length;
-    return [
-      {
-        id: 'q_play5',
-        title: 'Play 5 Games',
-        desc: 'Play any 5 mini-games',
-        reward: 50,
-        progress: Math.min(gamesPlayed, 5),
-        max: 5,
-        icon: 'play',
-      },
-      {
-        id: 'q_play20',
-        title: 'Play 20 Games',
-        desc: 'True crewmate grind',
-        reward: 150,
-        progress: Math.min(gamesPlayed, 20),
-        max: 20,
-        icon: 'play',
-      },
-      {
-        id: 'q_login3',
-        title: 'Login 3 Days',
-        desc: 'Log in 3 days in a row',
-        reward: 60,
-        progress: Math.min(loginStreak, 3),
-        max: 3,
-        icon: 'cal',
-      },
-      {
-        id: 'q_shop',
-        title: 'Visit the Shop',
-        desc: 'Browse the store',
-        reward: 20,
-        progress: visitedShop ? 1 : 0,
-        max: 1,
-        icon: 'shop',
-      },
-      {
-        id: 'q_buy1',
-        title: 'Buy an Item',
-        desc: 'Purchase from the shop',
-        reward: 40,
-        progress: Math.min(inventoryCount, 1),
-        max: 1,
-        icon: 'shop',
-      },
-      {
-        id: 'q_buy3',
-        title: 'Collect 3 Items',
-        desc: 'Build your collection',
-        reward: 100,
-        progress: Math.min(inventoryCount, 3),
-        max: 3,
-        icon: 'shop',
-      },
-      {
-        id: 'q_beans500',
-        title: 'Earn 500 Beans',
-        desc: 'Accumulate 500 beans total (incl. start)',
-        reward: 80,
-        progress: Math.min(beans, 500),
-        max: 500,
-        icon: 'bean',
-      },
-    ];
-  }
-
-  function renderQuests(userData) {
-    const list = document.getElementById('quests-list');
-    const claimed = userData?.claimedQuests || [];
-    const quests = getQuestDefs(userData);
-    const tab = window._currentQuestTab;
-
-    const filtered = quests.filter(q => {
-      const isComplete = q.progress >= q.max;
-      const isClaimed = claimed.includes(q.id);
-      if (tab === 'active') return !isClaimed;
-      return isClaimed;
+      if (!sectionHTML[q.section]) sectionHTML[q.section] = [];
+      sectionHTML[q.section].push(card);
     });
 
-    if (filtered.length === 0) {
-      list.innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--text-muted);font-size:14px;">${tab === 'completed' ? 'No completed quests yet.' : 'All quests done! 🎉'}</div>`;
-      return;
-    }
+    // Update summary
+    const completedCount = QUEST_DEFS.filter(q => {
+      const claimedKey = 'claimed_' + q.key.replace('quest_', '');
+      return data[claimedKey];
+    }).length;
+    document.getElementById('qs-sub').textContent = `${completedCount} / ${QUEST_DEFS.length} complete`;
+    document.getElementById('qs-total-reward').textContent = totalEarnable;
 
-    list.innerHTML = filtered.map(q => {
-      const pct = Math.min(100, (q.progress / q.max) * 100);
-      const isComplete = q.progress >= q.max;
-      const isClaimed = claimed.includes(q.id);
-      const iconSvg = {
-        play:   '<path d="M8 5v14l11-7z"/>',
-        trophy: '<path d="M8 21h8M12 17v4M7 4H4a1 1 0 0 0-1 1v2a4 4 0 0 0 4 4h10a4 4 0 0 0 4-4V5a1 1 0 0 0-1-1h-3"/><rect x="7" y="2" width="10" height="12" rx="2"/>',
-        shop:   '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>',
-        cal:    '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
-        bean:   '<ellipse cx="12" cy="12" rx="7" ry="9" fill="none"/><path d="M9 6c0 3 6 3 6 6s-6 3-6 6"/>',
-      }[q.icon] || '<circle cx="12" cy="12" r="10"/>';
-
-      return `
-        <div class="quest-item${isComplete ? ' completed' : ''}">
-          <div class="quest-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${iconSvg}</svg>
-          </div>
-          <div class="quest-info">
-            <h3>${escHtml(q.title)}</h3>
-            <div class="quest-progress-bar"><div class="quest-progress-fill" style="width:${pct}%"></div></div>
-            <div class="quest-meta"><span>${q.progress}/${q.max}</span><span>${escHtml(q.desc)}</span></div>
-          </div>
-          <div class="quest-reward">
-            <div class="quest-reward-row">
-              <img class="bean-icon" src="bean.png" alt="🫘" onerror="this.outerHTML='<span>🫘</span>'"/>
-              ${q.reward}
-            </div>
-            ${isComplete && !isClaimed
-              ? `<button class="btn-claim" onclick="claimQuest('${q.id}', ${q.reward})">CLAIM</button>`
-              : isClaimed
-              ? `<div class="claimed-badge">✓ Done</div>`
-              : ''
-            }
-          </div>
-        </div>
-      `;
-    }).join('');
+    container.innerHTML = Object.entries(sectionHTML).map(([section, cards]) =>
+      `<div class="section-label">${section}</div>${cards.join('')}`
+    ).join('');
   }
-  window.renderQuests = renderQuests;
 
-  window.claimQuest = function(questId, reward) {
-    if (window._claimQuest) window._claimQuest(questId, reward);
-  };
+  function updateBeansUI(amount) {
+    document.getElementById('header-beans').textContent = Number(amount).toLocaleString();
+  }
+  window.updateBeansUI = updateBeansUI;
 
-  window.switchQuestTab = function(tab) {
-    window._currentQuestTab = tab;
-    document.getElementById('tab-active').classList.toggle('active', tab === 'active');
-    document.getElementById('tab-completed').classList.toggle('active', tab === 'completed');
-    renderQuests(window._userData);
-  };
+  function showBeansPopup(amount) {
+    const badge = document.getElementById('beans-badge-header');
+    const rect = badge.getBoundingClientRect();
+    const pop = document.createElement('div');
+    pop.className = 'beans-earn-pop';
+    pop.textContent = '+' + amount + ' 🫘';
+    pop.style.left = rect.left + 'px';
+    pop.style.top = (rect.top - 10) + 'px';
+    document.body.appendChild(pop);
+    setTimeout(() => pop.remove(), 1500);
+  }
 
-  // ─────────────────────────────────────────────
-  // TOAST
-  // ─────────────────────────────────────────────
-  window.showToast = function(msg) {
+  function showToast(msg) {
     const t = document.getElementById('toast');
     t.textContent = msg;
     t.classList.add('show');
-    clearTimeout(t._timer);
-    t._timer = setTimeout(() => t.classList.remove('show'), 2800);
-  };
-
-  // ─────────────────────────────────────────────
-  // UTILS
-  // ─────────────────────────────────────────────
-  function escHtml(s) {
-    return String(s)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
+    setTimeout(() => t.classList.remove('show'), 2800);
   }
+  window.showToast = showToast;
 </script>
-
 </body>
- </html>
+</html>.

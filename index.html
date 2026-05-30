@@ -2,861 +2,657 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
 <title>Skeld.G — Game Launcher</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
 <style>
-/* ═══════════════════════════════════════════════════════
-   RESET & TOKENS
-═══════════════════════════════════════════════════════ */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-:root {
-  --bg:           #0e0e0e;
-  --surface:      #181818;
-  --surface2:     #202020;
-  --surface3:     #282828;
-  --border:       rgba(255,255,255,0.07);
-  --border-hi:    rgba(255,255,255,0.14);
-  --text:         #f0f0f0;
-  --text-muted:   #888;
-  --text-dim:     #444;
-  --accent:       #4ade80;
-  --accent-dim:   rgba(74,222,128,0.12);
-  --red:          #f87171;
-  --red-dim:      rgba(248,113,113,0.12);
-  --bean:         #e0623a;
-  --bean-dim:     rgba(224,98,58,0.15);
-  --yellow:       #facc15;
-  --blue:         #60a5fa;
-  --header-h:     58px;
-  --nav-h:        62px;
-  --radius:       14px;
-  --radius-sm:    9px;
-  --radius-xs:    6px;
-  --shadow:       0 4px 20px rgba(0,0,0,0.5);
-  --shadow-lg:    0 8px 32px rgba(0,0,0,0.65);
-  --transition:   0.18s ease;
-}
+  :root {
+    --bg: #111111;
+    --surface: #1a1a1a;
+    --surface2: #222222;
+    --surface3: #2a2a2a;
+    --border: rgba(255,255,255,0.07);
+    --text: #f0f0f0;
+    --text-muted: #888888;
+    --text-dim: #555555;
+    --accent: #4ade80;
+    --accent-dark: #16a34a;
+    --red: #f87171;
+    --bean: #e05c3a;
+    --header-h: 60px;
+    --nav-h: 64px;
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
 
-html, body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Nunito', sans-serif;
-  min-height: 100svh;
-  overflow-x: hidden;
-  -webkit-tap-highlight-color: transparent;
-  -webkit-font-smoothing: antialiased;
-  overscroll-behavior: none;
-}
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-font-smoothing: antialiased;
+  }
 
-::-webkit-scrollbar { width: 3px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 4px; }
 
-/* ═══════════════════════════════════════════════════════
-   SKELETON LOADER
-═══════════════════════════════════════════════════════ */
-@keyframes shimmer {
-  0%   { background-position: -200% 0; }
-  100% { background-position:  200% 0; }
-}
-.skeleton {
-  background: linear-gradient(90deg, var(--surface2) 25%, var(--surface3) 50%, var(--surface2) 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.4s infinite;
-  border-radius: var(--radius-xs);
-}
+  /* ── HEADER ── */
+  #header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    height: var(--header-h);
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px;
+    gap: 8px;
+  }
+  .header-logo {
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'Space Mono', monospace;
+    font-weight: 700; font-size: 15px;
+    color: var(--text);
+    letter-spacing: -0.5px;
+    text-decoration: none;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+  .header-logo span { color: var(--accent); }
+  .header-title {
+    font-size: 14px; font-weight: 700;
+    color: var(--text-muted);
+    text-align: center;
+    flex: 1;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .header-right {
+    display: flex; align-items: center; gap: 8px;
+    flex-shrink: 0;
+  }
+  .beans-badge {
+    display: flex; align-items: center; gap: 5px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 10px 4px 6px;
+    font-size: 13px; font-weight: 800;
+    color: var(--bean);
+    cursor: default;
+    transition: transform 0.2s;
+  }
+  .beans-badge.bump { animation: beanBump 0.35s ease; }
+  @keyframes beanBump {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.25); }
+    100% { transform: scale(1); }
+  }
+  .beans-badge .bean-icon { width: 18px; height: 18px; object-fit: contain; }
+  .avatar-btn {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--surface3);
+    border: 2px solid var(--border);
+    overflow: hidden; cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .avatar-btn:hover { border-color: var(--accent); transform: scale(1.05); }
+  .avatar-btn img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+  .avatar-btn svg { width: 18px; height: 18px; fill: var(--text-muted); }
 
-/* ═══════════════════════════════════════════════════════
-   HEADER
-═══════════════════════════════════════════════════════ */
-#header {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  height: var(--header-h);
-  background: var(--bg);
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 14px;
-  gap: 8px;
-  /* prevent layout shift */
-  contain: layout style;
-}
-.header-logo {
-  font-family: 'Space Mono', monospace;
-  font-weight: 700; font-size: 14px;
-  color: var(--text);
-  letter-spacing: -0.5px;
-  text-decoration: none;
-  flex-shrink: 0;
-  cursor: pointer;
-  user-select: none;
-  display: flex; align-items: center; gap: 6px;
-}
-.header-logo .dot { color: var(--accent); }
-.header-title {
-  font-size: 13px; font-weight: 700;
-  color: var(--text-muted);
-  text-align: center; flex: 1;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  /* stable width prevents shift */
-  min-width: 0;
-}
-.header-right {
-  display: flex; align-items: center; gap: 7px;
-  flex-shrink: 0;
-  /* reserve space before avatar loads */
-  min-width: calc(32px + 7px + 66px);
-  justify-content: flex-end;
-}
+  /* ── PAGES ── */
+  #app {
+    padding-top: var(--header-h);
+    padding-bottom: var(--nav-h);
+    min-height: 100vh;
+  }
+  .page { display: none; animation: fadeIn 0.2s ease; }
+  .page.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-/* Beans badge */
-.beans-badge {
-  display: flex; align-items: center; gap: 4px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 4px 9px 4px 5px;
-  font-size: 12px; font-weight: 800;
-  color: var(--bean);
-  cursor: default;
-  white-space: nowrap;
-  /* fixed min width prevents jump when number changes */
-  min-width: 54px;
-}
-.beans-badge .bean-icon { width: 16px; height: 16px; object-fit: contain; flex-shrink: 0; }
-@keyframes beanBump {
-  0%,100% { transform: scale(1); }
-  40%      { transform: scale(1.28); }
-}
-.beans-badge.bump { animation: beanBump 0.35s ease; }
+  /* ── HOME PAGE ── */
+  #page-home { padding: 20px 16px; }
+  .home-hero {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px;
+  }
+  .home-hero-text h1 {
+    font-size: 28px; font-weight: 900;
+    line-height: 1.1;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .home-hero-text h1 span { color: var(--accent); }
+  .home-hero-text p { font-size: 13px; color: var(--text-muted); line-height: 1.5; max-width: 200px; }
+  .home-hero-icon {
+    flex-shrink: 0; width: 72px; height: 72px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .home-hero-icon svg { width: 72px; height: 72px; }
 
-/* Avatar */
-.avatar-btn {
-  width: 32px; height: 32px;
-  border-radius: 50%;
-  background: var(--surface3);
-  border: 2px solid var(--border);
-  overflow: hidden; cursor: pointer;
-  transition: border-color var(--transition), transform 0.15s;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-.avatar-btn:hover { border-color: var(--accent); }
-.avatar-btn:active { transform: scale(0.92); }
-.avatar-btn img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
-.avatar-btn .avatar-placeholder { width: 16px; height: 16px; fill: var(--text-muted); }
+  .section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .section-header h2 { font-size: 16px; font-weight: 800; }
+  .section-header a { font-size: 12px; color: var(--accent); font-weight: 700; text-decoration: none; cursor: pointer; }
 
-/* ═══════════════════════════════════════════════════════
-   PAGES
-═══════════════════════════════════════════════════════ */
-#app {
-  padding-top: var(--header-h);
-  padding-bottom: var(--nav-h);
-  min-height: 100svh;
-}
-.page { display: none; }
-.page.active {
-  display: block;
-  animation: pgIn 0.22s ease both;
-}
-@keyframes pgIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  .game-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 12px;
+  }
+  .game-slot {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.18s, border-color 0.18s, box-shadow 0.18s;
+    aspect-ratio: 1;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 12px 8px;
+    gap: 8px;
+    position: relative;
+  }
+  .game-slot:hover { transform: scale(1.04); border-color: rgba(255,255,255,0.15); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+  .game-slot:active { transform: scale(0.97); }
+  .game-slot-icon {
+    width: 56px; height: 56px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--surface2);
+    flex-shrink: 0;
+  }
+  .game-slot-icon img { width: 100%; height: 100%; object-fit: cover; }
+  .game-slot-name {
+    font-size: 11px; font-weight: 700;
+    text-align: center; line-height: 1.3;
+    color: var(--text);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
 
-/* ═══════════════════════════════════════════════════════
-   SECTION HEADER
-═══════════════════════════════════════════════════════ */
-.section-header {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 12px;
-}
-.section-header h2 { font-size: 15px; font-weight: 800; }
-.section-header-action {
-  font-size: 11px; color: var(--accent); font-weight: 700;
-  text-decoration: none; cursor: pointer;
-  background: none; border: none; padding: 0; font-family: inherit;
-}
+  /* ── SEARCH PAGE ── */
+  #page-search { padding: 20px 16px; }
+  .search-bar {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    margin-bottom: 20px;
+    transition: border-color 0.2s;
+  }
+  .search-bar:focus-within { border-color: rgba(255,255,255,0.2); }
+  .search-bar svg { width: 18px; height: 18px; stroke: var(--text-muted); flex-shrink: 0; }
+  .search-bar input {
+    background: none; border: none; outline: none;
+    color: var(--text); font-family: 'Nunito', sans-serif;
+    font-size: 14px; font-weight: 600; flex: 1;
+  }
+  .search-bar input::placeholder { color: var(--text-dim); }
+  .search-results { display: flex; flex-direction: column; gap: 10px; }
+  .search-item {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    cursor: pointer;
+    transition: border-color 0.18s, transform 0.15s;
+  }
+  .search-item:hover { border-color: rgba(255,255,255,0.15); transform: translateX(3px); }
+  .search-item-icon { width: 44px; height: 44px; border-radius: 10px; overflow: hidden; background: var(--surface2); flex-shrink: 0; }
+  .search-item-icon img { width: 100%; height: 100%; object-fit: cover; }
+  .search-item-info h3 { font-size: 14px; font-weight: 700; }
+  .search-item-info p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .search-empty { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 14px; }
 
-/* ═══════════════════════════════════════════════════════
-   HOME PAGE
-═══════════════════════════════════════════════════════ */
-#page-home { padding: 16px 14px 8px; }
+  /* ── SHOP PAGE ── */
+  #page-shop { padding: 20px 16px; }
+  .shop-header-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .shop-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .shop-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: transform 0.18s, border-color 0.18s;
+  }
+  .shop-card:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.13); }
+  .shop-card-img {
+    width: 100%; aspect-ratio: 1;
+    background: var(--surface2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 40px;
+  }
+  .shop-card.owned .shop-card-img { opacity: 0.5; }
+  .shop-card-body { padding: 10px 12px 12px; }
+  .shop-card-title { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .shop-card-price {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 13px; font-weight: 800; color: var(--bean);
+    margin-bottom: 8px;
+  }
+  .shop-card-price .bean-icon { width: 14px; height: 14px; object-fit: contain; }
+  .btn-buy {
+    width: 100%;
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-size: 12px; font-weight: 700;
+    border-radius: 8px;
+    padding: 7px;
+    cursor: pointer;
+    transition: background 0.18s, border-color 0.18s, transform 0.15s;
+  }
+  .btn-buy:hover:not(:disabled) { background: var(--accent); border-color: var(--accent); color: #111; }
+  .btn-buy:active:not(:disabled) { transform: scale(0.96); }
+  .btn-buy:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-buy.owned-btn { background: rgba(74,222,128,0.1); border-color: rgba(74,222,128,0.3); color: var(--accent); }
 
-.home-hero {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 18px;
-  margin-bottom: 20px;
-  display: flex; align-items: center; justify-content: space-between; gap: 12px;
-}
-.home-hero-text h1 {
-  font-size: 26px; font-weight: 900; line-height: 1.1;
-  margin-bottom: 5px;
-}
-.home-hero-text h1 span { color: var(--accent); }
-.home-hero-text p { font-size: 12px; color: var(--text-muted); line-height: 1.5; max-width: 180px; }
-.home-hero-icon { flex-shrink: 0; width: 68px; height: 68px; }
-.home-hero-icon svg { width: 68px; height: 68px; }
+  /* ── QUESTS PAGE ── */
+  #page-quests { padding: 20px 16px; }
+  .quest-tabs {
+    display: flex; gap: 8px; margin-bottom: 16px;
+  }
+  .quest-tab {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px; font-weight: 700;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-muted);
+    transition: all 0.18s;
+  }
+  .quest-tab.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #111;
+  }
+  .quest-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 14px;
+    transition: border-color 0.2s;
+  }
+  .quest-item.completed { border-color: rgba(74,222,128,0.25); background: rgba(74,222,128,0.04); }
+  .quest-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: var(--surface2);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .quest-icon svg { width: 20px; height: 20px; stroke: var(--accent); }
+  .quest-item.completed .quest-icon svg { stroke: var(--accent); }
+  .quest-info { flex: 1; }
+  .quest-info h3 { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .quest-progress-bar {
+    height: 4px; background: var(--surface3);
+    border-radius: 4px; overflow: hidden; margin-bottom: 4px;
+  }
+  .quest-progress-fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.5s; }
+  .quest-item.completed .quest-progress-fill { background: var(--accent); }
+  .quest-meta { font-size: 11px; color: var(--text-muted); display: flex; justify-content: space-between; }
+  .quest-reward { display: flex; align-items: center; gap: 3px; font-size: 12px; font-weight: 800; color: var(--bean); flex-shrink: 0; flex-direction: column; align-items: flex-end; }
+  .quest-reward .bean-icon { width: 14px; height: 14px; object-fit: contain; }
+  .quest-reward-row { display: flex; align-items: center; gap: 3px; }
+  .btn-claim {
+    margin-top: 4px;
+    background: var(--accent); color: #111;
+    border: none; border-radius: 6px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 10px; font-weight: 800;
+    padding: 3px 8px; cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .btn-claim:active { transform: scale(0.95); }
+  .claimed-badge {
+    font-size: 10px; color: var(--accent); font-weight: 700; margin-top: 2px;
+  }
 
-/* Recently Played */
-.recently-played-row {
-  display: flex; gap: 8px;
-  overflow-x: auto;
-  padding-bottom: 4px;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  margin-bottom: 20px;
-}
-.recently-played-row::-webkit-scrollbar { display: none; }
-.recent-chip {
-  display: flex; align-items: center; gap: 7px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 5px 10px 5px 5px;
-  cursor: pointer; flex-shrink: 0;
-  font-size: 11px; font-weight: 700; color: var(--text);
-  transition: border-color var(--transition), transform 0.15s;
-}
-.recent-chip:hover { border-color: var(--border-hi); }
-.recent-chip:active { transform: scale(0.95); }
-.recent-chip-img {
-  width: 22px; height: 22px; border-radius: 5px;
-  background: var(--surface3); overflow: hidden; flex-shrink: 0;
-}
-.recent-chip-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  /* ── PROFILE PAGE ── */
+  #page-profile { padding: 20px 16px; }
+  .profile-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 20px;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 10px; margin-bottom: 20px; text-align: center;
+  }
+  .profile-avatar {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: var(--surface3);
+    border: 3px solid var(--border);
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .profile-avatar svg { width: 40px; height: 40px; fill: var(--text-muted); }
+  .profile-name { font-size: 18px; font-weight: 800; }
+  .profile-email { font-size: 12px; color: var(--text-muted); }
+  .profile-beans-row {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 15px; font-weight: 800; color: var(--bean);
+  }
+  .profile-beans-row .bean-icon { width: 20px; height: 20px; object-fit: contain; }
+  .stat-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+    margin-bottom: 20px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 10px;
+    text-align: center;
+  }
+  .stat-card .stat-val { font-size: 20px; font-weight: 900; }
+  .stat-card .stat-label { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 
-/* Game Grid */
-.game-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
-  gap: 10px;
-}
-.game-slot {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-  cursor: pointer;
-  transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
-  aspect-ratio: 1;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: 10px 6px; gap: 7px;
-  position: relative;
-}
-.game-slot:hover { transform: scale(1.04); border-color: var(--border-hi); box-shadow: var(--shadow); }
-.game-slot:active { transform: scale(0.96); }
-.game-slot-fav {
-  position: absolute; top: 5px; right: 5px;
-  width: 18px; height: 18px;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-.game-slot:hover .game-slot-fav,
-.game-slot.is-fav .game-slot-fav { opacity: 1; }
-.game-slot.is-fav .game-slot-fav svg { fill: var(--yellow); stroke: var(--yellow); }
-.game-slot-fav svg { width: 14px; height: 14px; fill: none; stroke: var(--text-muted); stroke-width: 2; }
-.game-slot-icon {
-  width: 52px; height: 52px;
-  border-radius: 11px; overflow: hidden;
-  background: var(--surface2); flex-shrink: 0;
-}
-.game-slot-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.game-slot-name {
-  font-size: 10px; font-weight: 700;
-  text-align: center; line-height: 1.3; color: var(--text);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
+  .profile-section-title { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+  .profile-info-row {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 8px;
+    font-size: 13px;
+  }
+  .profile-info-row span:first-child { color: var(--text-muted); }
+  .profile-info-row span:last-child { font-weight: 700; }
+  .btn-signout {
+    width: 100%;
+    background: rgba(248,113,113,0.1);
+    border: 1px solid rgba(248,113,113,0.3);
+    color: var(--red);
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px; font-weight: 700;
+    border-radius: var(--radius-sm);
+    padding: 13px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.2s, border-color 0.2s, transform 0.15s;
+  }
+  .btn-signout:hover { background: rgba(248,113,113,0.2); }
+  .btn-signout:active { transform: scale(0.98); }
 
-/* Skeleton slots */
-.game-slot-skel .game-slot-icon { background: none; }
-.game-slot-skel .skel-icon { width: 52px; height: 52px; border-radius: 11px; }
-.game-slot-skel .skel-name { width: 60px; height: 10px; margin-top: 4px; }
+  /* ── BOTTOM NAV ── */
+  #bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+    height: var(--nav-h);
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    display: flex; align-items: stretch;
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 4px; cursor: pointer;
+    transition: opacity 0.15s;
+    -webkit-tap-highlight-color: transparent;
+    position: relative;
+    padding-bottom: 6px;
+  }
+  .nav-item svg { width: 22px; height: 22px; stroke: var(--text-dim); transition: stroke 0.15s, transform 0.15s; stroke-width: 2; fill: none; }
+  .nav-item span { font-size: 10px; font-weight: 700; color: var(--text-dim); transition: color 0.15s; }
+  .nav-item.active svg { stroke: var(--accent); transform: scale(1.1); }
+  .nav-item.active span { color: var(--accent); }
+  .nav-item.active::after {
+    content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 20px; height: 2px; background: var(--accent); border-radius: 0 0 2px 2px;
+  }
+  .nav-item:active svg { transform: scale(0.92); }
 
-/* Empty/Error states */
-.state-empty {
-  grid-column: 1 / -1;
-  text-align: center; padding: 36px 16px;
-  color: var(--text-muted); font-size: 13px; line-height: 1.7;
-}
-.state-empty strong { display: block; font-size: 28px; margin-bottom: 6px; }
+  /* ── AUTH OVERLAY ── */
+  #auth-overlay {
+    position: fixed; inset: 0; z-index: 200;
+    background: var(--bg);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 32px 24px;
+  }
+  #auth-overlay.hidden { display: none; }
+  .auth-logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 28px; font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+    letter-spacing: -1px;
+  }
+  .auth-logo span { color: var(--accent); }
+  .auth-tagline { font-size: 14px; color: var(--text-muted); text-align: center; margin-bottom: 40px; line-height: 1.5; }
+  .auth-art {
+    width: 120px; height: 120px; margin-bottom: 28px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .btn-google {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px; font-weight: 700;
+    border-radius: var(--radius-sm);
+    padding: 13px 24px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, transform 0.15s;
+    width: 100%; max-width: 320px; justify-content: center;
+  }
+  .btn-google:hover { background: var(--surface2); border-color: rgba(255,255,255,0.15); }
+  .btn-google:active { transform: scale(0.97); }
+  .google-icon { width: 20px; height: 20px; }
 
-/* ═══════════════════════════════════════════════════════
-   SEARCH PAGE
-═══════════════════════════════════════════════════════ */
-#page-search { padding: 16px 14px; }
+  /* ── GAME DETAIL MODAL ── */
+  #modal-overlay {
+    position: fixed; inset: 0; z-index: 150;
+    background: rgba(0,0,0,0.75);
+    display: flex; align-items: flex-end; justify-content: center;
+    padding: 0;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.25s;
+  }
+  #modal-overlay.open { opacity: 1; pointer-events: all; }
+  #modal-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px 24px 0 0;
+    width: 100%; max-width: 520px;
+    padding: 24px 20px;
+    transform: translateY(100%);
+    transition: transform 0.28s cubic-bezier(0.32,0.72,0,1);
+    max-height: 88vh;
+    overflow-y: auto;
+  }
+  #modal-overlay.open #modal-card { transform: translateY(0); }
+  .modal-drag-handle {
+    width: 36px; height: 4px; background: var(--surface3);
+    border-radius: 4px; margin: 0 auto 20px;
+  }
+  .modal-top {
+    display: flex; gap: 16px; align-items: flex-start; margin-bottom: 20px;
+  }
+  .modal-icon {
+    width: 80px; height: 80px; border-radius: 18px;
+    overflow: hidden; background: var(--surface2); flex-shrink: 0;
+  }
+  .modal-icon img { width: 100%; height: 100%; object-fit: cover; }
+  .modal-info { flex: 1; }
+  .modal-info h2 { font-size: 20px; font-weight: 900; margin-bottom: 6px; line-height: 1.2; }
+  .modal-meta-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+  .chip {
+    font-size: 10px; font-weight: 700;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 20px; padding: 3px 8px; color: var(--text-muted);
+  }
+  .modal-desc {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 14px;
+  }
+  .modal-desc-label {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 700; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+  .modal-desc-label svg { width: 14px; height: 14px; stroke: var(--text-muted); }
+  .modal-desc p { font-size: 13px; color: var(--text); line-height: 1.6; }
+  .modal-stats-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+    margin-bottom: 14px;
+  }
+  .modal-stat {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 8px;
+    text-align: center;
+  }
+  .modal-stat-val { font-size: 14px; font-weight: 800; }
+  .modal-stat-label { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+  .modal-earnings {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 14px;
+  }
+  .modal-earnings .bean-icon { width: 28px; height: 28px; object-fit: contain; }
+  .modal-earnings-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+  .modal-earnings-val { font-size: 28px; font-weight: 900; color: var(--bean); line-height: 1; }
+  .modal-btns { display: flex; gap: 10px; margin-bottom: 10px; }
+  .btn-play {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
+    background: #4ade80; color: #111;
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px; font-weight: 800;
+    border: none; border-radius: var(--radius-sm);
+    padding: 14px; cursor: pointer;
+    transition: background 0.18s, transform 0.15s;
+  }
+  .btn-play:hover { background: #22c55e; }
+  .btn-play:active { transform: scale(0.97); }
+  .btn-play svg { width: 16px; height: 16px; fill: #111; }
+  .btn-return {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
+    background: var(--surface3); color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px; font-weight: 800;
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 14px; cursor: pointer;
+    transition: background 0.18s, transform 0.15s;
+  }
+  .btn-return:hover { background: var(--surface2); }
+  .btn-return:active { transform: scale(0.97); }
+  .btn-return svg { width: 16px; height: 16px; stroke: var(--text); }
+  .btn-quests-row {
+    width: 100%; display: flex; align-items: center; justify-content: space-between;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 14px 16px;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px; font-weight: 700; color: var(--text);
+    transition: background 0.18s, border-color 0.18s, transform 0.15s;
+  }
+  .btn-quests-row:hover { background: var(--surface3); border-color: rgba(255,255,255,0.12); }
+  .btn-quests-row:active { transform: scale(0.98); }
+  .btn-quests-row-left { display: flex; align-items: center; gap: 10px; }
+  .btn-quests-row svg.q-icon { width: 18px; height: 18px; stroke: var(--text-muted); }
+  .btn-quests-row svg.arrow { width: 16px; height: 16px; stroke: var(--text-muted); }
 
-.search-bar {
-  display: flex; align-items: center; gap: 9px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 9px 12px;
-  margin-bottom: 16px;
-  transition: border-color var(--transition);
-}
-.search-bar:focus-within { border-color: var(--border-hi); }
-.search-bar svg { width: 17px; height: 17px; stroke: var(--text-muted); flex-shrink: 0; }
-.search-bar input {
-  background: none; border: none; outline: none;
-  color: var(--text); font-family: 'Nunito', sans-serif;
-  font-size: 14px; font-weight: 600; flex: 1; min-width: 0;
-}
-.search-bar input::placeholder { color: var(--text-dim); }
-.search-clear {
-  background: none; border: none; padding: 0; cursor: pointer;
-  color: var(--text-muted); font-size: 17px; line-height: 1;
-  display: none;
-}
-.search-clear.visible { display: block; }
+  .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid var(--surface3);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    margin: 40px auto;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
-.search-results { display: flex; flex-direction: column; gap: 8px; }
-.search-item {
-  display: flex; align-items: center; gap: 11px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 11px 12px;
-  cursor: pointer;
-  transition: border-color var(--transition), transform 0.15s;
-}
-.search-item:hover { border-color: var(--border-hi); transform: translateX(2px); }
-.search-item:active { transform: scale(0.98); }
-.search-item-icon {
-  width: 42px; height: 42px; border-radius: 9px;
-  overflow: hidden; background: var(--surface2); flex-shrink: 0;
-}
-.search-item-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.search-item-info { flex: 1; min-width: 0; }
-.search-item-info h3 { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.search-item-info p { font-size: 11px; color: var(--text-muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.search-item-bean {
-  display: flex; align-items: center; gap: 3px;
-  font-size: 11px; font-weight: 800; color: var(--bean);
-  flex-shrink: 0;
-}
-.search-item-bean img { width: 12px; height: 12px; object-fit: contain; }
-.search-empty {
-  text-align: center; padding: 36px 16px;
-  color: var(--text-muted); font-size: 13px;
-}
-.search-empty strong { display: block; font-size: 26px; margin-bottom: 6px; }
+  #toast {
+    position: fixed; bottom: calc(var(--nav-h) + 12px); left: 50%; z-index: 999;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 18px;
+    font-size: 13px; font-weight: 600;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+    white-space: nowrap;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-/* ═══════════════════════════════════════════════════════
-   QUESTS PAGE
-═══════════════════════════════════════════════════════ */
-#page-quests { padding: 16px 14px; }
-
-.quest-tabs {
-  display: flex; gap: 6px; margin-bottom: 14px;
-  overflow-x: auto; scrollbar-width: none;
-}
-.quest-tabs::-webkit-scrollbar { display: none; }
-.quest-tab {
-  padding: 5px 13px;
-  border-radius: 20px;
-  font-size: 11px; font-weight: 700;
-  cursor: pointer;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text-muted);
-  transition: all var(--transition);
-  white-space: nowrap; flex-shrink: 0;
-}
-.quest-tab.active {
-  background: var(--accent); border-color: var(--accent); color: #111;
-}
-
-.quest-period-label {
-  font-size: 10px; font-weight: 700;
-  color: var(--text-dim); text-transform: uppercase;
-  letter-spacing: 0.1em; margin-bottom: 8px; margin-top: 4px;
-}
-
-.quest-item {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 13px 14px;
-  margin-bottom: 8px;
-  display: flex; align-items: center; gap: 12px;
-  transition: border-color var(--transition);
-}
-.quest-item.completed { border-color: rgba(74,222,128,0.2); background: rgba(74,222,128,0.03); }
-.quest-icon {
-  width: 38px; height: 38px; border-radius: 9px;
-  background: var(--surface2);
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-.quest-icon svg { width: 18px; height: 18px; stroke: var(--accent); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.quest-info { flex: 1; min-width: 0; }
-.quest-info h3 { font-size: 12px; font-weight: 700; margin-bottom: 5px; }
-.quest-progress-bar {
-  height: 3px; background: var(--surface3);
-  border-radius: 3px; overflow: hidden; margin-bottom: 4px;
-}
-.quest-progress-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.6s ease; }
-.quest-meta { font-size: 10px; color: var(--text-muted); display: flex; justify-content: space-between; }
-.quest-right {
-  display: flex; flex-direction: column; align-items: flex-end; gap: 3px; flex-shrink: 0;
-}
-.quest-reward-row {
-  display: flex; align-items: center; gap: 3px;
-  font-size: 11px; font-weight: 800; color: var(--bean);
-}
-.quest-reward-row img { width: 12px; height: 12px; object-fit: contain; }
-.btn-claim {
-  background: var(--accent); color: #111;
-  border: none; border-radius: 5px;
-  font-family: 'Nunito', sans-serif;
-  font-size: 9px; font-weight: 800;
-  padding: 3px 7px; cursor: pointer;
-  transition: transform 0.15s, background var(--transition);
-  letter-spacing: 0.04em;
-}
-.btn-claim:hover { background: #22c55e; }
-.btn-claim:active { transform: scale(0.93); }
-.claimed-badge { font-size: 9px; color: var(--accent); font-weight: 700; }
-
-/* ═══════════════════════════════════════════════════════
-   PROFILE PAGE
-═══════════════════════════════════════════════════════ */
-#page-profile { padding: 16px 14px; }
-
-.profile-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 22px 18px;
-  display: flex; flex-direction: column; align-items: center;
-  gap: 9px; margin-bottom: 16px; text-align: center;
-}
-.profile-avatar {
-  width: 76px; height: 76px; border-radius: 50%;
-  background: var(--surface3);
-  border: 3px solid var(--border);
-  overflow: hidden;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-.profile-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.profile-avatar svg { width: 36px; height: 36px; fill: var(--text-muted); }
-.profile-name { font-size: 17px; font-weight: 800; }
-.profile-email { font-size: 11px; color: var(--text-muted); word-break: break-all; }
-.profile-beans-row {
-  display: flex; align-items: center; gap: 5px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 5px 14px;
-  font-size: 14px; font-weight: 800; color: var(--bean);
-}
-.profile-beans-row img { width: 18px; height: 18px; object-fit: contain; }
-
-.stat-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
-  margin-bottom: 16px;
-}
-.stat-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 12px 8px; text-align: center;
-}
-.stat-card .stat-val { font-size: 19px; font-weight: 900; }
-.stat-card .stat-label { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
-
-.profile-section-title {
-  font-size: 10px; font-weight: 700; color: var(--text-dim);
-  text-transform: uppercase; letter-spacing: 0.1em;
-  margin-bottom: 8px;
-}
-.profile-info-row {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 11px 13px;
-  display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 6px; font-size: 12px; gap: 10px;
-}
-.profile-info-row .info-label { color: var(--text-muted); flex-shrink: 0; }
-.profile-info-row .info-val { font-weight: 700; text-align: right; word-break: break-all; min-width: 0; }
-.profile-info-row .info-val.mono { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--text-muted); }
-
-/* UID row */
-.uid-row {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 11px 13px;
-  display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 6px; gap: 10px;
-}
-.uid-row-label { font-size: 12px; color: var(--text-muted); flex-shrink: 0; }
-.uid-row-right { display: flex; align-items: center; gap: 8px; min-width: 0; }
-.uid-display {
-  font-family: 'Space Mono', monospace;
-  font-size: 9px; color: var(--text-muted);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  max-width: 150px;
-}
-.btn-copy-uid {
-  background: var(--surface3);
-  border: 1px solid var(--border);
-  color: var(--text-muted);
-  font-family: 'Nunito', sans-serif;
-  font-size: 10px; font-weight: 700;
-  border-radius: var(--radius-xs);
-  padding: 3px 8px; cursor: pointer;
-  transition: all var(--transition);
-  flex-shrink: 0;
-  white-space: nowrap;
-}
-.btn-copy-uid:hover { background: var(--surface2); border-color: var(--border-hi); color: var(--text); }
-.btn-copy-uid:active { transform: scale(0.94); }
-@keyframes copyPop {
-  0%,100% { transform: scale(1); }
-  40%      { transform: scale(1.12); }
-}
-.btn-copy-uid.copied {
-  background: var(--accent-dim);
-  border-color: rgba(74,222,128,0.3);
-  color: var(--accent);
-  animation: copyPop 0.3s ease;
-}
-
-.btn-signout {
-  width: 100%;
-  background: var(--red-dim);
-  border: 1px solid rgba(248,113,113,0.25);
-  color: var(--red);
-  font-family: 'Nunito', sans-serif;
-  font-size: 13px; font-weight: 700;
-  border-radius: var(--radius-sm);
-  padding: 12px; cursor: pointer; margin-top: 8px;
-  transition: background var(--transition), transform 0.15s;
-}
-.btn-signout:hover { background: rgba(248,113,113,0.2); }
-.btn-signout:active { transform: scale(0.98); }
-
-/* Favorites section */
-.fav-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
-  gap: 8px;
-  margin-bottom: 16px;
-}
-.fav-slot {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  aspect-ratio: 1;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  gap: 5px; cursor: pointer;
-  transition: transform 0.15s, border-color var(--transition);
-  padding: 6px 4px;
-}
-.fav-slot:hover { transform: scale(1.05); border-color: var(--border-hi); }
-.fav-slot:active { transform: scale(0.95); }
-.fav-slot-img {
-  width: 38px; height: 38px; border-radius: 8px;
-  background: var(--surface2); overflow: hidden;
-}
-.fav-slot-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.fav-slot-name { font-size: 9px; font-weight: 700; text-align: center; line-height: 1.2; color: var(--text); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-.fav-empty { font-size: 11px; color: var(--text-muted); padding: 12px 0 4px; }
-
-/* ═══════════════════════════════════════════════════════
-   BOTTOM NAV
-═══════════════════════════════════════════════════════ */
-#bottom-nav {
-  position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
-  height: var(--nav-h);
-  background: var(--bg);
-  border-top: 1px solid var(--border);
-  display: flex; align-items: stretch;
-}
-.nav-item {
-  flex: 1; display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  gap: 3px; cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  position: relative; padding-bottom: 6px;
-  transition: opacity 0.15s;
-}
-.nav-item svg {
-  width: 21px; height: 21px;
-  stroke: var(--text-dim); fill: none;
-  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
-  transition: stroke var(--transition), transform 0.15s;
-}
-.nav-item span {
-  font-size: 9px; font-weight: 700;
-  color: var(--text-dim);
-  transition: color var(--transition);
-}
-.nav-item.active svg { stroke: var(--accent); transform: scale(1.08); }
-.nav-item.active span { color: var(--accent); }
-.nav-item.active::after {
-  content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-  width: 18px; height: 2px; background: var(--accent); border-radius: 0 0 2px 2px;
-}
-.nav-item:active svg { transform: scale(0.9); }
-
-/* ═══════════════════════════════════════════════════════
-   AUTH OVERLAY
-═══════════════════════════════════════════════════════ */
-#auth-overlay {
-  position: fixed; inset: 0; z-index: 200;
-  background: var(--bg);
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: 32px 24px;
-  transition: opacity 0.3s;
-}
-#auth-overlay.hidden {
-  opacity: 0; pointer-events: none;
-  /* keep in DOM but invisible for transition */
-}
-.auth-logo {
-  font-family: 'Space Mono', monospace;
-  font-size: 26px; font-weight: 700;
-  color: var(--text); margin-bottom: 6px; letter-spacing: -1px;
-}
-.auth-logo span { color: var(--accent); }
-.auth-tagline {
-  font-size: 13px; color: var(--text-muted); text-align: center;
-  margin-bottom: 32px; line-height: 1.6;
-}
-.auth-art {
-  width: 110px; height: 110px; margin-bottom: 24px;
-  display: flex; align-items: center; justify-content: center;
-}
-.btn-google {
-  display: flex; align-items: center; gap: 9px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--text);
-  font-family: 'Nunito', sans-serif;
-  font-size: 14px; font-weight: 700;
-  border-radius: var(--radius-sm);
-  padding: 12px 22px;
-  cursor: pointer;
-  transition: background var(--transition), border-color var(--transition), transform 0.15s;
-  width: 100%; max-width: 310px; justify-content: center;
-}
-.btn-google:hover { background: var(--surface2); border-color: var(--border-hi); }
-.btn-google:active { transform: scale(0.97); }
-.btn-google:disabled { opacity: 0.5; pointer-events: none; }
-.google-icon { width: 18px; height: 18px; flex-shrink: 0; }
-.auth-spinner {
-  width: 26px; height: 26px; margin-top: 14px;
-  border: 2.5px solid var(--surface3);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-  display: none;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-.auth-spinner.visible { display: block; }
-
-/* ═══════════════════════════════════════════════════════
-   MODAL
-═══════════════════════════════════════════════════════ */
-#modal-overlay {
-  position: fixed; inset: 0; z-index: 150;
-  background: rgba(0,0,0,0.72);
-  display: flex; align-items: flex-end; justify-content: center;
-  opacity: 0; pointer-events: none;
-  transition: opacity 0.22s;
-}
-#modal-overlay.open { opacity: 1; pointer-events: all; }
-#modal-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 22px 22px 0 0;
-  width: 100%; max-width: 520px;
-  padding: 0 18px 24px;
-  transform: translateY(100%);
-  transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
-  max-height: 90svh; overflow-y: auto;
-  overscroll-behavior: contain;
-  /* focus trap sentinel */
-  outline: none;
-}
-#modal-overlay.open #modal-card { transform: translateY(0); }
-
-.modal-drag-handle {
-  width: 32px; height: 4px; background: var(--surface3);
-  border-radius: 4px; margin: 14px auto 18px;
-  cursor: grab;
-}
-.modal-top {
-  display: flex; gap: 14px; align-items: flex-start; margin-bottom: 16px;
-}
-.modal-icon {
-  width: 76px; height: 76px; border-radius: 16px;
-  overflow: hidden; background: var(--surface2); flex-shrink: 0;
-}
-.modal-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.modal-info { flex: 1; min-width: 0; }
-.modal-info h2 { font-size: 19px; font-weight: 900; margin-bottom: 5px; line-height: 1.2; }
-.modal-meta-chips { display: flex; flex-wrap: wrap; gap: 4px; }
-.chip {
-  font-size: 9px; font-weight: 700;
-  background: var(--surface2); border: 1px solid var(--border);
-  border-radius: 20px; padding: 2px 7px; color: var(--text-muted);
-}
-
-.modal-desc {
-  background: var(--surface2); border: 1px solid var(--border);
-  border-radius: var(--radius-sm); padding: 11px 12px; margin-bottom: 11px;
-}
-.modal-desc-label {
-  display: flex; align-items: center; gap: 5px;
-  font-size: 9px; font-weight: 700; color: var(--text-muted);
-  text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px;
-}
-.modal-desc-label svg { width: 12px; height: 12px; stroke: var(--text-muted); fill: none; stroke-width: 2; stroke-linecap: round; }
-.modal-desc p { font-size: 12px; color: var(--text); line-height: 1.6; }
-
-.modal-stats-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin-bottom: 11px;
-}
-.modal-stat {
-  background: var(--surface2); border: 1px solid var(--border);
-  border-radius: var(--radius-sm); padding: 9px 7px; text-align: center;
-}
-.modal-stat-val { font-size: 13px; font-weight: 800; }
-.modal-stat-label { font-size: 9px; color: var(--text-muted); margin-top: 2px; }
-
-.modal-earnings {
-  background: var(--surface2); border: 1px solid var(--border);
-  border-radius: var(--radius-sm); padding: 13px 14px;
-  display: flex; align-items: center; gap: 9px; margin-bottom: 11px;
-}
-.modal-earnings img { width: 26px; height: 26px; object-fit: contain; }
-.modal-earnings-label { font-size: 9px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; }
-.modal-earnings-val { font-size: 26px; font-weight: 900; color: var(--bean); line-height: 1; }
-
-.modal-btns { display: flex; gap: 9px; margin-bottom: 9px; }
-.btn-play {
-  flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px;
-  background: var(--accent); color: #111;
-  font-family: 'Nunito', sans-serif;
-  font-size: 14px; font-weight: 800;
-  border: none; border-radius: var(--radius-sm);
-  padding: 13px; cursor: pointer;
-  transition: background var(--transition), transform 0.15s;
-}
-.btn-play:hover { background: #22c55e; }
-.btn-play:active { transform: scale(0.97); }
-.btn-play svg { width: 15px; height: 15px; fill: #111; }
-
-.btn-fav {
-  width: 50px; display: flex; align-items: center; justify-content: center;
-  background: var(--surface3); color: var(--text);
-  font-family: 'Nunito', sans-serif;
-  border: 1px solid var(--border); border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: background var(--transition), border-color var(--transition), transform 0.15s;
-}
-.btn-fav:hover { background: var(--surface2); }
-.btn-fav:active { transform: scale(0.95); }
-.btn-fav svg { width: 18px; height: 18px; stroke: var(--text-muted); fill: none; stroke-width: 2; transition: stroke 0.2s, fill 0.2s; }
-.btn-fav.is-fav svg { stroke: var(--yellow); fill: var(--yellow); }
-
-.btn-return {
-  flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px;
-  background: var(--surface3); color: var(--text);
-  font-family: 'Nunito', sans-serif;
-  font-size: 14px; font-weight: 800;
-  border: 1px solid var(--border); border-radius: var(--radius-sm);
-  padding: 13px; cursor: pointer;
-  transition: background var(--transition), transform 0.15s;
-}
-.btn-return:hover { background: var(--surface2); }
-.btn-return:active { transform: scale(0.97); }
-.btn-return svg { width: 15px; height: 15px; stroke: var(--text); fill: none; stroke-width: 2.5; stroke-linecap: round; }
-
-.btn-quests-row {
-  width: 100%; display: flex; align-items: center; justify-content: space-between;
-  background: var(--surface2); border: 1px solid var(--border);
-  border-radius: var(--radius-sm); padding: 13px 14px;
-  cursor: pointer; font-family: 'Nunito', sans-serif;
-  font-size: 13px; font-weight: 700; color: var(--text);
-  transition: background var(--transition), border-color var(--transition), transform 0.15s;
-}
-.btn-quests-row:hover { background: var(--surface3); border-color: var(--border-hi); }
-.btn-quests-row:active { transform: scale(0.98); }
-.btn-quests-row-left { display: flex; align-items: center; gap: 9px; }
-.btn-quests-row svg { width: 16px; height: 16px; stroke: var(--text-muted); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.btn-quests-row .arrow { width: 14px; height: 14px; }
-
-/* ═══════════════════════════════════════════════════════
-   TOAST
-═══════════════════════════════════════════════════════ */
-#toast {
-  position: fixed;
-  bottom: calc(var(--nav-h) + 10px);
-  left: 50%; z-index: 999;
-  transform: translateX(-50%) translateY(16px);
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 9px 16px;
-  font-size: 12px; font-weight: 600;
-  opacity: 0; pointer-events: none;
-  transition: opacity 0.2s, transform 0.2s;
-  white-space: nowrap; max-width: calc(100vw - 32px);
-}
-#toast.show {
-  opacity: 1; transform: translateX(-50%) translateY(0);
-}
-
-/* ═══════════════════════════════════════════════════════
-   RESPONSIVE
-═══════════════════════════════════════════════════════ */
-@media (min-width: 600px) {
-  .game-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
-  #modal-overlay { align-items: center; }
-  #modal-card { border-radius: 22px; max-width: 460px; max-height: 82svh; }
-}
-@media (min-width: 900px) {
-  #app { max-width: 660px; margin: 0 auto; }
-  .game-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
-}
+  @media (min-width: 600px) {
+    .game-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+    #modal-overlay { align-items: center; }
+    #modal-card { border-radius: 24px; max-width: 480px; max-height: 80vh; }
+  }
+  @media (min-width: 900px) {
+    #app { max-width: 680px; margin: 0 auto; }
+    #header { max-width: none; }
+    .shop-grid { grid-template-columns: repeat(3, 1fr); }
+    .game-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+  }
 </style>
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════════════
-     AUTH OVERLAY
-═══════════════════════════════════════════════════ -->
-<div id="auth-overlay" role="dialog" aria-modal="true" aria-label="Sign in">
-  <div class="auth-art" aria-hidden="true">
+<!-- AUTH OVERLAY -->
+<div id="auth-overlay">
+  <div class="auth-art">
     <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <ellipse cx="60" cy="87" rx="29" ry="16" fill="#161616"/>
-      <rect x="31" y="55" width="58" height="37" rx="13" fill="#4ade80"/>
-      <ellipse cx="60" cy="42" rx="25" ry="27" fill="#4ade80"/>
-      <rect x="37" y="30" width="46" height="21" rx="10" fill="#111" opacity="0.92"/>
-      <rect x="39" y="32" width="42" height="17" rx="8" fill="#60a5fa" opacity="0.82"/>
-      <rect x="29" y="71" width="17" height="25" rx="8.5" fill="#4ade80"/>
-      <rect x="74" y="71" width="17" height="25" rx="8.5" fill="#4ade80"/>
+      <ellipse cx="60" cy="85" rx="30" ry="18" fill="#1a1a1a"/>
+      <rect x="30" y="55" width="60" height="38" rx="14" fill="#4ade80"/>
+      <ellipse cx="60" cy="42" rx="26" ry="28" fill="#4ade80"/>
+      <rect x="36" y="30" width="48" height="22" rx="11" fill="#1a1a1a" opacity="0.9"/>
+      <rect x="38" y="32" width="44" height="18" rx="9" fill="#60a5fa" opacity="0.85"/>
+      <rect x="28" y="72" width="18" height="26" rx="9" fill="#4ade80"/>
+      <rect x="74" y="72" width="18" height="26" rx="9" fill="#4ade80"/>
     </svg>
   </div>
   <div class="auth-logo">Skeld<span>.</span>G</div>
   <div class="auth-tagline">Your Among Us mini-game hub.<br>Sign in to start earning beans.</div>
-  <button class="btn-google" id="btn-google-signin">
-    <svg class="google-icon" viewBox="0 0 24 24" aria-hidden="true">
+  <button class="btn-google" id="btn-google-signin" onclick="signInWithGoogle()">
+    <svg class="google-icon" viewBox="0 0 24 24">
       <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
       <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
       <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
@@ -864,1229 +660,883 @@ html, body {
     </svg>
     Sign in with Google
   </button>
-  <div class="auth-spinner" id="auth-spinner" aria-label="Loading" role="status"></div>
+  <div id="auth-loading" style="display:none;margin-top:16px;"><div class="spinner" style="margin:0;width:28px;height:28px;"></div></div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════
-     HEADER
-═══════════════════════════════════════════════════ -->
-<header id="header" role="banner">
-  <button class="header-logo" id="logo-btn" aria-label="Go home">
-    <span class="dot">⬡</span> Skeld.G
-  </button>
-  <div class="header-title" id="header-title" aria-live="polite">Home</div>
+<!-- HEADER -->
+<div id="header">
+  <div class="header-logo" onclick="navigateTo('home')"><span>⬡</span> Skeld.G</div>
+  <div class="header-title" id="header-title">Home</div>
   <div class="header-right">
-    <div class="beans-badge" id="beans-badge" aria-label="Bean count" role="status">
-      <img class="bean-icon" src="bean.png" alt="" aria-hidden="true"
-           onerror="this.outerHTML='<span aria-hidden=\'true\' style=\'font-size:14px\'>🫘</span>'"/>
+    <div class="beans-badge" id="beans-badge">
+      <img class="bean-icon" src="bean.png" alt="🫘" onerror="this.outerHTML='<span style=\'font-size:15px\'>🫘</span>'"/>
       <span id="header-beans">0</span>
     </div>
-    <button class="avatar-btn" id="header-avatar" aria-label="Go to profile">
-      <svg class="avatar-placeholder" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
-      </svg>
-    </button>
+    <div class="avatar-btn" id="header-avatar" onclick="navigateTo('profile')">
+      <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+    </div>
   </div>
-</header>
+</div>
 
-<!-- ═══════════════════════════════════════════════════
-     APP
-═══════════════════════════════════════════════════ -->
-<main id="app" role="main">
+<!-- APP -->
+<div id="app">
 
-  <!-- ── HOME ── -->
-  <section class="page active" id="page-home" aria-label="Home">
-    <div class="home-hero" aria-hidden="true">
+  <!-- HOME -->
+  <div class="page active" id="page-home">
+    <div class="home-hero">
       <div class="home-hero-text">
         <h1>Play &amp;<br/><span>Earn</span> Beans</h1>
         <p>Mini-games. Compete. Collect rewards.</p>
       </div>
       <div class="home-hero-icon">
         <svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="4" y="18" width="64" height="42" rx="10" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="2"/>
-          <circle cx="22" cy="39" r="8" fill="#222" stroke="#333" stroke-width="1.5"/>
+          <rect x="4" y="18" width="64" height="42" rx="10" fill="#1e1e1e" stroke="#333" stroke-width="2"/>
+          <circle cx="22" cy="39" r="8" fill="#2a2a2a" stroke="#3a3a3a" stroke-width="1.5"/>
           <path d="M22 35v8M18 39h8" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round"/>
           <circle cx="52" cy="35" r="3.5" fill="#f87171"/>
           <circle cx="60" cy="39" r="3.5" fill="#facc15"/>
           <circle cx="52" cy="43" r="3.5" fill="#4ade80"/>
           <circle cx="44" cy="39" r="3.5" fill="#60a5fa"/>
-          <rect x="28" y="8" width="16" height="12" rx="4" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="2"/>
-          <rect x="31" y="4" width="10" height="6" rx="3" fill="#222" stroke="#2a2a2a" stroke-width="1.5"/>
+          <rect x="28" y="8" width="16" height="12" rx="4" fill="#1e1e1e" stroke="#333" stroke-width="2"/>
+          <rect x="31" y="4" width="10" height="6" rx="3" fill="#2a2a2a" stroke="#333" stroke-width="1.5"/>
         </svg>
       </div>
     </div>
-
-    <!-- Recently Played -->
-    <div id="recently-played-section" style="display:none; margin-bottom:20px;">
-      <div class="section-header">
-        <h2>Recently Played</h2>
-      </div>
-      <div class="recently-played-row" id="recently-played-row"></div>
-    </div>
-
-    <!-- Favorites -->
-    <div id="favorites-section" style="display:none; margin-bottom:20px;">
-      <div class="section-header">
-        <h2>Favorites ⭐</h2>
-      </div>
-      <div class="fav-grid" id="fav-grid-home"></div>
-    </div>
-
     <div class="section-header">
       <h2>All Games</h2>
-      <span id="games-count" style="font-size:11px;color:var(--text-muted);font-weight:700;"></span>
+      <span id="games-count" style="font-size:12px;color:var(--text-muted);font-weight:700;"></span>
     </div>
     <div class="game-grid" id="game-grid">
-      <!-- skeletons injected by JS -->
+      <div class="spinner" style="grid-column:1/-1;"></div>
     </div>
-  </section>
+  </div>
 
-  <!-- ── SEARCH ── -->
-  <section class="page" id="page-search" aria-label="Search">
-    <div class="search-bar" role="search">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <!-- SEARCH -->
+  <div class="page" id="page-search">
+    <div class="search-bar">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
       </svg>
-      <input type="search" id="search-input" placeholder="Search games…" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Search games"/>
-      <button class="search-clear" id="search-clear" aria-label="Clear search">✕</button>
+      <input type="text" id="search-input" placeholder="Search games &amp; items…" oninput="onSearch(this.value)"/>
     </div>
-    <div class="search-results" id="search-results" role="list" aria-live="polite">
-      <div class="search-empty"><strong>🔍</strong>Start typing to search…</div>
+    <div class="search-results" id="search-results">
+      <div class="search-empty">Start typing to search…</div>
     </div>
-  </section>
+  </div>
 
-  <!-- ── QUESTS ── -->
-  <section class="page" id="page-quests" aria-label="Quests">
-    <div class="section-header" style="margin-bottom:10px;"><h2>Quests</h2></div>
-    <div class="quest-tabs" role="tablist">
-      <button class="quest-tab active" id="tab-daily"    role="tab" aria-selected="true"  onclick="switchQuestTab('daily')">Daily</button>
-      <button class="quest-tab"        id="tab-weekly"   role="tab" aria-selected="false" onclick="switchQuestTab('weekly')">Weekly</button>
-      <button class="quest-tab"        id="tab-alltime"  role="tab" aria-selected="false" onclick="switchQuestTab('alltime')">All-Time</button>
-      <button class="quest-tab"        id="tab-claimed"  role="tab" aria-selected="false" onclick="switchQuestTab('claimed')">Claimed</button>
+  <!-- SHOP -->
+  <div class="page" id="page-shop">
+    <div class="shop-header-row">
+      <h2 style="font-size:16px;font-weight:800;">Shop</h2>
+      <div class="beans-badge">
+        <img class="bean-icon" src="bean.png" alt="🫘" onerror="this.outerHTML='<span style=\'font-size:13px\'>🫘</span>'"/>
+        <span id="shop-beans">0</span>
+      </div>
     </div>
-    <div id="quests-list" role="tabpanel" aria-live="polite"></div>
-  </section>
+    <div class="shop-grid" id="shop-grid"></div>
+  </div>
 
-  <!-- ── PROFILE ── -->
-  <section class="page" id="page-profile" aria-label="Profile">
+  <!-- QUESTS -->
+  <div class="page" id="page-quests">
+    <div class="section-header" style="margin-bottom:12px;"><h2>Quests</h2></div>
+    <div class="quest-tabs">
+      <div class="quest-tab active" id="tab-active" onclick="switchQuestTab('active')">Active</div>
+      <div class="quest-tab" id="tab-completed" onclick="switchQuestTab('completed')">Completed</div>
+    </div>
+    <div id="quests-list"></div>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="page" id="page-profile">
     <div class="profile-card">
-      <div class="profile-avatar" id="profile-avatar-wrap">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+      <div class="profile-avatar" id="profile-avatar-img">
+        <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
       </div>
       <div class="profile-name" id="profile-name">—</div>
       <div class="profile-email" id="profile-email">—</div>
       <div class="profile-beans-row">
-        <img src="bean.png" alt="" aria-hidden="true" onerror="this.outerHTML='<span aria-hidden=\'true\'>🫘</span>'"/>
+        <img class="bean-icon" src="bean.png" alt="🫘" onerror="this.outerHTML='<span style=\'font-size:18px\'>🫘</span>'"/>
         <span id="profile-beans">0</span> Beans
       </div>
     </div>
-
     <div class="stat-grid">
-      <div class="stat-card"><div class="stat-val" id="stat-games">—</div><div class="stat-label">Games</div></div>
+      <div class="stat-card"><div class="stat-val" id="stat-games">0</div><div class="stat-label">Games</div></div>
       <div class="stat-card"><div class="stat-val" id="stat-played">0</div><div class="stat-label">Played</div></div>
-      <div class="stat-card"><div class="stat-val" id="stat-quests">0</div><div class="stat-label">Quests</div></div>
+      <div class="stat-card"><div class="stat-val" id="stat-quests">0</div><div class="stat-label">Quests Done</div></div>
     </div>
-
-    <!-- Favorite Games on Profile -->
-    <div id="profile-fav-section" style="display:none; margin-bottom:16px;">
-      <div class="profile-section-title">Favorite Games</div>
-      <div class="fav-grid" id="fav-grid-profile"></div>
-    </div>
-
     <div class="profile-section-title">Account Info</div>
-    <div class="profile-info-row">
-      <span class="info-label">Joined</span>
-      <span class="info-val" id="profile-joined">—</span>
-    </div>
-    <div class="profile-info-row">
-      <span class="info-label">Last Login</span>
-      <span class="info-val" id="profile-lastlogin">—</span>
-    </div>
-    <div class="profile-info-row">
-      <span class="info-label">Login Streak</span>
-      <span class="info-val" id="profile-streak">—</span>
-    </div>
+    <div class="profile-info-row"><span>Joined</span><span id="profile-joined">—</span></div>
+    <div class="profile-info-row"><span>Last Login</span><span id="profile-lastlogin">—</span></div>
+    <div class="profile-info-row"><span>UID</span><span id="profile-uid" style="font-size:11px;color:var(--text-muted);font-family:'Space Mono',monospace;">—</span></div>
+    <button class="btn-signout" onclick="signOut()">Sign Out</button>
+  </div>
 
-    <!-- UID Row with copy button -->
-    <div class="uid-row">
-      <span class="uid-row-label">UID</span>
-      <div class="uid-row-right">
-        <span class="uid-display" id="uid-display">—</span>
-        <button class="btn-copy-uid" id="btn-copy-uid" aria-label="Copy UID">Copy</button>
-      </div>
-    </div>
+</div>
 
-    <button class="btn-signout" id="btn-signout">Sign Out</button>
-  </section>
-
-</main>
-
-<!-- ═══════════════════════════════════════════════════
-     BOTTOM NAV
-═══════════════════════════════════════════════════ -->
-<nav id="bottom-nav" role="navigation" aria-label="Main navigation">
-  <button class="nav-item active" id="nav-home" aria-label="Home" aria-current="page">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12L12 3l9 9"/><path d="M9 21V12h6v9"/></svg>
+<!-- BOTTOM NAV -->
+<nav id="bottom-nav">
+  <div class="nav-item active" id="nav-home" onclick="navigateTo('home')">
+    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12L12 3l9 9"/><path d="M9 21V12h6v9"/></svg>
     <span>Home</span>
-  </button>
-  <button class="nav-item" id="nav-search" aria-label="Search">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+  </div>
+  <div class="nav-item" id="nav-search" onclick="navigateTo('search')">
+    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
     <span>Search</span>
-  </button>
-  <button class="nav-item" id="nav-quests" aria-label="Quests">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h4"/></svg>
+  </div>
+  <div class="nav-item" id="nav-shop" onclick="navigateTo('shop')">
+    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+    <span>Shop</span>
+  </div>
+  <div class="nav-item" id="nav-quests" onclick="navigateTo('quests')">
+    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h4"/></svg>
     <span>Quests</span>
-  </button>
-  <button class="nav-item" id="nav-profile" aria-label="Profile">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+  </div>
+  <div class="nav-item" id="nav-profile" onclick="navigateTo('profile')">
+    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     <span>Profile</span>
-  </button>
+  </div>
 </nav>
 
-<!-- ═══════════════════════════════════════════════════
-     GAME DETAIL MODAL
-═══════════════════════════════════════════════════ -->
-<div id="modal-overlay" role="dialog" aria-modal="true" aria-label="Game details">
-  <div id="modal-card" tabindex="-1">
-    <div class="modal-drag-handle" aria-hidden="true"></div>
+<!-- GAME DETAIL MODAL -->
+<div id="modal-overlay" onclick="closeModal(event)">
+  <div id="modal-card">
+    <div class="modal-drag-handle"></div>
     <div class="modal-top">
-      <div class="modal-icon"><img id="modal-icon" src="" alt="" loading="lazy"/></div>
+      <div class="modal-icon"><img id="modal-icon" src="" alt=""/></div>
       <div class="modal-info">
         <h2 id="modal-title">Game</h2>
-        <div class="modal-meta-chips" id="modal-chips" aria-label="Tags"></div>
+        <div class="modal-meta-chips" id="modal-chips"></div>
       </div>
     </div>
     <div class="modal-desc">
-      <div class="modal-desc-label" aria-hidden="true">
-        <svg viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
-        Description
+      <div class="modal-desc-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
+        DESCRIPTION
       </div>
       <p id="modal-desc-text">—</p>
     </div>
-    <div class="modal-stats-grid" aria-label="Game statistics">
+    <div class="modal-stats-grid">
       <div class="modal-stat"><div class="modal-stat-val" id="modal-plays">—</div><div class="modal-stat-label">Total Plays</div></div>
       <div class="modal-stat"><div class="modal-stat-val" id="modal-active">—</div><div class="modal-stat-label">Active Users</div></div>
       <div class="modal-stat"><div class="modal-stat-val" id="modal-difficulty">—</div><div class="modal-stat-label">Difficulty</div></div>
     </div>
     <div class="modal-earnings">
-      <img src="bean.png" alt="" aria-hidden="true"
-           onerror="this.outerHTML='<span aria-hidden=\'true\' style=\'font-size:24px\'>🫘</span>'"/>
+      <img class="bean-icon" src="bean.png" alt="🫘" onerror="this.outerHTML='<span style=\'font-size:28px\'>🫘</span>'"/>
       <div>
         <div class="modal-earnings-label">Beans per Play</div>
-        <div class="modal-earnings-val" id="modal-earnings">0</div>
+        <div class="modal-earnings-val" id="modal-earnings">600</div>
       </div>
     </div>
     <div class="modal-btns">
-      <button class="btn-play" id="modal-play-btn">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+      <button class="btn-play" id="modal-play-btn" onclick="playGame()">
+        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
         PLAY
       </button>
-      <button class="btn-fav" id="modal-fav-btn" aria-label="Toggle favorite">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      </button>
-      <button class="btn-return" id="modal-return-btn">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
-        CLOSE
+      <button class="btn-return" onclick="closeModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+        RETURN
       </button>
     </div>
-    <button class="btn-quests-row" id="modal-quests-btn" aria-label="View quests">
+    <button class="btn-quests-row" onclick="navigateTo('quests');closeModal();">
       <div class="btn-quests-row-left">
-        <svg viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h4"/></svg>
+        <svg class="q-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h4"/></svg>
         VIEW QUESTS
       </div>
-      <svg class="arrow" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+      <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
     </button>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════
-     TOAST
-═══════════════════════════════════════════════════ -->
-<div id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+<!-- TOAST -->
+<div id="toast"></div>
 
-<!-- ═══════════════════════════════════════════════════
-     FIREBASE (module)
-═══════════════════════════════════════════════════ -->
+<!-- ════════════════════════════════════════════════
+     FIREBASE MODULE
+════════════════════════════════════════════════ -->
 <script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import {
-  getAuth, GoogleAuthProvider, signInWithPopup,
-  onAuthStateChanged, signOut as fbSignOut
-} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-import {
-  getFirestore, doc, getDoc, setDoc, updateDoc,
-  runTransaction, serverTimestamp, increment, arrayUnion, Timestamp
-} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-
-const FIREBASE_CONFIG = {
-  apiKey:            "AIzaSyCIkS8aU3NyKPH2EWqLNLjKxxg7y7kKu8M",
-  authDomain:        "skeld-g.firebaseapp.com",
-  projectId:         "skeld-g",
-  storageBucket:     "skeld-g.firebasestorage.app",
-  messagingSenderId: "474209822056",
-  appId:             "1:474209822056:web:eee11ece0da8f1cfd4a2dd"
-};
-
-const app  = initializeApp(FIREBASE_CONFIG);
-const auth = getAuth(app);
-const db   = getFirestore(app);
-
-/* ── SIGN IN ── */
-document.getElementById('btn-google-signin').addEventListener('click', async () => {
-  const btn     = document.getElementById('btn-google-signin');
-  const spinner = document.getElementById('auth-spinner');
-  btn.disabled = true;
-  spinner.classList.add('visible');
-  try {
-    const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
-  } catch (e) {
-    console.error('Sign-in error:', e);
-    showToast('Sign in failed. Try again.');
-    btn.disabled = false;
-    spinner.classList.remove('visible');
-  }
-});
-
-/* ── SIGN OUT ── */
-document.getElementById('btn-signout').addEventListener('click', async () => {
-  await fbSignOut(auth);
-  window.__userData  = null;
-  window.__userUid   = null;
-  updateAllBeanDisplays(0);
-});
-
-/* ── AUTH STATE ── */
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    document.getElementById('auth-overlay').classList.add('hidden');
-    await ensureUserDoc(user);
-    await loadUserData(user.uid);
-  } else {
-    document.getElementById('auth-overlay').classList.remove('hidden');
-  }
-});
-
-/* ── ENSURE USER DOC ──
-   Only creates fields server-side on first sign-in.
-   Never trusts client-supplied reward values. */
-async function ensureUserDoc(user) {
-  const ref  = doc(db, 'users', user.uid);
-  const snap = await getDoc(ref);
-
-  if (!snap.exists()) {
-    await setDoc(ref, {
-      displayName:      user.displayName || 'Crewmate',
-      photoURL:         user.photoURL    || '',
-      email:            user.email       || '',
-      beans:            100,                 // server-set starting beans
-      gamesPlayed:      0,
-      questsCompleted:  0,
-      claimedQuests:    [],
-      recentlyPlayed:   [],
-      favorites:        [],
-      loginStreak:      1,
-      lastLoginDate:    new Date().toDateString(),
-      createdAt:        serverTimestamp(),
-      lastLogin:        serverTimestamp(),
-    });
-    showToast('Welcome! You received 100 🫘 beans!');
-  } else {
-    /* ── Update login streak ── */
-    const data      = snap.data();
-    const today     = new Date().toDateString();
-    const yesterday = new Date(Date.now() - 86400000).toDateString();
-    const lastDate  = data.lastLoginDate;
-
-    if (lastDate !== today) {
-      let streak = data.loginStreak || 1;
-      streak = (lastDate === yesterday) ? streak + 1 : 1;
-      await updateDoc(ref, {
-        lastLogin:     serverTimestamp(),
-        lastLoginDate: today,
-        loginStreak:   streak,
-      });
-    }
-  }
-}
-
-/* ── LOAD USER DATA ── */
-async function loadUserData(uid) {
-  const ref  = doc(db, 'users', uid);
-  const snap = await getDoc(ref);
-  if (!snap.exists()) return;
-  const data = snap.data();
-
-  window.__userData = data;
-  window.__userUid  = uid;
-
-  const beans = data.beans ?? 0;
-  updateAllBeanDisplays(beans);
-
-  /* Profile */
-  document.getElementById('profile-name').textContent     = data.displayName || 'Crewmate';
-  document.getElementById('profile-email').textContent    = data.email || '';
-  document.getElementById('stat-played').textContent      = data.gamesPlayed ?? 0;
-  document.getElementById('stat-quests').textContent      = data.questsCompleted ?? 0;
-  document.getElementById('stat-games').textContent       = window.__gamesData?.length ?? '—';
-  document.getElementById('profile-streak').textContent   = (data.loginStreak || 1) + ' 🔥';
-
-  const createdAt = data.createdAt?.toDate?.();
-  const lastLogin = data.lastLogin?.toDate?.();
-  document.getElementById('profile-joined').textContent    = createdAt ? createdAt.toLocaleDateString() : '—';
-  document.getElementById('profile-lastlogin').textContent = lastLogin ? lastLogin.toLocaleDateString() : '—';
-
-  /* UID display */
-  document.getElementById('uid-display').textContent = uid;
-
-  /* Avatar */
-  const photoURL = auth.currentUser?.photoURL;
-  if (photoURL) {
-    const imgHtml = `<img src="${esc(photoURL)}" alt="Your avatar" loading="lazy"
-      onerror="this.parentElement.innerHTML='<svg viewBox=\\'0 0 24 24\\'><path d=\\'M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z\\'/></svg>'"/>`;
-    document.getElementById('profile-avatar-wrap').innerHTML = imgHtml;
-    document.getElementById('header-avatar').innerHTML =
-      `<img src="${esc(photoURL)}" alt="Your avatar" loading="lazy" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;"
-            onerror="this.outerHTML='<svg class=\\'avatar-placeholder\\'  viewBox=\\'0 0 24 24\\'><path d=\\'M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z\\'/></svg>'"/>`;
-  }
-
-  renderQuests(data);
-  renderRecentlyPlayed(data.recentlyPlayed || []);
-  renderFavorites(data.favorites || []);
-}
-window.__loadUserData = loadUserData;
-
-/* ── REFRESH ── */
-window.__refreshUser = async () => {
-  if (window.__userUid) await loadUserData(window.__userUid);
-};
-
-/* ── UPDATE BEAN DISPLAYS ── */
-window.updateAllBeanDisplays = (beans) => {
-  const val = Number(beans).toLocaleString();
-  document.getElementById('header-beans').textContent  = val;
-  document.getElementById('profile-beans').textContent = val;
-  const badge = document.getElementById('beans-badge');
-  badge.classList.remove('bump');
-  void badge.offsetWidth;   // force reflow
-  badge.classList.add('bump');
-  setTimeout(() => badge.classList.remove('bump'), 400);
-};
-
-/* ═══════════════════════════════════════════════════
-   SECURE REWARD TRANSACTIONS
-   All bean mutations go through Firestore transactions.
-   The client never blindly increments — each transaction
-   validates state before committing.
-═══════════════════════════════════════════════════ */
-
-/**
- * Awards beans for playing a game.
- * Security: transaction reads current doc first, validates
- * that the game folder exists in the known catalog, and
- * caps daily earnings to prevent farming loops.
- *
- * Firestore rules enforce:
- *   allow write: if false; (games collection)
- *   allow write: if request.auth.uid == uid; (users collection)
- *
- * This transaction runs entirely through the SDK with the
- * authenticated user's credentials — the server rules are
- * the last line of defense. Any tampered amount is rejected
- * because the server Firestore rules deny direct writes from
- * untrusted paths, and Cloud Functions (recommended for
- * production) would be the final enforcement layer.
- */
-window.__updatePlayCount = async (gameFolder, beansEarned) => {
-  const uid = window.__userUid;
-  if (!uid) return;
-
-  // Validate game exists in known catalog
-  const knownGame = (window.__gamesData || []).find(g => g.folder === gameFolder);
-  if (!knownGame) { console.warn('Unknown game folder:', gameFolder); return; }
-
-  // Clamp earnings to declared value — never trust caller
-  const safeEarnings = Math.max(0, Math.min(Number(knownGame.earnings) || 0, 10000));
-
-  try {
-    const ref    = doc(db, 'users', uid);
-    let newBeans = 0;
-    let newPlays = 0;
-
-    await runTransaction(db, async (tx) => {
-      const snap = await tx.get(ref);
-      if (!snap.exists()) throw new Error('User doc missing');
-      const d = snap.data();
-
-      /* ── Daily earnings cap: 50k beans / day ── */
-      const today        = new Date().toDateString();
-      const dailyKey     = 'dailyEarnings_' + today;
-      const dailyEarned  = d[dailyKey] || 0;
-      const MAX_DAILY    = 50000;
-
-      if (dailyEarned >= MAX_DAILY) {
-        showToast('Daily bean limit reached! Come back tomorrow.');
-        throw new Error('DAILY_CAP');
-      }
-
-      const clamped  = Math.min(safeEarnings, MAX_DAILY - dailyEarned);
-      newBeans       = (d.beans || 0) + clamped;
-      newPlays       = (d.gamesPlayed || 0) + 1;
-
-      /* Keep recentlyPlayed (max 10, deduped) */
-      const prev    = d.recentlyPlayed || [];
-      const deduped = [gameFolder, ...prev.filter(f => f !== gameFolder)].slice(0, 10);
-
-      tx.update(ref, {
-        gamesPlayed:       newPlays,
-        beans:             newBeans,
-        recentlyPlayed:    deduped,
-        [dailyKey]:        dailyEarned + clamped,
-      });
-    });
-
-    if (window.__userData) {
-      window.__userData.gamesPlayed = newPlays;
-      window.__userData.beans       = newBeans;
-    }
-    document.getElementById('stat-played').textContent = newPlays;
-    updateAllBeanDisplays(newBeans);
-    if (safeEarnings > 0) showToast(`+${safeEarnings} 🫘 beans earned!`);
-    await checkQuestProgress();
-    renderRecentlyPlayed(window.__userData?.recentlyPlayed || []);
-  } catch (e) {
-    if (e.message !== 'DAILY_CAP') console.error('updatePlayCount error:', e);
-  }
-};
-
-/**
- * Claims a quest reward.
- * Security: transaction checks claimedQuests array before
- * awarding. Double-claim is prevented at the DB level even if
- * two tabs fire simultaneously, because the transaction is atomic.
- */
-window.__claimQuest = async (questId, reward) => {
-  const uid = window.__userUid;
-  if (!uid) return;
-
-  // Validate quest & reward against server-side definition
-  const questDef = ALL_QUEST_DEFS.find(q => q.id === questId);
-  if (!questDef) { showToast('Unknown quest.'); return; }
-  const safeReward = questDef.reward; // never trust caller-supplied reward
-
-  try {
-    const ref    = doc(db, 'users', uid);
-    let newBeans = 0;
-    let newCount = 0;
-
-    await runTransaction(db, async (tx) => {
-      const snap = await tx.get(ref);
-      if (!snap.exists()) throw new Error('User doc missing');
-      const d       = snap.data();
-      const claimed = d.claimedQuests || [];
-
-      if (claimed.includes(questId)) throw new Error('ALREADY_CLAIMED');
-
-      // Validate progress server-side
-      if (!isQuestCompletedForUser(questId, d)) throw new Error('NOT_COMPLETE');
-
-      newBeans = (d.beans || 0) + safeReward;
-      newCount = (d.questsCompleted || 0) + 1;
-
-      tx.update(ref, {
-        claimedQuests:   arrayUnion(questId),
-        beans:           newBeans,
-        questsCompleted: newCount,
-      });
-    });
-
-    if (window.__userData) {
-      if (!window.__userData.claimedQuests) window.__userData.claimedQuests = [];
-      window.__userData.claimedQuests.push(questId);
-      window.__userData.beans           = newBeans;
-      window.__userData.questsCompleted = newCount;
-    }
-    updateAllBeanDisplays(newBeans);
-    document.getElementById('stat-quests').textContent = newCount;
-    showToast(`+${safeReward} 🫘 quest reward!`);
-    renderQuests(window.__userData);
-  } catch (e) {
-    if (e.message === 'ALREADY_CLAIMED') showToast('Already claimed!');
-    else if (e.message === 'NOT_COMPLETE') showToast('Quest not complete yet.');
-    else { console.error('Claim quest error:', e); showToast('Error claiming reward.'); }
-  }
-};
-
-async function checkQuestProgress() {
-  if (window.__userData) renderQuests(window.__userData);
-}
-
-/* ── LOAD GAMES ── */
-async function loadGames() {
-  renderGameSkeletons();
-  try {
-    const res = await fetch('game.json');
-    if (!res.ok) throw new Error('game.json not found');
-    const raw   = await res.json();
-    // Validate & fill defaults for each game object
-    const games = raw.map(g => ({
-      name:        String(g.name        || 'Unnamed Game'),
-      folder:      String(g.folder      || ''),
-      description: String(g.description || 'No description available.'),
-      developer:   String(g.developer   || 'Unknown'),
-      difficulty:  String(g.difficulty  || '—'),
-      earnings:    Math.max(0, Number(g.earnings) || 0),
-      releaseDate: String(g.releaseDate || ''),
-      activeUsers: Math.max(0, Number(g.activeUsers) || 0),
-      totalPlays:  Math.max(0, Number(g.totalPlays)  || 0),
-      thumbnail:   g.thumbnail ? String(g.thumbnail) : '',
-      tags:        Array.isArray(g.tags) ? g.tags.map(String) : [],
-    })).filter(g => g.folder); // must have folder
-
-    window.__gamesData = games;
-    renderGameGrid(games);
-    document.getElementById('games-count').textContent = games.length + ' games';
-    document.getElementById('stat-games').textContent  = games.length;
-  } catch (e) {
-    console.error('loadGames error:', e);
-    document.getElementById('game-grid').innerHTML =
-      `<div class="state-empty"><strong>⚠️</strong>No games found.<br>Add a game.json file.</div>`;
-  }
-}
-loadGames();
-
-/* Expose for app logic */
-window.__db             = db;
-window.__doc            = doc;
-window.__getDoc         = getDoc;
-window.__serverTimestamp = serverTimestamp;
-
-</script>
-
-<!-- ═══════════════════════════════════════════════════
-     APP LOGIC
-═══════════════════════════════════════════════════ -->
-<script>
-'use strict';
-
-/* ────────────────────────────────────────────────────
-   STATE
-──────────────────────────────────────────────────── */
-window.__gamesData    = [];
-window.__selectedGame = null;
-window.__userData     = null;
-window.__userUid      = null;
-window.__questTab     = 'daily';
-
-/* ────────────────────────────────────────────────────
-   ROUTING
-──────────────────────────────────────────────────── */
-const PAGE_MAP = {
-  '/':        'home',
-  '/games':   'home',
-  '/search':  'search',
-  '/quests':  'quests',
-  '/profile': 'profile',
-};
-const PATH_MAP = {
-  home:    '/',
-  search:  '/search',
-  quests:  '/quests',
-  profile: '/profile',
-};
-
-function resolvePageFromPath(path) {
-  const clean = path.length > 1 ? path.replace(/\/$/, '') : path;
-  // Handle game sub-routes: /games/cardswipe → still "home" (game is launched directly)
-  if (clean.startsWith('/games/')) return 'home';
-  return PAGE_MAP[clean] || 'home';
-}
-
-window.navigateTo = function(page, pushState = true) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => {
-    n.classList.remove('active');
-    n.removeAttribute('aria-current');
-  });
-  const pageEl = document.getElementById('page-' + page);
-  const navEl  = document.getElementById('nav-'  + page);
-  if (pageEl) pageEl.classList.add('active');
-  if (navEl)  {
-    navEl.classList.add('active');
-    navEl.setAttribute('aria-current', 'page');
-  }
-  const titles = { home:'Home', search:'Search', quests:'Quests', profile:'Profile' };
-  document.getElementById('header-title').textContent = titles[page] || '';
-  window.scrollTo({ top: 0, behavior: 'instant' });
-  if (pushState) {
-    const path = PATH_MAP[page] || '/';
-    history.pushState({ page }, '', path);
-  }
-};
-
-window.addEventListener('popstate', (e) => {
-  const page = (e.state?.page) || resolvePageFromPath(location.pathname);
-  navigateTo(page, false);
-});
-
-// Initial route
-(function initRoute() {
-  const page = resolvePageFromPath(location.pathname);
-  navigateTo(page, false);
-  history.replaceState({ page }, '', location.pathname);
-})();
-
-// Logo & avatar nav
-document.getElementById('logo-btn').addEventListener('click',    () => navigateTo('home'));
-document.getElementById('header-avatar').addEventListener('click', () => navigateTo('profile'));
-document.getElementById('nav-home').addEventListener('click',    () => navigateTo('home'));
-document.getElementById('nav-search').addEventListener('click',  () => navigateTo('search'));
-document.getElementById('nav-quests').addEventListener('click',  () => navigateTo('quests'));
-document.getElementById('nav-profile').addEventListener('click', () => navigateTo('profile'));
-
-/* ────────────────────────────────────────────────────
-   GAME GRID
-──────────────────────────────────────────────────── */
-function renderGameSkeletons() {
-  const grid = document.getElementById('game-grid');
-  grid.innerHTML = Array.from({length: 8}).map(() => `
-    <div class="game-slot game-slot-skel" aria-hidden="true">
-      <div class="game-slot-icon"><div class="skeleton skel-icon"></div></div>
-      <div class="skeleton skel-name"></div>
-    </div>
-  `).join('');
-}
-
-function renderGameGrid(games) {
-  const grid   = document.getElementById('game-grid');
-  const favs   = window.__userData?.favorites || [];
-  if (!games || games.length === 0) {
-    grid.innerHTML = '<div class="state-empty"><strong>🎮</strong>No games available.</div>';
-    return;
-  }
-  grid.innerHTML = games.map((g, i) => {
-    const isFav = favs.includes(g.folder);
-    return `
-      <button class="game-slot${isFav ? ' is-fav' : ''}"
-              aria-label="Open ${esc(g.name)}"
-              onclick="openGameModal(${i})">
-        <div class="game-slot-fav" aria-hidden="true" onclick="event.stopPropagation();toggleFavorite('${esc(g.folder)}')">
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        </div>
-        <div class="game-slot-icon">
-          <img src="${esc(g.folder)}/icon.png" alt="" loading="lazy"
-               onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2252%22 height=%2252%22><rect width=%2252%22 height=%2252%22 fill=%22%23222%22/><text x=%2250%25%22 y=%2254%25%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22 font-size=%2220%22 fill=%22%23444%22>?</text></svg>'"/>
-        </div>
-        <div class="game-slot-name">${esc(g.name)}</div>
-      </button>
-    `;
-  }).join('');
-}
-window.renderGameGrid = renderGameGrid;
-
-/* ────────────────────────────────────────────────────
-   RECENTLY PLAYED
-──────────────────────────────────────────────────── */
-function renderRecentlyPlayed(recentFolders) {
-  const section = document.getElementById('recently-played-section');
-  const row     = document.getElementById('recently-played-row');
-  if (!recentFolders || recentFolders.length === 0) {
-    section.style.display = 'none'; return;
-  }
-  section.style.display = 'block';
-  const games = window.__gamesData || [];
-  const items = recentFolders
-    .map(folder => games.find(g => g.folder === folder))
-    .filter(Boolean)
-    .slice(0, 8);
-  if (!items.length) { section.style.display = 'none'; return; }
-
-  row.innerHTML = items.map((g, i) => {
-    const origIdx = games.indexOf(g);
-    return `
-      <button class="recent-chip" aria-label="Play ${esc(g.name)}" onclick="openGameModal(${origIdx})">
-        <div class="recent-chip-img">
-          <img src="${esc(g.folder)}/icon.png" alt="" loading="lazy"
-               onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2222%22 height=%2222%22><rect width=%2222%22 height=%2222%22 fill=%22%23222%22/></svg>'"/>
-        </div>
-        ${esc(g.name)}
-      </button>
-    `;
-  }).join('');
-}
-
-/* ────────────────────────────────────────────────────
-   FAVORITES
-──────────────────────────────────────────────────── */
-function renderFavorites(favFolders) {
-  const section    = document.getElementById('favorites-section');
-  const homeGrid   = document.getElementById('fav-grid-home');
-  const profSec    = document.getElementById('profile-fav-section');
-  const profGrid   = document.getElementById('fav-grid-profile');
-  const games      = window.__gamesData || [];
-
-  if (!favFolders || favFolders.length === 0) {
-    section.style.display  = 'none';
-    profSec.style.display  = 'none';
-    return;
-  }
-
-  const items = favFolders
-    .map(folder => games.find(g => g.folder === folder))
-    .filter(Boolean);
-
-  if (!items.length) {
-    section.style.display = 'none';
-    profSec.style.display = 'none';
-    return;
-  }
-
-  section.style.display = 'block';
-  profSec.style.display  = 'block';
-
-  const html = items.map(g => {
-    const origIdx = games.indexOf(g);
-    return `
-      <button class="fav-slot" aria-label="Play ${esc(g.name)}" onclick="openGameModal(${origIdx})">
-        <div class="fav-slot-img">
-          <img src="${esc(g.folder)}/icon.png" alt="" loading="lazy"
-               onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2238%22 height=%2238%22><rect width=%2238%22 height=%2238%22 fill=%22%23222%22/></svg>'"/>
-        </div>
-        <div class="fav-slot-name">${esc(g.name)}</div>
-      </button>
-    `;
-  }).join('');
-
-  homeGrid.innerHTML = html;
-  profGrid.innerHTML = html;
-}
-
-window.toggleFavorite = async function(folder) {
-  const uid  = window.__userUid;
-  const data = window.__userData;
-  if (!uid || !data) { showToast('Sign in first!'); return; }
-
-  const favs    = [...(data.favorites || [])];
-  const idx     = favs.indexOf(folder);
-  let   newFavs;
-
-  if (idx === -1) {
-    newFavs = [...favs, folder].slice(0, 20); // cap at 20
-    showToast('⭐ Added to favorites!');
-  } else {
-    newFavs = favs.filter(f => f !== folder);
-    showToast('Removed from favorites.');
-  }
-
-  data.favorites = newFavs;
-
-  // Optimistic UI
-  renderFavorites(newFavs);
-  renderGameGrid(window.__gamesData);
-  updateModalFavBtn();
-
-  // Persist
-  try {
-    const ref = window.__doc(window.__db, 'users', uid);
-    await window.__updateDoc
-      ? null
-      : (await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js')).updateDoc;
-    // Use updateDoc via the module-level ref already established
-    // (workaround: re-import updateDoc since we're in non-module script)
-    const { updateDoc } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
-    await updateDoc(ref, { favorites: newFavs });
-  } catch(e) {
-    console.error('toggleFavorite error:', e);
-  }
-};
-
-function updateModalFavBtn() {
-  const g   = window.__selectedGame;
-  const btn = document.getElementById('modal-fav-btn');
-  if (!g || !btn) return;
-  const isFav = (window.__userData?.favorites || []).includes(g.folder);
-  btn.classList.toggle('is-fav', isFav);
-  btn.setAttribute('aria-label', isFav ? 'Remove from favorites' : 'Add to favorites');
-}
-
-/* ────────────────────────────────────────────────────
-   MODAL
-──────────────────────────────────────────────────── */
-let _modalTouchStartY = 0;
-let _lastFocusBeforeModal = null;
-
-window.openGameModal = function(idx) {
-  const g = window.__gamesData[idx];
-  if (!g) return;
-  window.__selectedGame = g;
-
-  const imgEl = document.getElementById('modal-icon');
-  imgEl.src   = '';
-  imgEl.alt   = esc(g.name);
-  imgEl.src   = `${g.folder}/icon.png`;
-  imgEl.onerror = function() { this.src = ''; };
-
-  document.getElementById('modal-title').textContent     = g.name;
-  document.getElementById('modal-desc-text').textContent = g.description;
-  document.getElementById('modal-plays').textContent     = g.totalPlays  ? Number(g.totalPlays).toLocaleString()  : '—';
-  document.getElementById('modal-active').textContent    = g.activeUsers ? Number(g.activeUsers).toLocaleString() : '—';
-  document.getElementById('modal-difficulty').textContent = g.difficulty || '—';
-  document.getElementById('modal-earnings').textContent  = g.earnings    ? Number(g.earnings).toLocaleString()    : '0';
-
-  const meta = [g.releaseDate, g.developer, ...(g.tags || [])].filter(Boolean);
-  document.getElementById('modal-chips').innerHTML = meta.map(m => `<span class="chip">${esc(String(m))}</span>`).join('');
-
-  updateModalFavBtn();
-
-  const overlay = document.getElementById('modal-overlay');
-  overlay.classList.add('open');
-  document.body.style.overflow = 'hidden';
-
-  _lastFocusBeforeModal = document.activeElement;
-  setTimeout(() => {
-    const card = document.getElementById('modal-card');
-    card.focus({ preventScroll: true });
-  }, 50);
-};
-
-function _closeModal() {
-  document.getElementById('modal-overlay').classList.remove('open');
-  document.body.style.overflow = '';
-  if (_lastFocusBeforeModal) _lastFocusBeforeModal.focus();
-}
-
-// Click outside
-document.getElementById('modal-overlay').addEventListener('click', (e) => {
-  if (e.target === document.getElementById('modal-overlay')) _closeModal();
-});
-
-// ESC key
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && document.getElementById('modal-overlay').classList.contains('open')) {
-    _closeModal();
-  }
-});
-
-// Swipe down to close
-const modalCard = document.getElementById('modal-card');
-modalCard.addEventListener('touchstart', (e) => {
-  _modalTouchStartY = e.touches[0].clientY;
-}, { passive: true });
-modalCard.addEventListener('touchend', (e) => {
-  const dy = e.changedTouches[0].clientY - _modalTouchStartY;
-  if (dy > 80 && modalCard.scrollTop <= 0) _closeModal();
-}, { passive: true });
-
-// Focus trap
-modalCard.addEventListener('keydown', (e) => {
-  if (e.key !== 'Tab') return;
-  const focusable = modalCard.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-  const first = focusable[0];
-  const last  = focusable[focusable.length - 1];
-  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-});
-
-// Buttons
-document.getElementById('modal-return-btn').addEventListener('click', _closeModal);
-document.getElementById('modal-play-btn').addEventListener('click', playGame);
-document.getElementById('modal-fav-btn').addEventListener('click', () => {
-  const g = window.__selectedGame;
-  if (g) toggleFavorite(g.folder);
-});
-document.getElementById('modal-quests-btn').addEventListener('click', () => {
-  _closeModal();
-  navigateTo('quests');
-});
-
-function playGame() {
-  const g = window.__selectedGame;
-  if (!g || !g.folder) return;
-  if (window.__updatePlayCount) window.__updatePlayCount(g.folder, g.earnings);
-  // Navigate to game folder — never exposes index.html
-  window.location.href = '/' + g.folder + '/';
-}
-
-/* ────────────────────────────────────────────────────
-   SEARCH — stays on search page, no forced navigation
-──────────────────────────────────────────────────── */
-const searchInput = document.getElementById('search-input');
-const searchClear = document.getElementById('search-clear');
-
-searchInput.addEventListener('input', () => {
-  const val = searchInput.value;
-  searchClear.classList.toggle('visible', val.length > 0);
-  renderSearch(window.__gamesData, val);
-});
-
-searchClear.addEventListener('click', () => {
-  searchInput.value = '';
-  searchClear.classList.remove('visible');
-  renderSearch(window.__gamesData, '');
-  searchInput.focus();
-});
-
-function renderSearch(games, query) {
-  const container = document.getElementById('search-results');
-  const q = query.toLowerCase().trim();
-
-  if (!q) {
-    container.innerHTML = '<div class="search-empty"><strong>🔍</strong>Start typing to search…</div>';
-    return;
-  }
-
-  const filtered = (games || []).filter(g =>
-    g.name.toLowerCase().includes(q) ||
-    g.description.toLowerCase().includes(q) ||
-    g.developer.toLowerCase().includes(q) ||
-    g.tags.some(t => t.toLowerCase().includes(q))
-  );
-
-  if (!filtered.length) {
-    container.innerHTML = `<div class="search-empty"><strong>😶</strong>No results for "<b>${esc(query)}</b>"</div>`;
-    return;
-  }
-
-  container.innerHTML = filtered.map(g => {
-    const origIdx = (window.__gamesData || []).indexOf(g);
-    return `
-      <button class="search-item" role="listitem" aria-label="Open ${esc(g.name)}"
-              onclick="openGameModal(${origIdx})">
-        <div class="search-item-icon">
-          <img src="${esc(g.folder)}/icon.png" alt="" loading="lazy"
-               onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2242%22 height=%2242%22><rect width=%2242%22 height=%2242%22 fill=%22%23222%22/></svg>'"/>
-        </div>
-        <div class="search-item-info">
-          <h3>${esc(g.name)}</h3>
-          <p>${esc(g.developer || g.description.substring(0, 50))}</p>
-        </div>
-        <div class="search-item-bean">
-          <img src="bean.png" alt="" onerror="this.outerHTML='🫘'"/>
-          ${Number(g.earnings).toLocaleString()}
-        </div>
-      </button>
-    `;
-  }).join('');
-}
-window.renderSearch = renderSearch;
-
-/* ────────────────────────────────────────────────────
-   QUESTS
-──────────────────────────────────────────────────── */
-
-/**
- * Quest definitions are declared here (client) but validated
- * server-side in __claimQuest using isQuestCompletedForUser().
- * The client can never forge completion — the transaction
- * re-checks the user doc's actual values.
- */
-const DAILY_QUESTS = [
-  {
-    id:       'q_daily_play1',
-    period:   'daily',
-    title:    'Play a Game',
-    desc:     'Play any game today',
-    reward:   15,
-    max:      1,
-    field:    'gamesPlayed',
-    absolute: false, // counts delta per day (simplified: uses total for demo)
-    icon:     'play',
-  },
-];
-const WEEKLY_QUESTS = [
-  {
-    id:       'q_weekly_play5',
-    period:   'weekly',
-    title:    'Play 5 Games',
-    desc:     'Play any 5 games this week',
-    reward:   50,
-    max:      5,
-    field:    'gamesPlayed',
-    icon:     'play',
-  },
-];
-const ALLTIME_QUESTS = [
-  {
-    id:     'q_play20',
-    period: 'alltime',
-    title:  'Play 20 Games',
-    desc:   'True crewmate grind',
-    reward: 150,
-    max:    20,
-    field:  'gamesPlayed',
-    icon:   'play',
-  },
-  {
-    id:     'q_login3',
-    period: 'alltime',
-    title:  'Login 3 Days',
-    desc:   'Log in 3 days in a row',
-    reward: 60,
-    max:    3,
-    field:  'loginStreak',
-    icon:   'cal',
-  },
-  {
-    id:     'q_beans500',
-    period: 'alltime',
-    title:  'Earn 500 Beans',
-    desc:   'Accumulate 500 beans total',
-    reward: 80,
-    max:    500,
-    field:  'beans',
-    icon:   'bean',
-  },
-];
-const ALL_QUEST_DEFS = [...DAILY_QUESTS, ...WEEKLY_QUESTS, ...ALLTIME_QUESTS];
-window.ALL_QUEST_DEFS = ALL_QUEST_DEFS; // exposed for Firebase module
-
-/** Server-side validation mirror (also used inside the Firestore transaction). */
-window.isQuestCompletedForUser = function(questId, userData) {
-  const def = ALL_QUEST_DEFS.find(q => q.id === questId);
-  if (!def) return false;
-  const val = userData[def.field] || 0;
-  return val >= def.max;
-};
-
-function getQuestProgress(def, userData) {
-  return Math.min(def.max, Number(userData?.[def.field] || 0));
-}
-
-function renderQuests(userData) {
-  const list    = document.getElementById('quests-list');
-  const claimed = userData?.claimedQuests || [];
-  const tab     = window.__questTab;
-
-  let quests;
-  if (tab === 'daily')   quests = DAILY_QUESTS;
-  else if (tab === 'weekly')  quests = WEEKLY_QUESTS;
-  else if (tab === 'alltime') quests = ALLTIME_QUESTS;
-  else /* claimed */          quests = ALL_QUEST_DEFS.filter(q => claimed.includes(q.id));
-
-  if (tab !== 'claimed') {
-    quests = quests.filter(q => !claimed.includes(q.id));
-  }
-
-  if (!quests.length) {
-    list.innerHTML = `<div style="text-align:center;padding:36px 16px;color:var(--text-muted);font-size:13px;">
-      ${tab === 'claimed' ? '🏅 No claimed quests yet.' : '🎉 All done! Check other tabs.'}
-    </div>`;
-    return;
-  }
-
-  const ICONS = {
-    play:   '<path d="M8 5v14l11-7z"/>',
-    cal:    '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
-    bean:   '<ellipse cx="12" cy="12" rx="7" ry="9"/><path d="M9 6c0 3 6 3 6 6s-6 3-6 6"/>',
-    trophy: '<path d="M8 21h8M12 17v4M7 4H4a1 1 0 0 0-1 1v2a4 4 0 0 0 4 4h10a4 4 0 0 0 4-4V5a1 1 0 0 0-1-1h-3"/><rect x="7" y="2" width="10" height="12" rx="2"/>',
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+  import {
+    getAuth, GoogleAuthProvider, signInWithPopup,
+    onAuthStateChanged, signOut as fbSignOut
+  } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+  import {
+    getFirestore, doc, getDoc, setDoc, updateDoc,
+    serverTimestamp, increment, arrayUnion
+  } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCIkS8aU3NyKPH2EWqLNLjKxxg7y7kKu8M",
+    authDomain: "skeld-g.firebaseapp.com",
+    projectId: "skeld-g",
+    storageBucket: "skeld-g.firebasestorage.app",
+    messagingSenderId: "474209822056",
+    appId: "1:474209822056:web:eee11ece0da8f1cfd4a2dd"
   };
 
-  list.innerHTML = quests.map(q => {
-    const progress   = getQuestProgress(q, userData);
-    const pct        = Math.min(100, (progress / q.max) * 100);
-    const complete   = progress >= q.max;
-    const isClaimed  = claimed.includes(q.id);
-    const iconPaths  = ICONS[q.icon] || '<circle cx="12" cy="12" r="10"/>';
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
 
-    return `
-      <div class="quest-item${complete ? ' completed' : ''}" role="article">
-        <div class="quest-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${iconPaths}</svg>
-        </div>
-        <div class="quest-info">
-          <h3>${esc(q.title)}</h3>
-          <div class="quest-progress-bar" role="progressbar" aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="${q.max}">
-            <div class="quest-progress-fill" style="width:${pct}%"></div>
-          </div>
-          <div class="quest-meta">
-            <span>${progress}/${q.max}</span>
-            <span>${esc(q.desc)}</span>
-          </div>
-        </div>
-        <div class="quest-right">
-          <div class="quest-reward-row">
-            <img src="bean.png" alt="" aria-hidden="true" onerror="this.outerHTML='🫘'"/>
-            ${q.reward}
-          </div>
-          ${complete && !isClaimed
-            ? `<button class="btn-claim" onclick="claimQuest('${q.id}',${q.reward})" aria-label="Claim ${q.reward} beans for ${esc(q.title)}">CLAIM</button>`
-            : isClaimed
-            ? `<div class="claimed-badge">✓ Done</div>`
-            : ''
-          }
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-window.renderQuests = renderQuests;
+  window._auth = auth;
+  window._db = db;
+  window._doc = doc;
+  window._getDoc = getDoc;
+  window._setDoc = setDoc;
+  window._updateDoc = updateDoc;
+  window._serverTimestamp = serverTimestamp;
+  window._increment = increment;
+  window._arrayUnion = arrayUnion;
 
-window.claimQuest = function(questId, reward) {
-  if (window.__claimQuest) window.__claimQuest(questId, reward);
-};
+  // ── SIGN IN ──
+  window.signInWithGoogle = async () => {
+    const loadEl = document.getElementById('auth-loading');
+    const btnEl = document.getElementById('btn-google-signin');
+    loadEl.style.display = 'block';
+    btnEl.disabled = true;
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+    } catch (e) {
+      console.error(e);
+      loadEl.style.display = 'none';
+      btnEl.disabled = false;
+      showToast('Sign in failed. Try again.');
+    }
+  };
 
-window.switchQuestTab = function(tab) {
-  window.__questTab = tab;
-  ['daily','weekly','alltime','claimed'].forEach(t => {
-    const el = document.getElementById('tab-' + t);
-    el.classList.toggle('active', t === tab);
-    el.setAttribute('aria-selected', t === tab ? 'true' : 'false');
+  window.signOut = async () => {
+    await fbSignOut(auth);
+    window._userData = null;
+    window._userUid = null;
+    updateAllBeanDisplays(0);
+  };
+
+  // ── AUTH STATE ──
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      document.getElementById('auth-overlay').classList.add('hidden');
+      await ensureUserDoc(user);
+      await loadUserData(user.uid);
+    } else {
+      document.getElementById('auth-overlay').classList.remove('hidden');
+    }
   });
-  renderQuests(window.__userData);
-};
 
-/* ────────────────────────────────────────────────────
-   COPY UID
-──────────────────────────────────────────────────── */
-document.getElementById('btn-copy-uid').addEventListener('click', async () => {
-  const uid = window.__userUid;
-  if (!uid) return;
-  try {
-    await navigator.clipboard.writeText(uid);
-    const btn = document.getElementById('btn-copy-uid');
-    btn.textContent = 'Copied!';
-    btn.classList.add('copied');
-    showToast('UID copied! 📋');
-    setTimeout(() => {
-      btn.textContent = 'Copy';
-      btn.classList.remove('copied');
-    }, 2000);
-  } catch (e) {
-    // Fallback for non-HTTPS / older browsers
-    const range = document.createRange();
-    const el    = document.getElementById('uid-display');
-    range.selectNode(el);
-    window.getSelection().removeAllRanges();
-    window.getSelection().addRange(range);
-    try { document.execCommand('copy'); showToast('UID copied! 📋'); }
-    catch(e2) { showToast('Copy failed — select the UID manually.'); }
-    window.getSelection().removeAllRanges();
+  // ── ENSURE USER DOC ──
+  async function ensureUserDoc(user) {
+    const ref = doc(db, 'users', user.uid);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) {
+      await setDoc(ref, {
+        displayName: user.displayName || 'Crewmate',
+        photoURL: user.photoURL || '',
+        email: user.email || '',
+        beans: 100,
+        inventory: [],
+        gamesPlayed: 0,
+        questsCompleted: 0,
+        claimedQuests: [],
+        loginStreak: 1,
+        lastLoginDate: new Date().toDateString(),
+        createdAt: serverTimestamp(),
+        lastLogin: serverTimestamp()
+      });
+      showToast('Welcome! You received 100 🫘 beans!');
+    } else {
+      // Update login streak
+      const data = snap.data();
+      const today = new Date().toDateString();
+      const lastDate = data.lastLoginDate;
+      const yesterday = new Date(Date.now() - 86400000).toDateString();
+      let streak = data.loginStreak || 1;
+      if (lastDate !== today) {
+        streak = lastDate === yesterday ? streak + 1 : 1;
+        await updateDoc(ref, {
+          lastLogin: serverTimestamp(),
+          lastLoginDate: today,
+          loginStreak: streak
+        });
+      }
+    }
   }
-});
 
-/* ────────────────────────────────────────────────────
-   TOAST
-──────────────────────────────────────────────────── */
-window.showToast = function(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(t.__timer);
-  t.__timer = setTimeout(() => t.classList.remove('show'), 2800);
-};
+  // ── LOAD USER DATA ──
+  async function loadUserData(uid) {
+    const ref = doc(db, 'users', uid);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return;
+    const data = snap.data();
 
-/* ────────────────────────────────────────────────────
-   UTILITY
-──────────────────────────────────────────────────── */
-function esc(s) {
-  return String(s)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-window.esc = esc; // expose for inline templates
+    window._userData = data;
+    window._userUid = uid;
+
+    const beans = data.beans ?? 0;
+    updateAllBeanDisplays(beans);
+
+    document.getElementById('profile-name').textContent = data.displayName || 'Crewmate';
+    document.getElementById('profile-email').textContent = data.email || '';
+    document.getElementById('profile-uid').textContent = uid.substring(0, 16) + '…';
+    document.getElementById('stat-games').textContent = window._gamesData?.length ?? '—';
+    document.getElementById('stat-played').textContent = data.gamesPlayed ?? 0;
+    document.getElementById('stat-quests').textContent = data.questsCompleted ?? 0;
+
+    const createdAt = data.createdAt?.toDate?.();
+    const lastLogin = data.lastLogin?.toDate?.();
+    document.getElementById('profile-joined').textContent = createdAt ? createdAt.toLocaleDateString() : '—';
+    document.getElementById('profile-lastlogin').textContent = lastLogin ? lastLogin.toLocaleDateString() : '—';
+
+    // Avatar
+    const av = auth.currentUser?.photoURL;
+    if (av) {
+      document.getElementById('profile-avatar-img').innerHTML = `<img src="${av}" alt="avatar"/>`;
+      document.getElementById('header-avatar').innerHTML = `<img src="${av}" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"/>`;
+    }
+
+    // Render quests with real data
+    renderQuests(data);
+    // Render shop with inventory
+    renderShop(data.inventory || []);
+  }
+
+  window._loadUserData = loadUserData;
+
+  // ── REFRESH USER FROM FIRESTORE ──
+  window._refreshUser = async () => {
+    const uid = window._userUid;
+    if (!uid) return;
+    await loadUserData(uid);
+  };
+
+  // ── UPDATE BEANS ACROSS ALL DISPLAYS ──
+  window.updateAllBeanDisplays = (beans) => {
+    const val = Number(beans).toLocaleString();
+    document.getElementById('header-beans').textContent = val;
+    document.getElementById('shop-beans').textContent = val;
+    document.getElementById('profile-beans').textContent = val;
+    // Bump animation
+    const badge = document.getElementById('beans-badge');
+    badge.classList.remove('bump');
+    void badge.offsetWidth;
+    badge.classList.add('bump');
+    setTimeout(() => badge.classList.remove('bump'), 400);
+  };
+
+  // ── AWARD BEANS ──
+  window._awardBeans = async (amount, reason) => {
+    const uid = window._userUid;
+    if (!uid) return;
+    try {
+      const ref = doc(db, 'users', uid);
+      await updateDoc(ref, { beans: increment(amount) });
+      const newBeans = (window._userData?.beans || 0) + amount;
+      if (window._userData) window._userData.beans = newBeans;
+      updateAllBeanDisplays(newBeans);
+      showToast(`+${amount} 🫘 ${reason || 'beans earned!'}`);
+    } catch (e) { console.error('Award beans error:', e); }
+  };
+
+  // ── DEDUCT BEANS ──
+  window._deductBeans = async (amount) => {
+    const uid = window._userUid;
+    if (!uid) return false;
+    const currentBeans = window._userData?.beans || 0;
+    if (currentBeans < amount) return false;
+    try {
+      const ref = doc(db, 'users', uid);
+      await updateDoc(ref, { beans: increment(-amount) });
+      const newBeans = currentBeans - amount;
+      if (window._userData) window._userData.beans = newBeans;
+      updateAllBeanDisplays(newBeans);
+      return true;
+    } catch (e) { console.error('Deduct beans error:', e); return false; }
+  };
+
+  // ── UPDATE PLAY COUNT + AWARD BEANS ──
+  window._updatePlayCount = async (gameFolder, beansEarned) => {
+    const uid = window._userUid;
+    if (!uid) return;
+    try {
+      const ref = doc(db, 'users', uid);
+      const snap = await getDoc(ref);
+      if (!snap.exists()) return;
+      const data = snap.data();
+      const played = (data.gamesPlayed || 0) + 1;
+      const earnedBeans = beansEarned || 0;
+      await updateDoc(ref, {
+        gamesPlayed: played,
+        beans: increment(earnedBeans)
+      });
+      if (window._userData) {
+        window._userData.gamesPlayed = played;
+        window._userData.beans = (window._userData.beans || 0) + earnedBeans;
+      }
+      document.getElementById('stat-played').textContent = played;
+      if (earnedBeans > 0) {
+        updateAllBeanDisplays(window._userData.beans);
+        showToast(`+${earnedBeans} 🫘 beans earned!`);
+      }
+      // Check quest progress
+      await checkQuestProgress('gamesPlayed', played);
+    } catch (e) { console.error(e); }
+  };
+
+  // ── CLAIM QUEST ──
+  window._claimQuest = async (questId, reward) => {
+    const uid = window._userUid;
+    if (!uid) return;
+    try {
+      const ref = doc(db, 'users', uid);
+      const snap = await getDoc(ref);
+      if (!snap.exists()) return;
+      const data = snap.data();
+      const claimed = data.claimedQuests || [];
+      if (claimed.includes(questId)) { showToast('Already claimed!'); return; }
+      await updateDoc(ref, {
+        claimedQuests: arrayUnion(questId),
+        beans: increment(reward),
+        questsCompleted: increment(1)
+      });
+      if (window._userData) {
+        window._userData.claimedQuests = [...claimed, questId];
+        window._userData.beans = (window._userData.beans || 0) + reward;
+        window._userData.questsCompleted = (window._userData.questsCompleted || 0) + 1;
+      }
+      updateAllBeanDisplays(window._userData.beans);
+      document.getElementById('stat-quests').textContent = window._userData.questsCompleted;
+      showToast(`+${reward} 🫘 quest reward!`);
+      renderQuests(window._userData);
+    } catch (e) { console.error('Claim quest error:', e); }
+  };
+
+  // ── CHECK QUEST PROGRESS ──
+  async function checkQuestProgress(field, value) {
+    if (!window._userData) return;
+    window._userData[field] = value;
+    renderQuests(window._userData);
+  }
+
+  // ── BUY ITEM ──
+  window.buyItem = async (id, price, name) => {
+    const uid = window._userUid;
+    if (!uid) { showToast('Sign in to buy items!'); return; }
+    const userData = window._userData;
+    if (!userData) return;
+    const inv = userData.inventory || [];
+    if (inv.includes(id)) { showToast('Already owned!'); return; }
+    if ((userData.beans || 0) < price) { showToast('Not enough beans! 🫘'); return; }
+    try {
+      const ref = doc(db, 'users', uid);
+      await updateDoc(ref, {
+        beans: increment(-price),
+        inventory: arrayUnion(id)
+      });
+      if (window._userData) {
+        window._userData.beans = (window._userData.beans || 0) - price;
+        window._userData.inventory = [...inv, id];
+      }
+      updateAllBeanDisplays(window._userData.beans);
+      showToast(`🎉 Bought ${name}!`);
+      // Re-render shop to show owned state
+      renderShop(window._userData.inventory);
+      // Check shop quest
+      await checkQuestProgress('visitedShop', true);
+    } catch(e) { console.error(e); showToast('Purchase failed.'); }
+  };
+
+  // ── LOAD GAMES ──
+  async function loadGames() {
+    try {
+      const res = await fetch('game.json');
+      if (!res.ok) throw new Error('game.json not found');
+      const games = await res.json();
+      window._gamesData = games;
+      renderGameGrid(games);
+      renderSearch(games, '');
+      document.getElementById('games-count').textContent = games.length + ' games';
+      document.getElementById('stat-games').textContent = games.length;
+    } catch (e) {
+      console.error(e);
+      document.getElementById('game-grid').innerHTML = `<p style="color:var(--text-muted);font-size:13px;padding:10px 0;grid-column:1/-1;">No games found. Add a game.json file.</p>`;
+    }
+  }
+  loadGames();
+
 </script>
+
+<!-- ════════════════════════════════════════════════
+     APP LOGIC (non-module)
+════════════════════════════════════════════════ -->
+<script>
+  window._gamesData = [];
+  window._selectedGame = null;
+  window._userData = null;
+  window._userUid = null;
+  window._currentQuestTab = 'active';
+
+  // ─────────────────────────────────────────────
+  // ROUTING — clean URLs, no index.html
+  // ─────────────────────────────────────────────
+  const PAGE_ROUTES = {
+    '':        'home',
+    '/':       'home',
+    '/shop':   'shop',
+    '/search': 'search',
+    '/quests': 'quests',
+    '/profile':'profile',
+  };
+  const ROUTE_PATHS = {
+    home:    '/',
+    shop:    '/shop',
+    search:  '/search',
+    quests:  '/quests',
+    profile: '/profile',
+  };
+
+  function resolvePageFromPath(path) {
+    // Strip trailing slash except root
+    const clean = path.length > 1 ? path.replace(/\/$/, '') : path;
+    return PAGE_ROUTES[clean] || 'home';
+  }
+
+  window.navigateTo = function(page, pushState = true) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const pageEl = document.getElementById('page-' + page);
+    const navEl = document.getElementById('nav-' + page);
+    if (pageEl) pageEl.classList.add('active');
+    if (navEl) navEl.classList.add('active');
+    const titles = { home:'Home', search:'Search', shop:'Shop', quests:'Quests', profile:'Profile' };
+    document.getElementById('header-title').textContent = titles[page] || '';
+    window.scrollTo(0, 0);
+    if (pushState) {
+      const path = ROUTE_PATHS[page] || '/';
+      history.pushState({ page }, '', path);
+    }
+    // Mark shop visited for quest
+    if (page === 'shop' && window._userData) {
+      window._userData.visitedShop = true;
+      renderQuests(window._userData);
+    }
+  };
+
+  // Handle browser back/forward
+  window.addEventListener('popstate', (e) => {
+    const page = (e.state && e.state.page) || resolvePageFromPath(location.pathname);
+    navigateTo(page, false);
+  });
+
+  // Initial route on load
+  (function initRoute() {
+    const page = resolvePageFromPath(location.pathname);
+    navigateTo(page, false);
+    // Replace state so back button works
+    history.replaceState({ page }, '', location.pathname);
+  })();
+
+  // ─────────────────────────────────────────────
+  // GAME GRID
+  // ─────────────────────────────────────────────
+  function renderGameGrid(games) {
+    const grid = document.getElementById('game-grid');
+    if (!games || games.length === 0) {
+      grid.innerHTML = '<p style="color:var(--text-muted);font-size:13px;padding:10px 0;grid-column:1/-1;">No games available.</p>';
+      return;
+    }
+    grid.innerHTML = games.map((g, i) => `
+      <div class="game-slot" onclick="openGameModal(${i})">
+        <div class="game-slot-icon">
+          <img src="${g.folder}/icon.png" alt="${escHtml(g.name)}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2256%22 height=%2256%22><rect width=%2256%22 height=%2256%22 fill=%22%23222%22/><text x=%2250%25%22 y=%2255%25%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22 font-size=%2222%22 fill=%22%23555%22>?</text></svg>'"/>
+        </div>
+        <div class="game-slot-name">${escHtml(g.name)}</div>
+      </div>
+    `).join('');
+  }
+  window.renderGameGrid = renderGameGrid;
+
+  // ─────────────────────────────────────────────
+  // GAME MODAL
+  // ─────────────────────────────────────────────
+  window.openGameModal = function(idx) {
+    const g = window._gamesData[idx];
+    if (!g) return;
+    window._selectedGame = g;
+    document.getElementById('modal-icon').src = `${g.folder}/icon.png`;
+    document.getElementById('modal-icon').onerror = function(){ this.src = ''; };
+    document.getElementById('modal-title').textContent = g.name;
+    document.getElementById('modal-desc-text').textContent = g.description || 'No description available.';
+    document.getElementById('modal-plays').textContent = g.totalPlays != null ? Number(g.totalPlays).toLocaleString() : '—';
+    document.getElementById('modal-active').textContent = g.activeUsers != null ? Number(g.activeUsers).toLocaleString() : '—';
+    document.getElementById('modal-difficulty').textContent = g.difficulty || '—';
+    document.getElementById('modal-earnings').textContent = g.earnings != null ? Number(g.earnings).toLocaleString() : '600';
+    const chips = document.getElementById('modal-chips');
+    const meta = [];
+    if (g.releaseDate) meta.push(g.releaseDate);
+    if (g.developer) meta.push(g.developer);
+    if (g.tags) meta.push(...(Array.isArray(g.tags) ? g.tags : [g.tags]));
+    chips.innerHTML = meta.map(m => `<span class="chip">${escHtml(String(m))}</span>`).join('');
+    document.getElementById('modal-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  };
+
+  window.closeModal = function(e) {
+    if (e && e.target !== document.getElementById('modal-overlay')) return;
+    document.getElementById('modal-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+  };
+
+  window.playGame = function() {
+    const g = window._selectedGame;
+    if (!g) return;
+    const beansEarned = g.earnings || 0;
+    if (window._updatePlayCount) window._updatePlayCount(g.folder, beansEarned);
+    // Navigate to game folder without showing index.html
+    const path = `/${g.folder}`;
+    window.location.href = path;
+  };
+
+  // ─────────────────────────────────────────────
+  // SEARCH
+  // ─────────────────────────────────────────────
+  function renderSearch(games, query) {
+    const container = document.getElementById('search-results');
+    const q = query.toLowerCase().trim();
+    if (!q) {
+      container.innerHTML = '<div class="search-empty">Start typing to search…</div>';
+      return;
+    }
+    const filtered = (games || []).filter(g =>
+      g.name.toLowerCase().includes(q) ||
+      (g.description || '').toLowerCase().includes(q) ||
+      (g.developer || '').toLowerCase().includes(q)
+    );
+    if (!filtered.length) {
+      container.innerHTML = '<div class="search-empty">No results found.</div>';
+      return;
+    }
+    container.innerHTML = filtered.map(g => {
+      const origIdx = (window._gamesData || []).indexOf(g);
+      return `
+        <div class="search-item" onclick="openGameModal(${origIdx});navigateTo('home');">
+          <div class="search-item-icon">
+            <img src="${g.folder}/icon.png" alt="${escHtml(g.name)}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2244%22 height=%2244%22><rect width=%2244%22 height=%2244%22 fill=%22%23222%22/><text x=%2250%25%22 y=%2255%25%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22 font-size=%2218%22 fill=%22%23555%22>?</text></svg>'"/>
+          </div>
+          <div class="search-item-info">
+            <h3>${escHtml(g.name)}</h3>
+            <p>${escHtml(g.developer || g.description?.substring(0, 40) || '—')}</p>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+  window.renderSearch = renderSearch;
+  window.onSearch = function(val) { renderSearch(window._gamesData, val); };
+
+  // ─────────────────────────────────────────────
+  // SHOP
+  // ─────────────────────────────────────────────
+  const SHOP_ITEMS = [
+    { id: 'hat_crewmate',  name: 'Crewmate Hat',       price: 50,  emoji: '🪖' },
+    { id: 'skin_red',      name: 'Red Skin',            price: 80,  emoji: '🔴' },
+    { id: 'pet_mini',      name: 'Mini Crewmate Pet',   price: 200, emoji: '👶' },
+    { id: 'hat_party',     name: 'Party Hat',           price: 60,  emoji: '🎉' },
+    { id: 'skin_ghost',    name: 'Ghost Skin',          price: 120, emoji: '👻' },
+    { id: 'boost_2x',      name: '2× Bean Boost',       price: 150, emoji: '⚡' },
+  ];
+  window.SHOP_ITEMS = SHOP_ITEMS;
+
+  function renderShop(inventory) {
+    const inv = inventory || window._userData?.inventory || [];
+    const grid = document.getElementById('shop-grid');
+    grid.innerHTML = SHOP_ITEMS.map(item => {
+      const owned = inv.includes(item.id);
+      return `
+        <div class="shop-card${owned ? ' owned' : ''}">
+          <div class="shop-card-img">${item.emoji}</div>
+          <div class="shop-card-body">
+            <div class="shop-card-title">${escHtml(item.name)}</div>
+            <div class="shop-card-price">
+              <img class="bean-icon" src="bean.png" alt="🫘" onerror="this.outerHTML='<span>🫘</span>'"/>
+              ${item.price}
+            </div>
+            ${owned
+              ? `<button class="btn-buy owned-btn" disabled>✓ Owned</button>`
+              : `<button class="btn-buy" onclick="buyItem('${item.id}', ${item.price}, '${escHtml(item.name)}')">Buy</button>`
+            }
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+  window.renderShop = renderShop;
+  renderShop([]);
+
+  // ─────────────────────────────────────────────
+  // QUESTS — fully dynamic based on user data
+  // ─────────────────────────────────────────────
+  function getQuestDefs(userData) {
+    const gamesPlayed = userData?.gamesPlayed || 0;
+    const beans = userData?.beans || 0;
+    const loginStreak = userData?.loginStreak || 0;
+    const visitedShop = userData?.visitedShop || false;
+    const inventoryCount = (userData?.inventory || []).length;
+    return [
+      {
+        id: 'q_play5',
+        title: 'Play 5 Games',
+        desc: 'Play any 5 mini-games',
+        reward: 50,
+        progress: Math.min(gamesPlayed, 5),
+        max: 5,
+        icon: 'play',
+      },
+      {
+        id: 'q_play20',
+        title: 'Play 20 Games',
+        desc: 'True crewmate grind',
+        reward: 150,
+        progress: Math.min(gamesPlayed, 20),
+        max: 20,
+        icon: 'play',
+      },
+      {
+        id: 'q_login3',
+        title: 'Login 3 Days',
+        desc: 'Log in 3 days in a row',
+        reward: 60,
+        progress: Math.min(loginStreak, 3),
+        max: 3,
+        icon: 'cal',
+      },
+      {
+        id: 'q_shop',
+        title: 'Visit the Shop',
+        desc: 'Browse the store',
+        reward: 20,
+        progress: visitedShop ? 1 : 0,
+        max: 1,
+        icon: 'shop',
+      },
+      {
+        id: 'q_buy1',
+        title: 'Buy an Item',
+        desc: 'Purchase from the shop',
+        reward: 40,
+        progress: Math.min(inventoryCount, 1),
+        max: 1,
+        icon: 'shop',
+      },
+      {
+        id: 'q_buy3',
+        title: 'Collect 3 Items',
+        desc: 'Build your collection',
+        reward: 100,
+        progress: Math.min(inventoryCount, 3),
+        max: 3,
+        icon: 'shop',
+      },
+      {
+        id: 'q_beans500',
+        title: 'Earn 500 Beans',
+        desc: 'Accumulate 500 beans total (incl. start)',
+        reward: 80,
+        progress: Math.min(beans, 500),
+        max: 500,
+        icon: 'bean',
+      },
+    ];
+  }
+
+  function renderQuests(userData) {
+    const list = document.getElementById('quests-list');
+    const claimed = userData?.claimedQuests || [];
+    const quests = getQuestDefs(userData);
+    const tab = window._currentQuestTab;
+
+    const filtered = quests.filter(q => {
+      const isComplete = q.progress >= q.max;
+      const isClaimed = claimed.includes(q.id);
+      if (tab === 'active') return !isClaimed;
+      return isClaimed;
+    });
+
+    if (filtered.length === 0) {
+      list.innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--text-muted);font-size:14px;">${tab === 'completed' ? 'No completed quests yet.' : 'All quests done! 🎉'}</div>`;
+      return;
+    }
+
+    list.innerHTML = filtered.map(q => {
+      const pct = Math.min(100, (q.progress / q.max) * 100);
+      const isComplete = q.progress >= q.max;
+      const isClaimed = claimed.includes(q.id);
+      const iconSvg = {
+        play:   '<path d="M8 5v14l11-7z"/>',
+        trophy: '<path d="M8 21h8M12 17v4M7 4H4a1 1 0 0 0-1 1v2a4 4 0 0 0 4 4h10a4 4 0 0 0 4-4V5a1 1 0 0 0-1-1h-3"/><rect x="7" y="2" width="10" height="12" rx="2"/>',
+        shop:   '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>',
+        cal:    '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+        bean:   '<ellipse cx="12" cy="12" rx="7" ry="9" fill="none"/><path d="M9 6c0 3 6 3 6 6s-6 3-6 6"/>',
+      }[q.icon] || '<circle cx="12" cy="12" r="10"/>';
+
+      return `
+        <div class="quest-item${isComplete ? ' completed' : ''}">
+          <div class="quest-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${iconSvg}</svg>
+          </div>
+          <div class="quest-info">
+            <h3>${escHtml(q.title)}</h3>
+            <div class="quest-progress-bar"><div class="quest-progress-fill" style="width:${pct}%"></div></div>
+            <div class="quest-meta"><span>${q.progress}/${q.max}</span><span>${escHtml(q.desc)}</span></div>
+          </div>
+          <div class="quest-reward">
+            <div class="quest-reward-row">
+              <img class="bean-icon" src="bean.png" alt="🫘" onerror="this.outerHTML='<span>🫘</span>'"/>
+              ${q.reward}
+            </div>
+            ${isComplete && !isClaimed
+              ? `<button class="btn-claim" onclick="claimQuest('${q.id}', ${q.reward})">CLAIM</button>`
+              : isClaimed
+              ? `<div class="claimed-badge">✓ Done</div>`
+              : ''
+            }
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+  window.renderQuests = renderQuests;
+
+  window.claimQuest = function(questId, reward) {
+    if (window._claimQuest) window._claimQuest(questId, reward);
+  };
+
+  window.switchQuestTab = function(tab) {
+    window._currentQuestTab = tab;
+    document.getElementById('tab-active').classList.toggle('active', tab === 'active');
+    document.getElementById('tab-completed').classList.toggle('active', tab === 'completed');
+    renderQuests(window._userData);
+  };
+
+  // ─────────────────────────────────────────────
+  // TOAST
+  // ─────────────────────────────────────────────
+  window.showToast = function(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove('show'), 2800);
+  };
+
+  // ─────────────────────────────────────────────
+  // UTILS
+  // ─────────────────────────────────────────────
+  function escHtml(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+</script>
+
 </body>
- </html>
+</html>

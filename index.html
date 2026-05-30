@@ -18,79 +18,24 @@
   html, body { background: var(--bg); color: var(--text); font-family: 'Nunito', sans-serif; min-height: 100vh; overflow-x: hidden; -webkit-tap-highlight-color: transparent; -webkit-font-smoothing: antialiased; }
   ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: var(--bg); } ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 4px; }
 
+  /* ── HEADER ── */
   #header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: var(--header-h); background: var(--bg); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; gap: 8px; }
   .header-logo { display: flex; align-items: center; gap: 8px; font-family: 'Space Mono', monospace; font-weight: 700; font-size: 15px; color: var(--text); letter-spacing: -0.5px; text-decoration: none; flex-shrink: 0; }
   .header-logo span { color: var(--accent); }
   .header-title { font-size: 14px; font-weight: 700; color: var(--text-muted); text-align: center; flex: 1; }
   .header-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
   .beans-badge { display: flex; align-items: center; gap: 5px; background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 4px 10px 4px 6px; font-size: 13px; font-weight: 800; color: var(--bean); }
-  .beans-badge img { width: 18px; height: 18px; object-fit: contain; }
-  .avatar-btn { width: 32px; height: 32px; border-radius: 50%; background: var(--surface3); border: 2px solid var(--border); overflow: hidden; cursor: pointer; display: flex; align-items: center; justify-content: center; text-decoration: none; }
-  .avatar-btn img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+  .avatar-btn { width: 32px; height: 32px; border-radius: 50%; background: var(--surface3); border: 2px solid var(--border); overflow: hidden; cursor: pointer; display: flex; align-items: center; justify-content: center; text-decoration: none; flex-shrink: 0; }
+  .avatar-btn img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
   .avatar-btn svg { width: 18px; height: 18px; fill: var(--text-muted); }
 
-  #app { padding: calc(var(--header-h) + 20px) 16px 20px; min-height: 100vh; padding-bottom: calc(var(--nav-h) + 20px); }
+  /* ── APP ── */
+  #app { padding: calc(var(--header-h) + 20px) 16px calc(var(--nav-h) + 20px); min-height: 100vh; }
 
-  /* SUMMARY CARD */
-  .quests-summary {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 18px 20px; margin-bottom: 24px;
-    display: flex; align-items: center; gap: 16px;
-  }
-  .qs-left { flex: 1; }
-  .qs-left h2 { font-size: 20px; font-weight: 900; margin-bottom: 4px; }
-  .qs-left p { font-size: 13px; color: var(--text-muted); }
-  .qs-beans { display: flex; align-items: center; gap: 6px; font-size: 22px; font-weight: 900; color: var(--bean); flex-shrink: 0; }
-  .qs-beans img { width: 24px; height: 24px; object-fit: contain; }
-
-  /* QUEST CARDS */
-  .section-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; margin-top: 20px; }
-
-  .quest-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 16px; margin-bottom: 10px;
-    display: flex; align-items: center; gap: 14px;
-    position: relative; overflow: hidden;
-    transition: border-color 0.2s, transform 0.15s;
-  }
-  .quest-card:hover { border-color: rgba(255,255,255,0.1); transform: translateY(-1px); }
-  .quest-card.complete { border-color: rgba(74,222,128,0.2); }
-  .quest-card.complete::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(74,222,128,0.04) 0%, transparent 60%); pointer-events: none; }
-  .quest-card.claimed { opacity: 0.6; }
-
-  .quest-icon-wrap {
-    width: 44px; height: 44px; border-radius: 12px; background: var(--surface2);
-    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-  }
-  .quest-icon-wrap svg { width: 22px; height: 22px; stroke: var(--accent); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-  .quest-icon-wrap.done { background: rgba(74,222,128,0.15); }
-  .quest-icon-wrap.done svg { stroke: var(--accent); }
-
-  .quest-body { flex: 1; min-width: 0; }
-  .quest-title { font-size: 14px; font-weight: 800; margin-bottom: 2px; }
-  .quest-desc { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
-  .quest-bar { height: 5px; background: var(--surface3); border-radius: 5px; overflow: hidden; margin-bottom: 5px; }
-  .quest-bar-fill { height: 100%; background: var(--accent); border-radius: 5px; transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1); }
-  .quest-bar-fill.done { background: var(--accent); }
-  .quest-counts { font-size: 11px; color: var(--text-muted); display: flex; justify-content: space-between; }
-
-  .quest-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
-  .quest-reward-badge { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 900; color: var(--bean); }
-  .quest-reward-badge img { width: 14px; height: 14px; object-fit: contain; }
-  .btn-claim {
-    background: var(--accent); color: #111; border: none;
-    font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 900;
-    border-radius: 8px; padding: 6px 12px; cursor: pointer;
-    transition: background 0.18s, transform 0.15s;
-    white-space: nowrap;
-  }
-  .btn-claim:hover { background: #22c55e; }
-  .btn-claim:active { transform: scale(0.95); }
-  .btn-claimed { background: var(--surface3); color: var(--text-muted); border: 1px solid var(--border); font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 700; border-radius: 8px; padding: 6px 12px; cursor: default; }
-
-  /* AUTH OVERLAY */
-  #auth-overlay { position: fixed; inset: 0; z-index: 200; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; padding: 32px 24px; }
+  /* ── AUTH OVERLAY ── */
+  #auth-overlay { position: fixed; inset: 0; z-index: 200; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; padding: 32px 24px; transition: opacity 0.2s; }
   #auth-overlay.hidden { display: none; }
+  #auth-overlay.loading { pointer-events: none; }
   .auth-logo { font-family: 'Space Mono', monospace; font-size: 28px; font-weight: 700; color: var(--text); margin-bottom: 8px; letter-spacing: -1px; }
   .auth-logo span { color: var(--accent); }
   .auth-tagline { font-size: 14px; color: var(--text-muted); text-align: center; margin-bottom: 40px; line-height: 1.5; }
@@ -98,9 +43,105 @@
   .btn-google { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--border); color: var(--text); font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 700; border-radius: var(--radius-sm); padding: 13px 24px; cursor: pointer; transition: background 0.2s, transform 0.15s; width: 100%; max-width: 320px; justify-content: center; }
   .btn-google:hover { background: var(--surface2); }
   .btn-google:active { transform: scale(0.97); }
-  .google-icon { width: 20px; height: 20px; }
+  .btn-google:disabled { opacity: 0.5; cursor: not-allowed; }
+  .google-icon { width: 20px; height: 20px; flex-shrink: 0; }
+  .auth-spinner { width: 32px; height: 32px; border: 3px solid var(--surface3); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 20px auto 0; }
 
-  /* BOTTOM NAV */
+  /* ── SUMMARY CARD ── */
+  .quests-summary { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; margin-bottom: 16px; display: flex; align-items: center; gap: 16px; }
+  .qs-left { flex: 1; }
+  .qs-left h2 { font-size: 20px; font-weight: 900; margin-bottom: 4px; }
+  .qs-left p { font-size: 13px; color: var(--text-muted); }
+  .qs-beans { display: flex; align-items: center; gap: 6px; font-size: 22px; font-weight: 900; color: var(--bean); flex-shrink: 0; }
+
+  /* ── RESET TIMER ── */
+  .reset-timer-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+  .reset-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+  .reset-time { font-family: 'Space Mono', monospace; font-size: 15px; font-weight: 700; color: var(--text); }
+
+  /* ── STREAK CARD ── */
+  .streak-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
+  .streak-icon { font-size: 22px; line-height: 1; }
+  .streak-body { flex: 1; }
+  .streak-title { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 2px; }
+  .streak-val { font-size: 18px; font-weight: 900; color: var(--text); }
+
+  /* ── STATS ROW ── */
+  .stats-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; }
+  .stat-card .stat-val { font-size: 20px; font-weight: 900; color: var(--text); margin-bottom: 2px; }
+  .stat-card .stat-label { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+  .stat-card.highlight .stat-val { color: var(--bean); }
+
+  /* ── CLAIM ALL ── */
+  .claim-all-wrap { margin-bottom: 16px; }
+  .btn-claim-all { width: 100%; background: var(--bean); color: #fff; border: none; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 900; border-radius: var(--radius-sm); padding: 13px; cursor: pointer; transition: opacity 0.2s, transform 0.15s; }
+  .btn-claim-all:hover { opacity: 0.9; }
+  .btn-claim-all:active { transform: scale(0.98); }
+  .btn-claim-all:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ── ACCOUNT PANEL ── */
+  .account-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; margin-bottom: 24px; }
+  .account-panel h3 { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px; }
+  .account-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); gap: 10px; }
+  .account-row:last-child { border-bottom: none; }
+  .account-key { font-size: 12px; color: var(--text-muted); font-weight: 600; flex-shrink: 0; }
+  .account-val { font-size: 12px; color: var(--text); font-weight: 700; text-align: right; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .btn-copy { background: var(--surface3); border: 1px solid var(--border); color: var(--text-muted); font-family: 'Nunito', sans-serif; font-size: 10px; font-weight: 700; border-radius: 6px; padding: 3px 8px; cursor: pointer; flex-shrink: 0; transition: background 0.15s; }
+  .btn-copy:hover { background: var(--surface2); color: var(--text); }
+  .btn-copy:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ── QUEST SECTION LABEL ── */
+  .section-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; margin-top: 20px; }
+
+  /* ── QUEST CARDS ── */
+  .quest-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 14px; position: relative; overflow: hidden; transition: border-color 0.2s, transform 0.15s; }
+  .quest-card:hover { border-color: rgba(255,255,255,0.1); transform: translateY(-1px); }
+  .quest-card.complete { border-color: rgba(74,222,128,0.2); }
+  .quest-card.complete::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(74,222,128,0.04) 0%, transparent 60%); pointer-events: none; }
+  .quest-card.claimed { opacity: 0.6; }
+  .quest-icon-wrap { width: 44px; height: 44px; border-radius: 12px; background: var(--surface2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .quest-icon-wrap svg { width: 22px; height: 22px; stroke: var(--accent); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .quest-icon-wrap.done { background: rgba(74,222,128,0.15); }
+  .quest-body { flex: 1; min-width: 0; }
+  .quest-title { font-size: 14px; font-weight: 800; margin-bottom: 2px; }
+  .quest-desc { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+  .quest-bar { height: 5px; background: var(--surface3); border-radius: 5px; overflow: hidden; margin-bottom: 5px; }
+  .quest-bar-fill { height: 100%; background: var(--accent); border-radius: 5px; transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1); }
+  .quest-counts { font-size: 11px; color: var(--text-muted); display: flex; justify-content: space-between; }
+  .quest-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
+  .quest-reward-badge { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 900; color: var(--bean); }
+  .btn-claim { background: var(--accent); color: #111; border: none; font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 900; border-radius: 8px; padding: 6px 12px; cursor: pointer; transition: background 0.18s, transform 0.15s, opacity 0.15s; white-space: nowrap; }
+  .btn-claim:hover { background: #22c55e; }
+  .btn-claim:active { transform: scale(0.95); }
+  .btn-claim:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+  .btn-claim:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .btn-claimed { background: var(--surface3); color: var(--text-muted); border: 1px solid var(--border); font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 700; border-radius: 8px; padding: 6px 12px; cursor: default; }
+
+  /* ── SKELETON LOADER ── */
+  .skeleton-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 14px; }
+  .skel { background: var(--surface3); border-radius: 6px; animation: shimmer 1.4s ease infinite; }
+  .skel-icon { width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0; }
+  .skel-body { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+  .skel-line { height: 10px; }
+  .skel-line.short { width: 55%; }
+  .skel-line.long { width: 85%; }
+  .skel-bar { height: 5px; border-radius: 5px; width: 100%; }
+  @keyframes shimmer { 0%,100% { opacity: 0.4; } 50% { opacity: 0.7; } }
+
+  /* ── BEANS POP ANIMATION ── */
+  .beans-earn-pop { position: fixed; z-index: 9999; font-size: 16px; font-weight: 900; color: var(--bean); font-family: 'Nunito', sans-serif; pointer-events: none; animation: beansPop 1.4s ease forwards; }
+  @keyframes beansPop { 0% { opacity: 1; transform: translateY(0) scale(1); } 60% { opacity: 1; transform: translateY(-40px) scale(1.2); } 100% { opacity: 0; transform: translateY(-70px) scale(0.9); } }
+
+  /* ── SPINNER ── */
+  .spinner { width: 40px; height: 40px; border: 3px solid var(--surface3); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 40px auto; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── TOAST ── */
+  #toast { position: fixed; bottom: calc(var(--nav-h) + 12px); left: 50%; z-index: 999; transform: translateX(-50%) translateY(20px); background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 18px; font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; white-space: nowrap; }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ── BOTTOM NAV ── */
   #bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 100; height: var(--nav-h); background: var(--bg); border-top: 1px solid var(--border); display: flex; align-items: stretch; }
   .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; -webkit-tap-highlight-color: transparent; position: relative; padding-bottom: 6px; text-decoration: none; }
   .nav-item svg { width: 22px; height: 22px; stroke: var(--text-dim); transition: stroke 0.15s; stroke-width: 2; fill: none; }
@@ -108,100 +149,175 @@
   .nav-item.active svg { stroke: var(--accent); }
   .nav-item.active span { color: var(--accent); }
   .nav-item.active::after { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 20px; height: 2px; background: var(--accent); border-radius: 0 0 2px 2px; }
-
-  /* Beans earn animation */
-  .beans-earn-pop { position: fixed; z-index: 9999; font-size: 16px; font-weight: 900; color: var(--bean); font-family: 'Nunito', sans-serif; pointer-events: none; animation: beansPop 1.4s ease forwards; }
-  @keyframes beansPop { 0% { opacity: 1; transform: translateY(0) scale(1); } 60% { opacity: 1; transform: translateY(-40px) scale(1.2); } 100% { opacity: 0; transform: translateY(-70px) scale(0.9); } }
-
-  .spinner { width: 40px; height: 40px; border: 3px solid var(--surface3); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 40px auto; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  #toast { position: fixed; bottom: calc(var(--nav-h) + 12px); left: 50%; z-index: 999; transform: translateX(-50%) translateY(20px); background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 18px; font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; white-space: nowrap; }
-  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .nav-item:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 
   @media (min-width: 900px) { #app { max-width: 680px; margin: 0 auto; } }
 </style>
 </head>
 <body>
 
-<!-- AUTH OVERLAY -->
-<div id="auth-overlay">
-  <div class="auth-art">
+<!-- ── AUTH OVERLAY ── -->
+<div id="auth-overlay" class="loading" aria-live="polite" aria-label="Authentication">
+  <div class="auth-art" aria-hidden="true">
     <svg viewBox="0 0 120 120" fill="none"><ellipse cx="60" cy="85" rx="30" ry="18" fill="#1a1a1a"/><rect x="30" y="55" width="60" height="38" rx="14" fill="#4ade80"/><ellipse cx="60" cy="42" rx="26" ry="28" fill="#4ade80"/><rect x="36" y="30" width="48" height="22" rx="11" fill="#1a1a1a" opacity="0.9"/><rect x="38" y="32" width="44" height="18" rx="9" fill="#60a5fa" opacity="0.85"/><rect x="28" y="72" width="18" height="26" rx="9" fill="#4ade80"/><rect x="74" y="72" width="18" height="26" rx="9" fill="#4ade80"/></svg>
   </div>
   <div class="auth-logo">Skeld<span>.</span>G</div>
-  <div class="auth-tagline">Sign in to view your quests.</div>
-  <button class="btn-google" id="btn-google-signin" onclick="signInWithGoogle()">
-    <svg class="google-icon" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-    Sign in with Google
-  </button>
+  <div class="auth-spinner" id="auth-spinner" aria-label="Checking sign-in status"></div>
+  <div id="auth-signin-ui" style="display:none; flex-direction:column; align-items:center; gap:0; width:100%; max-width:320px;">
+    <div class="auth-tagline">Sign in to view your quests.</div>
+    <button class="btn-google" id="btn-google-signin" onclick="handleSignIn()" aria-label="Sign in with Google">
+      <svg class="google-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+      Sign in with Google
+    </button>
+  </div>
 </div>
 
-<!-- HEADER -->
-<div id="header">
-  <a class="header-logo" href="/"><span>⬡</span> Skeld.G</a>
-  <div class="header-title">Quests</div>
+<!-- ── HEADER ── -->
+<div id="header" role="banner">
+  <a class="header-logo" href="/" aria-label="Skeld.G Home"><span>⬡</span> Skeld.G</a>
+  <div class="header-title" aria-label="Current page: Quests">Quests</div>
   <div class="header-right">
-    <div class="beans-badge" id="beans-badge-header">
-      <img src="/bean.png" alt="bean" onerror="this.style.display='none';this.nextSibling.style.display='inline'"/>
-      <span style="display:none;font-size:14px;">🫘</span>
+    <div class="beans-badge" id="beans-badge-header" aria-label="Bean balance">
+      <span style="font-size:14px;" aria-hidden="true">🫘</span>
       <span id="header-beans">0</span>
     </div>
-    <a class="avatar-btn" id="header-avatar" href="/">
-      <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+    <a class="avatar-btn" id="header-avatar" href="/profile" aria-label="Profile">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
     </a>
   </div>
 </div>
 
-<div id="app">
-  <div class="quests-summary">
+<!-- ── MAIN APP ── -->
+<main id="app" aria-label="Quests page">
+
+  <!-- Summary card (shown after load) -->
+  <div class="quests-summary" id="quests-summary" style="display:none;">
     <div class="qs-left">
       <h2>Daily Quests</h2>
-      <p id="qs-sub">Loading your progress…</p>
+      <p id="qs-sub">Loading…</p>
     </div>
-    <div class="qs-beans">
-      <img src="/bean.png" alt="" onerror="this.style.display='none'"/>
+    <div class="qs-beans" aria-label="Claimable beans">
+      <span aria-hidden="true">🫘</span>
       <span id="qs-total-reward">0</span>
     </div>
   </div>
-  <div id="quests-loading"><div class="spinner"></div></div>
-  <div id="quests-container" style="display:none;"></div>
-</div>
 
-<!-- BOTTOM NAV -->
-<nav id="bottom-nav">
-  <a class="nav-item" href="/">
-    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12L12 3l9 9"/><path d="M9 21V12h6v9"/></svg>
+  <!-- Reset timer -->
+  <div class="reset-timer-card" id="reset-timer-card" style="display:none;" aria-live="polite">
+    <span class="reset-label">Daily Reset In</span>
+    <span class="reset-time" id="reset-countdown">--:--:--</span>
+  </div>
+
+  <!-- Login streak -->
+  <div class="streak-card" id="streak-card" style="display:none;" aria-label="Login streak">
+    <span class="streak-icon" aria-hidden="true">🔥</span>
+    <div class="streak-body">
+      <div class="streak-title">Login Streak</div>
+      <div class="streak-val" id="streak-val">0 Days</div>
+    </div>
+  </div>
+
+  <!-- Stats row -->
+  <div class="stats-row" id="stats-row" style="display:none;" aria-label="Quest statistics">
+    <div class="stat-card">
+      <div class="stat-val" id="stat-completed">0</div>
+      <div class="stat-label">Completed</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" id="stat-remaining">0</div>
+      <div class="stat-label">Remaining</div>
+    </div>
+    <div class="stat-card highlight">
+      <div class="stat-val" id="stat-claimable">0</div>
+      <div class="stat-label">Claimable 🫘</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" id="stat-pct">0%</div>
+      <div class="stat-label">Complete</div>
+    </div>
+  </div>
+
+  <!-- Claim All button -->
+  <div class="claim-all-wrap" id="claim-all-wrap" style="display:none;">
+    <button class="btn-claim-all" id="btn-claim-all" onclick="claimAll()" aria-label="Claim all completed quests">Claim All Rewards 🫘</button>
+  </div>
+
+  <!-- Skeletons while loading -->
+  <div id="quests-loading" aria-busy="true" aria-label="Loading quests">
+    <div class="section-label">Gameplay</div>
+    ${[1,2,3].map(() => `
+    <div class="skeleton-card" aria-hidden="true">
+      <div class="skel skel-icon"></div>
+      <div class="skel-body">
+        <div class="skel skel-line long"></div>
+        <div class="skel skel-line short"></div>
+        <div class="skel skel-bar"></div>
+      </div>
+    </div>`).join('')}
+    <div class="section-label">Social</div>
+    ${[1,2].map(() => `
+    <div class="skeleton-card" aria-hidden="true">
+      <div class="skel skel-icon"></div>
+      <div class="skel-body">
+        <div class="skel skel-line long"></div>
+        <div class="skel skel-line short"></div>
+        <div class="skel skel-bar"></div>
+      </div>
+    </div>`).join('')}
+  </div>
+
+  <!-- Quest cards rendered here -->
+  <div id="quests-container" style="display:none;" role="list" aria-label="Quest list"></div>
+
+  <!-- Account panel -->
+  <div class="account-panel" id="account-panel" style="display:none;" aria-label="Account information">
+    <h3>Account</h3>
+    <div id="account-rows"></div>
+  </div>
+
+</main>
+
+<!-- ── BOTTOM NAV ── -->
+<nav id="bottom-nav" aria-label="Main navigation">
+  <a class="nav-item" href="/" aria-label="Home">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12L12 3l9 9"/><path d="M9 21V12h6v9"/></svg>
     <span>Home</span>
   </a>
-  <a class="nav-item" href="/">
-    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+  <a class="nav-item" href="/search" aria-label="Search">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
     <span>Search</span>
   </a>
-  <a class="nav-item" href="/shop">
-    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+  <a class="nav-item" href="/shop" aria-label="Shop">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
     <span>Shop</span>
   </a>
-  <a class="nav-item active" href="/quests">
-    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h4"/></svg>
+  <a class="nav-item active" href="/quests" aria-label="Quests" aria-current="page">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h4"/></svg>
     <span>Quests</span>
   </a>
-  <a class="nav-item" href="/">
-    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+  <a class="nav-item" href="/profile" aria-label="Profile">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     <span>Profile</span>
   </a>
 </nav>
 
-<div id="toast"></div>
+<div id="toast" role="status" aria-live="polite"></div>
 
-<!-- FIREBASE -->
+<!-- ── FIREBASE ── -->
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-  import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged }
-    from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-  import { getFirestore, doc, getDoc, setDoc, updateDoc, increment, serverTimestamp }
-    from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+  import {
+    getAuth, GoogleAuthProvider,
+    signInWithPopup, signInWithRedirect, getRedirectResult,
+    onAuthStateChanged
+  } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+  import {
+    getFirestore, doc, getDoc, setDoc, updateDoc, increment, serverTimestamp, arrayUnion
+  } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
+  // ─────────────────────────────────────────────
+  // FIREBASE INIT
+  // ─────────────────────────────────────────────
   const firebaseConfig = {
     apiKey: "AIzaSyCIkS8aU3NyKPH2EWqLNLjKxxg7y7kKu8M",
     authDomain: "skeld-g.firebaseapp.com",
@@ -210,137 +326,481 @@
     messagingSenderId: "474209822056",
     appId: "1:474209822056:web:eee11ece0da8f1cfd4a2dd"
   };
+  const fbApp = initializeApp(firebaseConfig);
+  const auth  = getAuth(fbApp);
+  const db    = getFirestore(fbApp);
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
+  // ─────────────────────────────────────────────
+  // MOBILE DETECTION
+  // ─────────────────────────────────────────────
+  const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
 
-  window._auth = auth;
-  window._db_doc = (path) => doc(db, ...path.split('/'));
-  window._fs_getDoc = getDoc;
-  window._fs_updateDoc = updateDoc;
-  window._fs_increment = increment;
-
-  window.signInWithGoogle = async () => {
-    try { await signInWithPopup(auth, new GoogleAuthProvider()); }
-    catch(e) { showToast('Sign in failed.'); }
+  // ─────────────────────────────────────────────
+  // SIGN IN
+  // ─────────────────────────────────────────────
+  window.handleSignIn = async () => {
+    const btn = document.getElementById('btn-google-signin');
+    btn.disabled = true;
+    try {
+      const provider = new GoogleAuthProvider();
+      if (isMobile) {
+        await signInWithRedirect(auth, provider);
+      } else {
+        await signInWithPopup(auth, provider);
+      }
+    } catch (e) {
+      console.error('Sign-in error:', e);
+      showToast('Sign in failed. Please try again.');
+      btn.disabled = false;
+    }
   };
+
+  // ─────────────────────────────────────────────
+  // AUTH STATE — single source of truth
+  // ─────────────────────────────────────────────
+  const overlay     = document.getElementById('auth-overlay');
+  const authSpinner = document.getElementById('auth-spinner');
+  const authSigninUI= document.getElementById('auth-signin-ui');
+
+  // Handle redirect result first (mobile sign-in returns here)
+  try {
+    const result = await getRedirectResult(auth);
+    // result handled by onAuthStateChanged below
+  } catch (e) {
+    console.error('Redirect result error:', e);
+  }
 
   onAuthStateChanged(auth, async (user) => {
     if (user) {
-      document.getElementById('auth-overlay').classList.add('hidden');
-      const ref = doc(db, 'users', user.uid);
-      const snap = await getDoc(ref);
-      if (!snap.exists()) {
-        await setDoc(ref, { displayName: user.displayName || 'Crewmate', photoURL: user.photoURL || '', email: user.email || '', beans: 100, inventory: [], gamesPlayed: 0, questsCompleted: 0, quest_play5: 0, quest_play10: 0, quest_play20: 0, quest_visitShop: 0, quest_login3: 1, claimed_play5: false, claimed_play10: false, claimed_play20: false, claimed_visitShop: false, claimed_login3: false, createdAt: serverTimestamp(), lastLogin: serverTimestamp() });
-      }
-      const data = (await getDoc(ref)).data();
-      window._userData = data;
-      window._userUid = user.uid;
+      // Hide overlay completely
+      overlay.classList.add('hidden');
 
-      const av = user.photoURL;
-      if (av) {
-        document.getElementById('header-avatar').innerHTML = `<img src="${av}" alt="avatar"/>`;
+      // Restore avatar
+      if (user.photoURL) {
+        const av = document.getElementById('header-avatar');
+        av.innerHTML = `<img src="${user.photoURL}" alt="${user.displayName || 'Avatar'}" onerror="this.parentElement.innerHTML='<svg viewBox=\\'0 0 24 24\\'><path d=\\'M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z\\'></path></svg>'"/>`;
       }
 
-      updateBeansUI(data.beans ?? 0);
-      renderQuests(data);
+      await initUser(user);
     } else {
-      document.getElementById('auth-overlay').classList.remove('hidden');
+      // Not signed in — show sign-in UI
+      authSpinner.style.display  = 'none';
+      authSigninUI.style.display = 'flex';
+      overlay.classList.remove('loading');
     }
   });
 
-  window.claimQuest = async function(key) {
+  // ─────────────────────────────────────────────
+  // USER INITIALIZATION
+  // ─────────────────────────────────────────────
+  async function initUser(user) {
+    const ref  = doc(db, 'users', user.uid);
+    const snap = await getDoc(ref);
+
+    const today = todayStr();
+
+    if (!snap.exists()) {
+      // New user — create document
+      await setDoc(ref, {
+        displayName:      user.displayName || 'Crewmate',
+        photoURL:         user.photoURL    || '',
+        email:            user.email       || '',
+        beans:            100,
+        inventory:        [],
+        gamesPlayed:      0,
+        questsCompleted:  0,
+        // Daily quest progress
+        quest_play5:      0,
+        quest_play10:     0,
+        quest_play20:     0,
+        quest_visitShop:  0,
+        // Login streak (not daily-reset)
+        quest_login3:     1,
+        // Claimed flags
+        claimed_play5:    false,
+        claimed_play10:   false,
+        claimed_play20:   false,
+        claimed_visitShop:false,
+        claimed_login3:   false,
+        // Reset tracking
+        lastQuestReset:   today,
+        // Login streak
+        loginStreak:      1,
+        lastLoginDate:    today,
+        createdAt:        serverTimestamp(),
+        lastLogin:        serverTimestamp()
+      });
+    }
+
+    // Re-read after possible creation
+    const data = (await getDoc(ref)).data();
+    window._userData = data;
+    window._userUid  = user.uid;
+    window._userRef  = ref;
+    window._userEmail= user.email;
+    window._userCreatedAt = user.metadata?.creationTime || 'N/A';
+    window._userUidStr= user.uid;
+
+    // Update beans header
+    updateBeansUI(data.beans ?? 0);
+
+    // Daily reset check
+    await checkDailyReset(ref, data);
+
+    // Login streak
+    await checkLoginStreak(ref, data);
+
+    // Re-read after mutations
+    const freshSnap = await getDoc(ref);
+    window._userData = freshSnap.data();
+
+    renderAll(window._userData);
+  }
+
+  // ─────────────────────────────────────────────
+  // DAILY RESET
+  // ─────────────────────────────────────────────
+  function todayStr() {
+    return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+  }
+
+  async function checkDailyReset(ref, data) {
+    const today = todayStr();
+    if (data.lastQuestReset !== today) {
+      await updateDoc(ref, {
+        quest_play5:       0,
+        quest_play10:      0,
+        quest_play20:      0,
+        quest_visitShop:   0,
+        claimed_play5:     false,
+        claimed_play10:    false,
+        claimed_play20:    false,
+        claimed_visitShop: false,
+        lastQuestReset:    today
+      });
+    }
+  }
+
+  // ─────────────────────────────────────────────
+  // LOGIN STREAK
+  // ─────────────────────────────────────────────
+  async function checkLoginStreak(ref, data) {
+    const today     = todayStr();
+    const lastLogin = data.lastLoginDate || '';
+    if (lastLogin === today) return; // Already counted today
+
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().slice(0, 10);
+
+    let newStreak = lastLogin === yesterdayStr
+      ? (data.loginStreak ?? 0) + 1
+      : 1;
+
+    // Also update quest_login3 (capped at 3 for the quest)
+    const newLogin3 = Math.min(3, (data.quest_login3 ?? 0) + 1);
+
+    await updateDoc(ref, {
+      loginStreak:   newStreak,
+      lastLoginDate: today,
+      quest_login3:  newLogin3,
+      lastLogin:     serverTimestamp()
+    });
+  }
+
+  // ─────────────────────────────────────────────
+  // QUEST PROGRESS HELPERS (callable from game pages)
+  // ─────────────────────────────────────────────
+  window.incrementGameProgress = async () => {
+    if (!window._userRef) return;
+    await updateDoc(window._userRef, {
+      gamesPlayed:  increment(1),
+      quest_play5:  increment(1),
+      quest_play10: increment(1),
+      quest_play20: increment(1)
+    });
+    const snap = await getDoc(window._userRef);
+    window._userData = snap.data();
+    renderAll(window._userData);
+  };
+
+  window.incrementShopVisit = async () => {
+    if (!window._userRef) return;
+    const current = window._userData?.quest_visitShop ?? 0;
+    if (current >= 1) return; // Already visited
+    await updateDoc(window._userRef, { quest_visitShop: 1 });
+    const snap = await getDoc(window._userRef);
+    window._userData = snap.data();
+    renderAll(window._userData);
+  };
+
+  window.incrementLoginProgress = async () => {
+    // Handled automatically on sign-in via checkLoginStreak
+  };
+
+  // ─────────────────────────────────────────────
+  // CLAIM SINGLE QUEST
+  // ─────────────────────────────────────────────
+  window.claimQuest = async (key, buttonEl) => {
     const uid = window._userUid;
     if (!uid) return;
-    const QUEST_DEFS = window._QUEST_DEFS;
-    const quest = QUEST_DEFS.find(q => q.key === key);
+
+    const QUEST_DEFS  = window._QUEST_DEFS;
+    const quest       = QUEST_DEFS.find(q => q.key === key);
     if (!quest) return;
 
-    const data = window._userData;
-    const progress = data[key] ?? 0;
+    const data       = window._userData;
+    const progress   = data[key] ?? 0;
     const claimedKey = 'claimed_' + key.replace('quest_', '');
 
+    // Server-side-style validation (client guard)
     if (progress < quest.max) { showToast('Quest not complete yet!'); return; }
-    if (data[claimedKey]) { showToast('Already claimed!'); return; }
+    if (data[claimedKey])     { showToast('Already claimed!');        return; }
 
-    const ref = window._db_doc(`users/${uid}`);
+    // Disable button immediately to prevent spam
+    if (buttonEl) buttonEl.disabled = true;
+
     try {
-      await window._fs_updateDoc(ref, {
-        [claimedKey]: true,
-        beans: window._fs_increment(quest.reward),
-        questsCompleted: window._fs_increment(1)
+      await updateDoc(window._userRef, {
+        [claimedKey]:    true,
+        beans:           increment(quest.reward),
+        questsCompleted: increment(1)
       });
-      window._userData[claimedKey] = true;
-      window._userData.beans = (window._userData.beans ?? 0) + quest.reward;
-      window._userData.questsCompleted = (window._userData.questsCompleted ?? 0) + 1;
+
+      // Optimistically update local cache
+      window._userData[claimedKey]       = true;
+      window._userData.beans             = (window._userData.beans ?? 0) + quest.reward;
+      window._userData.questsCompleted   = (window._userData.questsCompleted ?? 0) + 1;
 
       updateBeansUI(window._userData.beans);
       showBeansPopup(quest.reward);
       showToast(`+${quest.reward} beans claimed! 🫘`);
-      renderQuests(window._userData);
-    } catch(e) { showToast('Error claiming reward.'); }
+      renderAll(window._userData);
+    } catch (e) {
+      console.error('Claim error:', e);
+      showToast('Error claiming reward. Try again.');
+      if (buttonEl) buttonEl.disabled = false;
+    }
   };
+
+  // ─────────────────────────────────────────────
+  // CLAIM ALL
+  // ─────────────────────────────────────────────
+  window.claimAll = async () => {
+    const uid = window._userUid;
+    if (!uid) return;
+
+    const QUEST_DEFS = window._QUEST_DEFS;
+    const data       = window._userData;
+
+    const claimable = QUEST_DEFS.filter(q => {
+      const progress   = data[q.key] ?? 0;
+      const claimedKey = 'claimed_' + q.key.replace('quest_', '');
+      return progress >= q.max && !data[claimedKey];
+    });
+
+    if (claimable.length === 0) { showToast('Nothing to claim!'); return; }
+
+    const btn = document.getElementById('btn-claim-all');
+    if (btn) btn.disabled = true;
+
+    const updates = { beans: increment(0), questsCompleted: increment(0) };
+    let totalReward = 0;
+
+    claimable.forEach(q => {
+      const claimedKey = 'claimed_' + q.key.replace('quest_', '');
+      updates[claimedKey]       = true;
+      updates.beans             = increment(totalReward + q.reward);
+      updates.questsCompleted   = increment(claimable.length);
+      totalReward              += q.reward;
+    });
+
+    // Build a clean update object
+    const finalUpdates = { questsCompleted: increment(claimable.length), beans: increment(totalReward) };
+    claimable.forEach(q => {
+      finalUpdates['claimed_' + q.key.replace('quest_', '')] = true;
+    });
+
+    try {
+      await updateDoc(window._userRef, finalUpdates);
+
+      // Update local cache
+      claimable.forEach(q => {
+        window._userData['claimed_' + q.key.replace('quest_', '')] = true;
+      });
+      window._userData.beans           = (window._userData.beans ?? 0) + totalReward;
+      window._userData.questsCompleted = (window._userData.questsCompleted ?? 0) + claimable.length;
+
+      updateBeansUI(window._userData.beans);
+      showBeansPopup(totalReward);
+      showToast(`+${totalReward} Beans Claimed! 🫘`);
+      renderAll(window._userData);
+    } catch (e) {
+      console.error('Claim all error:', e);
+      showToast('Error claiming rewards.');
+      if (btn) btn.disabled = false;
+    }
+  };
+
+  // ─────────────────────────────────────────────
+  // RENDER ALL UI
+  // ─────────────────────────────────────────────
+  function renderAll(data) {
+    document.getElementById('quests-loading').style.display = 'none';
+    document.getElementById('quests-summary').style.display = 'flex';
+    document.getElementById('reset-timer-card').style.display = 'flex';
+    document.getElementById('streak-card').style.display = 'flex';
+    document.getElementById('stats-row').style.display = 'grid';
+    document.getElementById('account-panel').style.display = 'block';
+    document.getElementById('quests-container').style.display = 'block';
+
+    renderQuests(data);
+    renderStats(data);
+    renderStreak(data);
+    renderAccount(data);
+    startResetTimer();
+  }
+  window.renderAll = renderAll;
+
+  // ─────────────────────────────────────────────
+  // UPDATE BEANS HEADER
+  // ─────────────────────────────────────────────
+  window.updateBeansUI = function(amount) {
+    document.getElementById('header-beans').textContent = Number(amount).toLocaleString();
+  };
+
+  // ─────────────────────────────────────────────
+  // BEANS POP ANIMATION (memory-leak safe)
+  // ─────────────────────────────────────────────
+  function showBeansPopup(amount) {
+    const badge = document.getElementById('beans-badge-header');
+    const rect  = badge.getBoundingClientRect();
+    const pop   = document.createElement('div');
+    pop.className  = 'beans-earn-pop';
+    pop.textContent = '+' + amount + ' 🫘';
+    pop.style.left = rect.left + 'px';
+    pop.style.top  = (rect.top - 10) + 'px';
+    document.body.appendChild(pop);
+    // Remove on animation end to prevent memory leaks
+    pop.addEventListener('animationend', () => pop.remove(), { once: true });
+  }
+
+  // ─────────────────────────────────────────────
+  // TOAST
+  // ─────────────────────────────────────────────
+  let toastTimer = null;
+  window.showToast = function(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+  };
+
+  // ─────────────────────────────────────────────
+  // DAILY RESET COUNTDOWN TIMER
+  // ─────────────────────────────────────────────
+  let resetInterval = null;
+  function startResetTimer() {
+    if (resetInterval) clearInterval(resetInterval);
+    function tick() {
+      const now       = new Date();
+      const tomorrow  = new Date(now);
+      tomorrow.setUTCHours(0, 0, 0, 0);
+      tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+      const diff = tomorrow - now;
+
+      const h = Math.floor(diff / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+
+      const pad = n => String(n).padStart(2, '0');
+      document.getElementById('reset-countdown').textContent = `${pad(h)}h ${pad(m)}m ${pad(s)}s`;
+    }
+    tick();
+    resetInterval = setInterval(tick, 1000);
+  }
+
+  // Expose db helpers for other pages if needed
+  window._db       = db;
+  window._increment= increment;
+  window._serverTs = serverTimestamp;
+
 </script>
 
+<!-- ── QUEST DEFINITIONS & RENDERING ── -->
 <script>
+  // ─────────────────────────────────────────────
+  // QUEST DEFINITIONS
+  // ─────────────────────────────────────────────
   window._QUEST_DEFS = [
-    { key: 'quest_play5',     title: 'Play 5 Games',      max: 5,  reward: 50,  icon: 'play',   desc: 'Play any 5 mini-games', section: 'Gameplay' },
-    { key: 'quest_play10',    title: 'Play 10 Games',     max: 10, reward: 100, icon: 'play',   desc: 'Play any 10 mini-games', section: 'Gameplay' },
-    { key: 'quest_play20',    title: 'Play 20 Games',     max: 20, reward: 250, icon: 'play',   desc: 'Play any 20 mini-games', section: 'Gameplay' },
-    { key: 'quest_visitShop', title: 'Visit the Shop',    max: 1,  reward: 20,  icon: 'shop',   desc: 'Browse the Skeld.G store', section: 'Social' },
-    { key: 'quest_login3',    title: 'Log in 3 Days',     max: 3,  reward: 60,  icon: 'cal',    desc: 'Return on 3 different days', section: 'Social' },
+    { key: 'quest_play5',      title: 'Play 5 Games',     max: 5,  reward: 50,  icon: 'play',  desc: 'Play any 5 mini-games',         section: 'Gameplay', daily: true  },
+    { key: 'quest_play10',     title: 'Play 10 Games',    max: 10, reward: 100, icon: 'play',  desc: 'Play any 10 mini-games',        section: 'Gameplay', daily: true  },
+    { key: 'quest_play20',     title: 'Play 20 Games',    max: 20, reward: 250, icon: 'play',  desc: 'Play any 20 mini-games',        section: 'Gameplay', daily: true  },
+    { key: 'quest_visitShop',  title: 'Visit the Shop',   max: 1,  reward: 20,  icon: 'shop',  desc: 'Browse the Skeld.G store',      section: 'Social',   daily: true  },
+    { key: 'quest_login3',     title: 'Log in 3 Days',    max: 3,  reward: 60,  icon: 'cal',   desc: 'Return on 3 different days',    section: 'Social',   daily: false },
   ];
 
+  // ─────────────────────────────────────────────
+  // SVG ICONS
+  // ─────────────────────────────────────────────
   function getQuestIcon(icon) {
     const icons = {
-      play: '<path d="M8 5v14l11-7z"/>',
-      shop: '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>',
-      cal: '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+      play:   '<path d="M8 5v14l11-7z"/>',
+      shop:   '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>',
+      cal:    '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
       trophy: '<path d="M8 21h8M12 17v4M7 4H4a1 1 0 0 0-1 1v2a4 4 0 0 0 4 4h10a4 4 0 0 0 4-4V5a1 1 0 0 0-1-1h-3"/><rect x="7" y="2" width="10" height="12" rx="2"/>',
     };
     return icons[icon] || icons.play;
   }
 
+  // ─────────────────────────────────────────────
+  // RENDER QUEST CARDS
+  // ─────────────────────────────────────────────
   function renderQuests(data) {
-    document.getElementById('quests-loading').style.display = 'none';
-    const container = document.getElementById('quests-container');
-    container.style.display = 'block';
-
-    const QUEST_DEFS = window._QUEST_DEFS;
-    let totalPossible = 0;
+    const container   = document.getElementById('quests-container');
+    const QUEST_DEFS  = window._QUEST_DEFS;
+    const sectionHTML = {};
     let totalEarnable = 0;
-    let sectionHTML = {};
+    let hasClaimable  = false;
 
     QUEST_DEFS.forEach(q => {
-      const progress = data[q.key] ?? 0;
+      const progress   = Math.min(q.max, data[q.key] ?? 0);
       const claimedKey = 'claimed_' + q.key.replace('quest_', '');
-      const claimed = data[claimedKey] ?? false;
-      const complete = progress >= q.max;
-      const pct = Math.min(100, (progress / q.max) * 100);
+      const claimed    = data[claimedKey] ?? false;
+      const complete   = progress >= q.max;
+      const pct        = Math.min(100, Math.round((progress / q.max) * 100));
 
-      totalPossible += q.reward;
       if (!claimed) totalEarnable += q.reward;
+      if (complete && !claimed) hasClaimable = true;
 
-      const cardClass = ['quest-card', complete ? 'complete' : '', claimed ? 'claimed' : ''].join(' ').trim();
-      const iconClass = complete ? 'quest-icon-wrap done' : 'quest-icon-wrap';
+      const cardClass   = ['quest-card', complete ? 'complete' : '', claimed ? 'claimed' : ''].filter(Boolean).join(' ');
+      const iconClass   = complete ? 'quest-icon-wrap done' : 'quest-icon-wrap';
+      const btnId       = `claim-btn-${q.key}`;
 
       const rightHTML = claimed
-        ? `<div class="quest-reward-badge"><img src="/bean.png" alt="" onerror="this.style.display='none'"/>${q.reward}</div><span class="btn-claimed">✓ Done</span>`
+        ? `<div class="quest-reward-badge" aria-label="${q.reward} beans"><span aria-hidden="true">🫘</span>${q.reward}</div>
+           <span class="btn-claimed" aria-label="Reward claimed">✓ Done</span>`
         : complete
-          ? `<div class="quest-reward-badge"><img src="/bean.png" alt="" onerror="this.style.display='none'"/>${q.reward}</div><button class="btn-claim" onclick="claimQuest('${q.key}')">Claim!</button>`
-          : `<div class="quest-reward-badge"><img src="/bean.png" alt="" onerror="this.style.display='none'"/>${q.reward}</div>`;
+          ? `<div class="quest-reward-badge" aria-label="${q.reward} beans"><span aria-hidden="true">🫘</span>${q.reward}</div>
+             <button class="btn-claim" id="${btnId}" onclick="claimQuest('${q.key}', this)" aria-label="Claim ${q.reward} beans for ${q.title}">Claim!</button>`
+          : `<div class="quest-reward-badge" aria-label="${q.reward} beans"><span aria-hidden="true">🫘</span>${q.reward}</div>`;
 
       const card = `
-        <div class="${cardClass}">
-          <div class="${iconClass}">
+        <div class="${cardClass}" role="listitem" aria-label="${q.title}: ${progress} of ${q.max}">
+          <div class="${iconClass}" aria-hidden="true">
             <svg viewBox="0 0 24 24">${getQuestIcon(q.icon)}</svg>
           </div>
           <div class="quest-body">
             <div class="quest-title">${q.title}</div>
-            <div class="quest-desc">${q.desc}</div>
-            <div class="quest-bar"><div class="quest-bar-fill ${complete ? 'done' : ''}" style="width:${pct}%"></div></div>
-            <div class="quest-counts"><span>${claimed ? 'Complete ✓' : `${progress} / ${q.max}`}</span><span>${q.section}</span></div>
+            <div class="quest-desc">${q.desc}${q.daily ? ' · Daily' : ''}</div>
+            <div class="quest-bar" role="progressbar" aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="${q.max}" aria-label="${q.title} progress">
+              <div class="quest-bar-fill${complete ? ' done' : ''}" style="width:${pct}%"></div>
+            </div>
+            <div class="quest-counts">
+              <span>${claimed ? 'Complete ✓' : `${progress} / ${q.max}`}</span>
+              <span>${q.section}</span>
+            </div>
           </div>
           <div class="quest-right">${rightHTML}</div>
         </div>`;
@@ -350,42 +810,103 @@
     });
 
     // Update summary
-    const completedCount = QUEST_DEFS.filter(q => {
-      const claimedKey = 'claimed_' + q.key.replace('quest_', '');
-      return data[claimedKey];
-    }).length;
+    const completedCount = QUEST_DEFS.filter(q => data['claimed_' + q.key.replace('quest_', '')]).length;
     document.getElementById('qs-sub').textContent = `${completedCount} / ${QUEST_DEFS.length} complete`;
     document.getElementById('qs-total-reward').textContent = totalEarnable;
 
     container.innerHTML = Object.entries(sectionHTML).map(([section, cards]) =>
       `<div class="section-label">${section}</div>${cards.join('')}`
     ).join('');
+
+    // Show/hide Claim All
+    const wrapEl = document.getElementById('claim-all-wrap');
+    if (wrapEl) wrapEl.style.display = hasClaimable ? 'block' : 'none';
   }
 
-  function updateBeansUI(amount) {
-    document.getElementById('header-beans').textContent = Number(amount).toLocaleString();
-  }
-  window.updateBeansUI = updateBeansUI;
+  // ─────────────────────────────────────────────
+  // RENDER STATS
+  // ─────────────────────────────────────────────
+  function renderStats(data) {
+    const QUEST_DEFS  = window._QUEST_DEFS;
+    let completed = 0, claimableReward = 0;
 
-  function showBeansPopup(amount) {
-    const badge = document.getElementById('beans-badge-header');
-    const rect = badge.getBoundingClientRect();
-    const pop = document.createElement('div');
-    pop.className = 'beans-earn-pop';
-    pop.textContent = '+' + amount + ' 🫘';
-    pop.style.left = rect.left + 'px';
-    pop.style.top = (rect.top - 10) + 'px';
-    document.body.appendChild(pop);
-    setTimeout(() => pop.remove(), 1500);
+    QUEST_DEFS.forEach(q => {
+      const progress   = data[q.key] ?? 0;
+      const claimedKey = 'claimed_' + q.key.replace('quest_', '');
+      const claimed    = data[claimedKey] ?? false;
+      const complete   = progress >= q.max;
+      if (claimed) completed++;
+      if (complete && !claimed) claimableReward += q.reward;
+    });
+
+    const remaining  = QUEST_DEFS.length - completed;
+    const pct        = Math.round((completed / QUEST_DEFS.length) * 100);
+
+    document.getElementById('stat-completed').textContent  = completed;
+    document.getElementById('stat-remaining').textContent  = remaining;
+    document.getElementById('stat-claimable').textContent  = claimableReward;
+    document.getElementById('stat-pct').textContent        = pct + '%';
   }
 
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2800);
+  // ─────────────────────────────────────────────
+  // RENDER STREAK
+  // ─────────────────────────────────────────────
+  function renderStreak(data) {
+    const streak = data.loginStreak ?? 0;
+    document.getElementById('streak-val').textContent = `${streak} Day${streak !== 1 ? 's' : ''}`;
   }
-  window.showToast = showToast;
+
+  // ─────────────────────────────────────────────
+  // RENDER ACCOUNT PANEL
+  // ─────────────────────────────────────────────
+  function renderAccount(data) {
+    const uid       = window._userUidStr || '';
+    const email     = window._userEmail || data.email || '';
+    const created   = window._userCreatedAt || 'N/A';
+    const beans     = Number(data.beans ?? 0).toLocaleString();
+    const completed = data.questsCompleted ?? 0;
+    const streak    = data.loginStreak ?? 0;
+    const name      = data.displayName || 'Crewmate';
+
+    const rows = [
+      { key: 'Name',      val: name,      copy: false },
+      { key: 'Email',     val: email,     copy: true,  copyLabel: 'Copy Email',  toastMsg: 'Email copied!' },
+      { key: 'UID',       val: uid.slice(0,18)+'…', fullVal: uid, copy: true, copyLabel: 'Copy UID', toastMsg: 'UID copied!' },
+      { key: 'Joined',    val: created,   copy: false },
+      { key: 'Beans',     val: `🫘 ${beans}`, copy: false },
+      { key: 'Quests Done', val: String(completed), copy: false },
+      { key: 'Streak',    val: `🔥 ${streak} day${streak !== 1 ? 's' : ''}`, copy: false },
+    ];
+
+    document.getElementById('account-rows').innerHTML = rows.map(r => `
+      <div class="account-row">
+        <span class="account-key">${r.key}</span>
+        <span class="account-val" title="${r.fullVal || r.val}">${r.val}</span>
+        ${r.copy ? `<button class="btn-copy" onclick="copyToClipboard('${r.fullVal || r.val}', '${r.toastMsg}')" aria-label="${r.copyLabel}">${r.copyLabel}</button>` : ''}
+      </div>`
+    ).join('');
+  }
+
+  // ─────────────────────────────────────────────
+  // COPY TO CLIPBOARD
+  // ─────────────────────────────────────────────
+  window.copyToClipboard = async (text, msg) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast(msg || 'Copied!');
+    } catch (e) {
+      // Fallback for older browsers
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+      showToast(msg || 'Copied!');
+    }
+  };
 </script>
 </body>
-</html>.
+</html>

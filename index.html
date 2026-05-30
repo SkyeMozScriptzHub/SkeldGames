@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>Skeld.G — Game Launcher</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #111111;
+    --surface: #1a1a1a;
+    --surface2: #222222;
+    --surface3: #2a2a2a;
+    --border: rgba(255,255,255,0.07);
+    --text: #f0f0f0;
+    --text-muted: #888888;
+    --text-dim: #555555;
+    --accent: #4ade80;
+    --accent-dark: #16a34a;
+    --red: #f87171;
+    --bean: #e05c3a;
+    --header-h: 60px;
+    --nav-h: 64px;
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 4px; }
+
+  /* ── HEADER ── */
+  #header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    height: var(--header-h);
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px;
+    gap: 8px;
+  }
+  .header-logo {
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'Space Mono', monospace;
+    font-weight: 700; font-size: 15px;
+    color: var(--text);
+    letter-spacing: -0.5px;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+  .header-logo span { color: var(--accent); }
+  .header-title {
+    font-size: 14px; font-weight: 700;
+    color: var(--text-muted);
+    text-align: center;
+    flex: 1;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .header-right {
+    display: flex; align-items: center; gap: 8px;
+    flex-shrink: 0;
+  }
+  .beans-badge {
+    display: flex; align-items: center; gap: 5px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 10px 4px 6px;
+    font-size: 13px; font-weight: 800;
+    color: var(--bean);
+    cursor: default;
+  }
+  .beans-badge img { width: 18px; height: 18px; object-fit: contain; }
+  .avatar-btn {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--surface3);
+    border: 2px solid var(--border);
+    overflow: hidden; cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .avatar-btn:hover { border-color: var(--accent); transform: scale(1.05); }
+  .avatar-btn img { width: 100%; height: 100%; object-fit: cover; }
+  .avatar-btn svg { width: 18px; height: 18px; fill: var(--text-muted); }
+
+  /* ── PAGES ── */
+  #app {
+    padding-top: var(--header-h);
+    padding-bottom: var(--nav-h);
+    min-height: 100vh;
+  }
+  .page { display: none; animation: fadeIn 0.2s ease; }
+  .page.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── HOME PAGE ── */
+  #page-home { padding: 20px 16px; }
+  .home-hero {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px;
+  }
+  .home-hero-text h1 {
+    font-size: 28px; font-weight: 900;
+    line-height: 1.1;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .home-hero-text h1 span { color: var(--accent); }
+  .home-hero-text p { font-size: 13px; color: var(--text-muted); line-height: 1.5; max-width: 200px; }
+  .home-hero-icon {
+    flex-shrink: 0; width: 72px; height: 72px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .home-hero-icon svg { width: 72px; height: 72px; }
+
+  .section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .section-header h2 { font-size: 16px; font-weight: 800; }
+  .section-header a { font-size: 12px; color: var(--accent); font-weight: 700; text-decoration: none; cursor: pointer; }
+
+  /* GAME GRID */
+  .game-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 12px;
+  }
+  .game-slot {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.18s, border-color 0.18s, box-shadow 0.18s;
+    aspect-ratio: 1;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 12px 8px;
+    gap: 8px;
+    position: relative;
+  }
+  .game-slot:hover { transform: scale(1.04); border-color: rgba(255,255,255,0.15); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+  .game-slot:active { transform: scale(0.97); }
+  .game-slot-icon {
+    width: 56px; height: 56px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--surface2);
+    flex-shrink: 0;
+  }
+  .game-slot-icon img { width: 100%; height: 100%; object-fit: cover; }
+  .game-slot-name {
+    font-size: 11px; font-weight: 700;
+    text-align: center; line-height: 1.3;
+    color: var(--text);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* ── SEARCH PAGE ── */
+  #page-search { padding: 20px 16px; }
+  .search-bar {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    margin-bottom: 20px;
+    transition: border-color 0.2s;
+  }
+  .search-bar:focus-within { border-color: rgba(255,255,255,0.2); }
+  .search-bar svg { width: 18px; height: 18px; stroke: var(--text-muted); flex-shrink: 0; }
+  .search-bar input {
+    background: none; border: none; outline: none;
+    color: var(--text); font-family: 'Nunito', sans-serif;
+    font-size: 14px; font-weight: 600; flex: 1;
+  }
+  .search-bar input::placeholder { color: var(--text-dim); }
+  .search-results { display: flex; flex-direction: column; gap: 10px; }
+  .search-item {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    cursor: pointer;
+    transition: border-color 0.18s, transform 0.15s;
+  }
+  .search-item:hover { border-color: rgba(255,255,255,0.15); transform: translateX(3px); }
+  .search-item-icon { width: 44px; height: 44px; border-radius: 10px; overflow: hidden; background: var(--surface2); flex-shrink: 0; }
+  .search-item-icon img { width: 100%; height: 100%; object-fit: cover; }
+  .search-item-info h3 { font-size: 14px; font-weight: 700; }
+  .search-item-info p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .search-empty { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 14px; }
+
+  /* ── SHOP PAGE ── */
+  #page-shop { padding: 20px 16px; }
+  .shop-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .shop-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: transform 0.18s, border-color 0.18s;
+  }
+  .shop-card:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.13); }
+  .shop-card-img {
+    width: 100%; aspect-ratio: 1;
+    background: var(--surface2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 40px;
+  }
+  .shop-card-body { padding: 10px 12px 12px; }
+  .shop-card-title { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .shop-card-price {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 13px; font-weight: 800; color: var(--bean);
+    margin-bottom: 8px;
+  }
+  .shop-card-price img { width: 14px; height: 14px; object-fit: contain; }
+  .btn-buy {
+    width: 100%;
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-size: 12px; font-weight: 700;
+    border-radius: 8px;
+    padding: 7px;
+    cursor: pointer;
+    transition: background 0.18s, border-color 0.18s, transform 0.15s;
+  }
+  .btn-buy:hover { background: var(--accent); border-color: var(--accent); color: #111; }
+  .btn-buy:active { transform: scale(0.96); }
+
+  /* ── QUESTS PAGE ── */
+  #page-quests { padding: 20px 16px; }
+  .quest-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .quest-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: var(--surface2);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .quest-icon svg { width: 20px; height: 20px; stroke: var(--accent); }
+  .quest-info { flex: 1; }
+  .quest-info h3 { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .quest-progress-bar {
+    height: 4px; background: var(--surface3);
+    border-radius: 4px; overflow: hidden; margin-bottom: 4px;
+  }
+  .quest-progress-fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.5s; }
+  .quest-meta { font-size: 11px; color: var(--text-muted); display: flex; justify-content: space-between; }
+  .quest-reward { display: flex; align-items: center; gap: 3px; font-size: 12px; font-weight: 800; color: var(--bean); flex-shrink: 0; }
+  .quest-reward img { width: 14px; height: 14px; object-fit: contain; }
+
+  /* ── PROFILE PAGE ── */
+  #page-profile { padding: 20px 16px; }
+  .profile-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 20px;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 10px; margin-bottom: 20px; text-align: center;
+  }
+  .profile-avatar {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: var(--surface3);
+    border: 3px solid var(--border);
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .profile-avatar svg { width: 40px; height: 40px; fill: var(--text-muted); }
+  .profile-name { font-size: 18px; font-weight: 800; }
+  .profile-email { font-size: 12px; color: var(--text-muted); }
+  .profile-beans-row {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 15px; font-weight: 800; color: var(--bean);
+  }
+  .profile-beans-row img { width: 20px; height: 20px; object-fit: contain; }
+  .stat-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+    margin-bottom: 20px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 10px;
+    text-align: center;
+  }
+  .stat-card .stat-val { font-size: 20px; font-weight: 900; }
+  .stat-card .stat-label { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  .profile-section-title { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+  .profile-info-row {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 8px;
+    font-size: 13px;
+  }
+  .profile-info-row span:first-child { color: var(--text-muted); }
+  .profile-info-row span:last-child { font-weight: 700; }
+  .btn-signout {
+    width: 100%;
+    background: rgba(248,113,113,0.1);
+    border: 1px solid rgba(248,113,113,0.3);
+    color: var(--red);
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px; font-weight: 700;
+    border-radius: var(--radius-sm);
+    padding: 13px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.2s, border-color 0.2s, transform 0.15s;
+  }
+  .btn-signout:hover { background: rgba(248,113,113,0.2); }
+  .btn-signout:active { transform: scale(0.98); }
+
+  /* ── BOTTOM NAV ── */
+  #bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+    height: var(--nav-h);
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    display: flex; align-items: stretch;
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 4px; cursor: pointer;
+    transition: opacity 0.15s;
+    -webkit-tap-highlight-color: transparent;
+    position: relative;
+    padding-bottom: 6px;
+  }
+  .nav-item svg { width: 22px; height: 22px; stroke: var(--text-dim); transition: stroke 0.15s, transform 0.15s; stroke-width: 2; fill: none; }
+  .nav-item span { font-size: 10px; font-weight: 700; color: var(--text-dim); transition: color 0.15s; }
+  .nav-item.active svg { stroke: var(--accent); transform: scale(1.1); }
+  .nav-item.active span { color: var(--accent); }
+  .nav-item.active::after {
+    content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 20px; height: 2px; background: var(--accent); border-radius: 0 0 2px 2px;
+  }
+  .nav-item:active svg { transform: scale(0.92); }
+
+  /* ── AUTH OVERLAY ── */
+  #auth-overlay {
+    position: fixed; inset: 0; z-index: 200;
+    background: var(--bg);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 0;
+    padding: 32px 24px;
+  }
+  #auth-overlay.hidden { display: none; }
+  .auth-logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 28px; font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+    letter-spacing: -1px;
+  }
+  .auth-logo span { color: var(--accent); }
+  .auth-tagline { font-size: 14px; color: var(--text-muted); text-align: center; margin-bottom: 40px; line-height: 1.5; }
+  .auth-art {
+    width: 120px; height: 120px; margin-bottom: 28px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .btn-google {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px; font-weight: 700;
+    border-radius: var(--radius-sm);
+    padding: 13px 24px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, transform 0.15s;
+    width: 100%; max-width: 320px; justify-content: center;
+  }
+  .btn-google:hover { background: var(--surface2); border-color: rgba(255,255,255,0.15); }
+  .btn-google:active { transform: scale(0.97); }
+  .google-icon { width: 20px; height: 20px; }
+
+  /* ── GAME DETAIL MODAL ── */
+  #modal-overlay {
+    position: fixed; inset: 0; z-index: 150;
+    background: rgba(0,0,0,0.75);
+    display: flex; align-items: flex-end; justify-content: center;
+    padding: 0;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.25s;
+  }
+  #modal-overlay.open { opacity: 1; pointer-events: all; }
+  #modal-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px 24px 0 0;
+    width: 100%; max-width: 520px;
+    padding: 24px 20px;
+    transform: translateY(100%);
+    transition: transform 0.28s cubic-bezier(0.32,0.72,0,1);
+    max-height: 88vh;
+    overflow-y: auto;
+  }
+  #modal-overlay.open #modal-card { transform: translateY(0); }
+
+  .modal-drag-handle {
+    width: 36px; height: 4px; background: var(--surface3);
+    border-radius: 4px; margin: 0 auto 20px;
+  }
+  .modal-top {
+    display: flex; gap: 16px; align-items: flex-start; margin-bottom: 20px;
+  }
+  .modal-icon {
+    width: 80px; height: 80px; border-radius: 18px;
+    overflow: hidden; background: var(--surface2); flex-shrink: 0;
+  }
+  .modal-icon img { width: 100%; height: 100%; object-fit: cover; }
+  .modal-info { flex: 1; }
+  .modal-info h2 { font-size: 20px; font-weight: 900; margin-bottom: 6px; line-height: 1.2; }
+  .modal-meta-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+  .chip {
+    font-size: 10px; font-weight: 700;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 20px; padding: 3px 8px; color: var(--text-muted);
+  }
+  .modal-desc {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 14px;
+  }
+  .modal-desc-label {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 700; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+  .modal-desc-label svg { width: 14px; height: 14px; stroke: var(--text-muted); }
+  .modal-desc p { font-size: 13px; color: var(--text); line-height: 1.6; }
+  .modal-stats-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+    margin-bottom: 14px;
+  }
+  .modal-stat {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 8px;
+    text-align: center;
+  }
+  .modal-stat-val { font-size: 14px; font-weight: 800; }
+  .modal-stat-label { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+  .modal-earnings {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 14px;
+  }
+  .modal-earnings img { width: 28px; height: 28px; object-fit: contain; }
+  .modal-earnings-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+  .modal-earnings-val { font-size: 28px; font-weight: 900; color: var(--bean); line-height: 1; }
+  .modal-btns { display: flex; gap: 10px; margin-bottom: 10px; }
+  .btn-play {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
+    background: #4ade80; color: #111;
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px; font-weight: 800;
+    border: none; border-radius: var(--radius-sm);
+    padding: 14px; cursor: pointer;
+    transition: background 0.18s, transform 0.15s;
+  }
+  .btn-play:hover { background: #22c55e; }
+  .btn-play:active { transform: scale(0.97); }
+  .btn-play svg { width: 16px; height: 16px; fill: #111; }
+  .btn-return {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
+    background: var(--surface3); color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px; font-weight: 800;
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 14px; cursor: pointer;
+    transition: background 0.18s, transform 0.15s;
+  }
+  .btn-return:hover { background: var(--surface2); }
+  .btn-return:active { transform: scale(0.97); }
+  .btn-return svg { width: 16px; height: 16px; stroke: var(--text); }
+  .btn-quests-row {
+    width: 100%; display: flex; align-items: center; justify-content: space-between;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 14px 16px;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px; font-weight: 700; color: var(--text);
+    transition: background 0.18s, border-color 0.18s, transform 0.15s;
+  }
+  .btn-quests-row:hover { background: var(--surface3); border-color: rgba(255,255,255,0.12); }
+  .btn-quests-row:active { transform: scale(0.98); }
+  .btn-quests-row-left { display: flex; align-items: center; gap: 10px; }
+  .btn-quests-row svg.q-icon { width: 18px; height: 18px; stroke: var(--text-muted); }
+  .btn-quests-row svg.arrow { width: 16px; height: 16px; stroke: var(--text-muted); }
+
+  /* Loading spinner */
+  .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid var(--surface3);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    margin: 40px auto;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Toast */
+  #toast {
+    position: fixed; bottom: calc(var(--nav-h) + 12px); left: 50%; z-index: 999;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 18px;
+    font-size: 13px; font-weight: 600;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+    white-space: nowrap;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  @media (min-width: 600px) {
+    .game-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+    #modal-overlay { align-items: center; }
+    #modal-card { border-radius: 24px; max-width: 480px; max-height: 80vh; }
+  }
+  @media (min-width: 900px) {
+    #app { max-width: 680px; margin: 0 auto; }
+    #header { max-width: none; }
+    .shop-grid { grid-template-columns: repeat(3, 1fr); }
+    .game-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+  }
+</style>
+</head>
+<body>
+
+<!-- AUTH OVERLAY -->
+<div id="auth-overlay">
+  <div class="auth-art">
+    <!-- Among Us crewmate SVG -->
+    <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="60" cy="85" rx="30" ry="18" fill="#1a1a1a"/>
+      <rect x="30" y="55" width="60" height="38" rx="14" fill="#4ade80"/>
+      <ellipse cx="60" cy="42" rx="26" ry="28" fill="#4ade80"/>
+      <rect x="36" y="30" width="48" height="22" rx="11" fill="#1a1a1a" opacity="0.9"/>
+      <rect x="38" y="32" width="44" height="18" rx="9" fill="#60a5fa" opacity="0.85"/>
+      <rect x="28" y="72" width="18" height="26" rx="9" fill="#4ade80"/>
+      <rect x="74" y="72" width="18" height="26" rx="9" fill="#4ade80"/>
+    </svg>
+  </div>
+  <div class="auth-logo">Skeld<span>.</span>G</div>
+  <div class="auth-tagline">Your Among Us mini-game hub.<br>Sign in to start earning beans.</div>
+  <button class="btn-google" id="btn-google-signin" onclick="signInWithGoogle()">
+    <svg class="google-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+    </svg>
+    Sign in with Google
+  </button>
+  <div id="auth-loading" style="display:none;margin-top:16px;"><div class="spinner" style="margin:0;width:28px;height:28px;"></div></div>
+</div>
+
+<!-- HEADER -->
+<div id="header">
+  <a class="header-logo" href="#"><span>⬡</span> Skeld.G</a>
+  <div class="header-title" id="header-title">Home</div>
+  <div class="header-right">
+    <div class="beans-badge">
+      <img src="bean.png" alt="bean" onerror="this.style.display='none';this.nextSibling.style.display='inline'"/>
+      <span style="display:none;font-size:14px;">🫘</span>
+      <span id="header-beans">0</span>
+    </div>
+    <div class="avatar-btn" id="header-avatar" onclick="navigateTo('profile')">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+
+  <!-- HOME -->
+  <div class="page active" id="page-home">
+    <div class="home-hero">
+      <div class="home-hero-text">
+        <h1>Play &amp;<br/><span>Earn</span> Beans</h1>
+        <p>Mini-games. Compete. Collect rewards.</p>
+      </div>
+      <div class="home-hero-icon">
+        <svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="18" width="64" height="42" rx="10" fill="#1e1e1e" stroke="#333" stroke-width="2"/>
+          <circle cx="22" cy="39" r="8" fill="#2a2a2a" stroke="#3a3a3a" stroke-width="1.5"/>
+          <path d="M22 35v8M18 39h8" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="52" cy="35" r="3.5" fill="#f87171"/>
+          <circle cx="60" cy="39" r="3.5" fill="#facc15"/>
+          <circle cx="52" cy="43" r="3.5" fill="#4ade80"/>
+          <circle cx="44" cy="39" r="3.5" fill="#60a5fa"/>
+          <rect x="28" y="8" width="16" height="12" rx="4" fill="#1e1e1e" stroke="#333" stroke-width="2"/>
+          <rect x="31" y="4" width="10" height="6" rx="3" fill="#2a2a2a" stroke="#333" stroke-width="1.5"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="section-header">
+      <h2>All Games</h2>
+      <span id="games-count" style="font-size:12px;color:var(--text-muted);font-weight:700;"></span>
+    </div>
+    <div class="game-grid" id="game-grid">
+      <div class="spinner"></div>
+    </div>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="page" id="page-search">
+    <div class="search-bar">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input type="text" id="search-input" placeholder="Search games &amp; items…" oninput="onSearch(this.value)"/>
+    </div>
+    <div class="search-results" id="search-results">
+      <div class="search-empty">Start typing to search…</div>
+    </div>
+  </div>
+
+  <!-- SHOP -->
+  <div class="page" id="page-shop">
+    <div class="section-header" style="margin-bottom:16px;">
+      <h2>Shop</h2>
+      <div class="beans-badge" style="font-size:13px;">
+        <img src="bean.png" alt="" style="width:16px;height:16px;" onerror="this.style.display='none'"/>
+        <span id="shop-beans">0</span>
+      </div>
+    </div>
+    <div class="shop-grid" id="shop-grid"></div>
+  </div>
+
+  <!-- QUESTS -->
+  <div class="page" id="page-quests">
+    <div class="section-header" style="margin-bottom:16px;"><h2>Quests</h2></div>
+    <div id="quests-list"></div>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="page" id="page-profile">
+    <div class="profile-card">
+      <div class="profile-avatar" id="profile-avatar-img">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+      </div>
+      <div class="profile-name" id="profile-name">—</div>
+      <div class="profile-email" id="profile-email">—</div>
+      <div class="profile-beans-row">
+        <img src="bean.png" alt="bean" onerror="this.style.display='none'"/>
+        <span id="profile-beans">0</span> Beans
+      </div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-val" id="stat-games">0</div><div class="stat-label">Games</div></div>
+      <div class="stat-card"><div class="stat-val" id="stat-played">0</div><div class="stat-label">Played</div></div>
+      <div class="stat-card"><div class="stat-val" id="stat-quests">0</div><div class="stat-label">Quests</div></div>
+    </div>
+    <div class="profile-section-title">Account Info</div>
+    <div class="profile-info-row"><span>Joined</span><span id="profile-joined">—</span></div>
+    <div class="profile-info-row"><span>Last Login</span><span id="profile-lastlogin">—</span></div>
+    <div class="profile-info-row"><span>UID</span><span id="profile-uid" style="font-size:11px;color:var(--text-muted);font-family:'Space Mono',monospace;">—</span></div>
+    <button class="btn-signout" onclick="signOut()">Sign Out</button>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<nav id="bottom-nav">
+  <div class="nav-item active" id="nav-home" onclick="navigateTo('home')">
+    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12L12 3l9 9"/><path d="M9 21V12h6v9"/></svg>
+    <span>Home</span>
+  </div>
+  <div class="nav-item" id="nav-search" onclick="navigateTo('search')">
+    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <span>Search</span>
+  </div>
+  <div class="nav-item" id="nav-shop" onclick="navigateTo('shop')">
+    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+    <span>Shop</span>
+  </div>
+  <div class="nav-item" id="nav-quests" onclick="navigateTo('quests')">
+    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h4"/></svg>
+    <span>Quests</span>
+  </div>
+  <div class="nav-item" id="nav-profile" onclick="navigateTo('profile')">
+    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span>Profile</span>
+  </div>
+</nav>
+
+<!-- GAME DETAIL MODAL -->
+<div id="modal-overlay" onclick="closeModal(event)">
+  <div id="modal-card">
+    <div class="modal-drag-handle"></div>
+    <div class="modal-top">
+      <div class="modal-icon"><img id="modal-icon" src="" alt=""/></div>
+      <div class="modal-info">
+        <h2 id="modal-title">Game</h2>
+        <div class="modal-meta-chips" id="modal-chips"></div>
+      </div>
+    </div>
+    <div class="modal-desc">
+      <div class="modal-desc-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
+        DESCRIPTION
+      </div>
+      <p id="modal-desc-text">—</p>
+    </div>
+    <div class="modal-stats-grid">
+      <div class="modal-stat"><div class="modal-stat-val" id="modal-plays">—</div><div class="modal-stat-label">Total Plays</div></div>
+      <div class="modal-stat"><div class="modal-stat-val" id="modal-active">—</div><div class="modal-stat-label">Active Users</div></div>
+      <div class="modal-stat"><div class="modal-stat-val" id="modal-difficulty">—</div><div class="modal-stat-label">Difficulty</div></div>
+    </div>
+    <div class="modal-earnings">
+      <img src="bean.png" alt="bean" onerror="this.style.fontSize='28px';this.outerHTML='<span style=\'font-size:28px\'>🫘</span>'"/>
+      <div>
+        <div class="modal-earnings-label">Earnings</div>
+        <div class="modal-earnings-val" id="modal-earnings">600</div>
+      </div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-play" id="modal-play-btn" onclick="playGame()">
+        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        PLAY
+      </button>
+      <button class="btn-return" onclick="closeModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+        RETURN
+      </button>
+    </div>
+    <button class="btn-quests-row" onclick="navigateTo('quests');closeModal();">
+      <div class="btn-quests-row-left">
+        <svg class="q-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h4"/></svg>
+        QUESTS
+      </div>
+      <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- FIREBASE -->
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+  import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut as fbSignOut }
+    from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+  import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp, collection, getDocs }
+    from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCIkS8aU3NyKPH2EWqLNLjKxxg7y7kKu8M",
+    authDomain: "skeld-g.firebaseapp.com",
+    projectId: "skeld-g",
+    storageBucket: "skeld-g.firebasestorage.app",
+    messagingSenderId: "474209822056",
+    appId: "1:474209822056:web:eee11ece0da8f1cfd4a2dd"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // Expose globals for inline handlers
+  window._auth = auth;
+  window._db = db;
+
+  // ── SIGN IN ──
+  window.signInWithGoogle = async () => {
+    const loadEl = document.getElementById('auth-loading');
+    const btnEl = document.getElementById('btn-google-signin');
+    loadEl.style.display = 'block';
+    btnEl.disabled = true;
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+    } catch (e) {
+      console.error(e);
+      loadEl.style.display = 'none';
+      btnEl.disabled = false;
+      showToast('Sign in failed. Try again.');
+    }
+  };
+
+  // ── SIGN OUT ──
+  window.signOut = async () => {
+    await fbSignOut(auth);
+  };
+
+  // ── AUTH STATE ──
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      document.getElementById('auth-overlay').classList.add('hidden');
+      await ensureUserDoc(user);
+      loadUserData(user.uid);
+    } else {
+      document.getElementById('auth-overlay').classList.remove('hidden');
+    }
+  });
+
+  // ── ENSURE USER DOC (auto-create if missing) ──
+  async function ensureUserDoc(user) {
+    const ref = doc(db, 'users', user.uid);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) {
+      // Auto-create with starting 100 beans
+      await setDoc(ref, {
+        displayName: user.displayName || 'Crewmate',
+        photoURL: user.photoURL || '',
+        email: user.email || '',
+        beans: 100,
+        inventory: [],
+        gamesPlayed: 0,
+        questsCompleted: 0,
+        createdAt: serverTimestamp(),
+        lastLogin: serverTimestamp()
+      });
+      showToast('Welcome! You received 100 🫘 beans!');
+    } else {
+      await updateDoc(ref, { lastLogin: serverTimestamp() });
+    }
+  }
+
+  // ── LOAD USER DATA ──
+  async function loadUserData(uid) {
+    const ref = doc(db, 'users', uid);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return;
+    const data = snap.data();
+
+    window._userData = data;
+    window._userUid = uid;
+    window._userAuth = window._auth.currentUser;
+
+    const beans = data.beans ?? 0;
+    document.getElementById('header-beans').textContent = beans.toLocaleString();
+    document.getElementById('shop-beans').textContent = beans.toLocaleString();
+    document.getElementById('profile-beans').textContent = beans.toLocaleString();
+    document.getElementById('profile-name').textContent = data.displayName || 'Crewmate';
+    document.getElementById('profile-email').textContent = data.email || '';
+    document.getElementById('profile-uid').textContent = uid.substring(0, 16) + '…';
+    document.getElementById('stat-games').textContent = window._gamesData ? window._gamesData.length : '—';
+    document.getElementById('stat-played').textContent = data.gamesPlayed ?? 0;
+    document.getElementById('stat-quests').textContent = data.questsCompleted ?? 0;
+
+    const createdAt = data.createdAt?.toDate?.();
+    const lastLogin = data.lastLogin?.toDate?.();
+    document.getElementById('profile-joined').textContent = createdAt ? createdAt.toLocaleDateString() : '—';
+    document.getElementById('profile-lastlogin').textContent = lastLogin ? lastLogin.toLocaleDateString() : '—';
+
+    // Avatar
+    const av = window._auth.currentUser?.photoURL;
+    if (av) {
+      const avEl = document.getElementById('profile-avatar-img');
+      avEl.innerHTML = `<img src="${av}" alt="avatar"/>`;
+      const hAv = document.getElementById('header-avatar');
+      hAv.innerHTML = `<img src="${av}" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"/>`;
+    }
+  }
+
+  window._loadUserData = loadUserData;
+
+  // ── LOAD GAMES FROM game.json ──
+  async function loadGames() {
+    try {
+      const res = await fetch('game.json');
+      if (!res.ok) throw new Error('game.json not found');
+      const games = await res.json();
+      window._gamesData = games;
+      renderGameGrid(games);
+      renderSearch(games, '');
+      document.getElementById('games-count').textContent = games.length + ' games';
+      if (window._userData) document.getElementById('stat-games').textContent = games.length;
+    } catch (e) {
+      console.error(e);
+      document.getElementById('game-grid').innerHTML = `<p style="color:var(--text-muted);font-size:13px;padding:10px 0;">No games found. Add a game.json file.</p>`;
+    }
+  }
+
+  loadGames();
+
+  // Expose Firestore doc updater for plays
+  window._updatePlayCount = async (gameFolder) => {
+    try {
+      const uid = window._auth?.currentUser?.uid;
+      if (!uid) return;
+      const ref = doc(db, 'users', uid);
+      const snap = await getDoc(ref);
+      if (snap.exists()) {
+        const played = (snap.data().gamesPlayed || 0) + 1;
+        await updateDoc(ref, { gamesPlayed: played });
+        document.getElementById('stat-played').textContent = played;
+      }
+    } catch (e) { console.error(e); }
+  };
+
+</script>
+
+<script>
+  // ── GAMES DATA ──
+  window._gamesData = [];
+  window._selectedGame = null;
+
+  // ── RENDER GAME GRID ──
+  function renderGameGrid(games) {
+    const grid = document.getElementById('game-grid');
+    if (!games || games.length === 0) {
+      grid.innerHTML = '<p style="color:var(--text-muted);font-size:13px;padding:10px 0;grid-column:1/-1;">No games available.</p>';
+      return;
+    }
+    grid.innerHTML = games.map((g, i) => `
+      <div class="game-slot" onclick="openGameModal(${i})" style="animation-delay:${i*0.04}s">
+        <div class="game-slot-icon">
+          <img src="${g.folder}/icon.png" alt="${g.name}" onerror="this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'56\' height=\'56\' viewBox=\'0 0 56 56\'><rect width=\'56\' height=\'56\' fill=\'%23222\'/><text x=\'50%25\' y=\'55%25\' text-anchor=\'middle\' dominant-baseline=\'middle\' font-size=\'22\' fill=\'%23555\'>?</text></svg>'"/>
+        </div>
+        <div class="game-slot-name">${escHtml(g.name)}</div>
+      </div>
+    `).join('');
+  }
+
+  // ── OPEN GAME MODAL ──
+  function openGameModal(idx) {
+    const g = window._gamesData[idx];
+    if (!g) return;
+    window._selectedGame = g;
+    document.getElementById('modal-icon').src = `${g.folder}/icon.png`;
+    document.getElementById('modal-icon').onerror = function(){ this.src = ''; };
+    document.getElementById('modal-title').textContent = g.name;
+    document.getElementById('modal-desc-text').textContent = g.description || 'No description available.';
+    document.getElementById('modal-plays').textContent = g.totalPlays != null ? Number(g.totalPlays).toLocaleString() : '—';
+    document.getElementById('modal-active').textContent = g.activeUsers != null ? Number(g.activeUsers).toLocaleString() : '—';
+    document.getElementById('modal-difficulty').textContent = g.difficulty || '—';
+    document.getElementById('modal-earnings').textContent = g.earnings != null ? Number(g.earnings).toLocaleString() : '600';
+
+    const chips = document.getElementById('modal-chips');
+    const meta = [];
+    if (g.releaseDate) meta.push(g.releaseDate);
+    if (g.developer) meta.push(g.developer);
+    if (g.tags) meta.push(...(Array.isArray(g.tags) ? g.tags : [g.tags]));
+    chips.innerHTML = meta.map(m => `<span class="chip">${escHtml(String(m))}</span>`).join('');
+
+    const overlay = document.getElementById('modal-overlay');
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  window.openGameModal = openGameModal;
+
+  function closeModal(e) {
+    if (e && e.target !== document.getElementById('modal-overlay')) return;
+    document.getElementById('modal-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  window.closeModal = closeModal;
+
+  function playGame() {
+    const g = window._selectedGame;
+    if (!g) return;
+    if (window._updatePlayCount) window._updatePlayCount(g.folder);
+    window.location.href = `${g.folder}/index.html`;
+  }
+  window.playGame = playGame;
+
+  // ── NAVIGATION ──
+  function navigateTo(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const pageEl = document.getElementById('page-' + page);
+    const navEl = document.getElementById('nav-' + page);
+    if (pageEl) pageEl.classList.add('active');
+    if (navEl) navEl.classList.add('active');
+    const titles = { home: 'Home', search: 'Search', shop: 'Shop', quests: 'Quests', profile: 'Profile' };
+    document.getElementById('header-title').textContent = titles[page] || '';
+    window.scrollTo(0, 0);
+  }
+  window.navigateTo = navigateTo;
+
+  // ── SEARCH ──
+  function renderSearch(games, query) {
+    const container = document.getElementById('search-results');
+    const q = query.toLowerCase().trim();
+    if (!q) {
+      container.innerHTML = '<div class="search-empty">Start typing to search…</div>';
+      return;
+    }
+    const filtered = (games || []).filter(g =>
+      g.name.toLowerCase().includes(q) ||
+      (g.description || '').toLowerCase().includes(q) ||
+      (g.developer || '').toLowerCase().includes(q)
+    );
+    if (!filtered.length) {
+      container.innerHTML = '<div class="search-empty">No results found.</div>';
+      return;
+    }
+    container.innerHTML = filtered.map((g, i) => {
+      const origIdx = (window._gamesData || []).indexOf(g);
+      return `
+        <div class="search-item" onclick="openGameModal(${origIdx});navigateTo('home');">
+          <div class="search-item-icon">
+            <img src="${g.folder}/icon.png" alt="${g.name}" onerror="this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'44\' height=\'44\'><rect width=\'44\' height=\'44\' fill=\'%23222\'/><text x=\'50%25\' y=\'55%25\' text-anchor=\'middle\' dominant-baseline=\'middle\' font-size=\'18\' fill=\'%23555\'>?</text></svg>'"/>
+          </div>
+          <div class="search-item-info">
+            <h3>${escHtml(g.name)}</h3>
+            <p>${escHtml(g.developer || g.description?.substring(0,40) || '—')}</p>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+  window.onSearch = function(val) {
+    renderSearch(window._gamesData, val);
+  };
+
+  // ── SHOP ──
+  const SHOP_ITEMS = [
+    { id: 'hat_crewmate', name: 'Crewmate Hat', price: 50, emoji: '🪖' },
+    { id: 'skin_red', name: 'Red Skin', price: 80, emoji: '🔴' },
+    { id: 'pet_mini', name: 'Mini Crewmate Pet', price: 200, emoji: '👶' },
+    { id: 'hat_party', name: 'Party Hat', price: 60, emoji: '🎉' },
+    { id: 'skin_ghost', name: 'Ghost Skin', price: 120, emoji: '👻' },
+    { id: 'boost_2x', name: '2x Bean Boost', price: 150, emoji: '⚡' },
+  ];
+
+  function renderShop() {
+    const grid = document.getElementById('shop-grid');
+    grid.innerHTML = SHOP_ITEMS.map(item => `
+      <div class="shop-card">
+        <div class="shop-card-img">${item.emoji}</div>
+        <div class="shop-card-body">
+          <div class="shop-card-title">${escHtml(item.name)}</div>
+          <div class="shop-card-price">
+            <img src="bean.png" alt="" onerror="this.style.display='none'"/>
+            ${item.price}
+          </div>
+          <button class="btn-buy" onclick="buyItem('${item.id}', ${item.price}, '${escHtml(item.name)}')">Buy</button>
+        </div>
+      </div>
+    `).join('');
+  }
+  renderShop();
+
+  window.buyItem = async function(id, price, name) {
+    const uid = window._userAuth?.uid || window._userUid;
+    if (!uid) { showToast('Sign in to buy items!'); return; }
+    const userData = window._userData;
+    if (!userData) return;
+    if ((userData.beans || 0) < price) { showToast('Not enough beans!'); return; }
+    const inv = userData.inventory || [];
+    if (inv.includes(id)) { showToast('Already owned!'); return; }
+    try {
+      const ref = window._db.doc ? window._db.doc('users/' + uid) : null;
+      // Use Firestore via global (set in module)
+      showToast(`Bought ${name}!`);
+    } catch(e) { showToast('Purchase failed.'); }
+  };
+
+  // ── QUESTS ──
+  const QUESTS_DATA = [
+    { id: 'q1', title: 'Play 5 games', desc: '5 games', reward: 50, progress: 0, max: 5, icon: 'play' },
+    { id: 'q2', title: 'Earn 100 beans', desc: 'Accumulate 100 beans', reward: 30, progress: 0, max: 100, icon: 'bean' },
+    { id: 'q3', title: 'Complete 3 games', desc: 'Win 3 rounds', reward: 80, progress: 0, max: 3, icon: 'trophy' },
+    { id: 'q4', title: 'Visit the shop', desc: 'Browse the store', reward: 20, progress: 0, max: 1, icon: 'shop' },
+    { id: 'q5', title: 'Log in 3 days', desc: 'Consecutive logins', reward: 60, progress: 1, max: 3, icon: 'cal' },
+  ];
+
+  function renderQuests() {
+    const list = document.getElementById('quests-list');
+    list.innerHTML = QUESTS_DATA.map(q => `
+      <div class="quest-item">
+        <div class="quest-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            ${q.icon === 'play' ? '<path d="M8 5v14l11-7z"/>' :
+              q.icon === 'trophy' ? '<path d="M8 21h8M12 17v4M7 4H4a1 1 0 0 0-1 1v2a4 4 0 0 0 4 4h10a4 4 0 0 0 4-4V5a1 1 0 0 0-1-1h-3"/><rect x="7" y="2" width="10" height="12" rx="2"/>' :
+              q.icon === 'shop' ? '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/>' :
+              q.icon === 'cal' ? '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>' :
+              '<circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>'}
+          </svg>
+        </div>
+        <div class="quest-info">
+          <h3>${escHtml(q.title)}</h3>
+          <div class="quest-progress-bar"><div class="quest-progress-fill" style="width:${Math.min(100,(q.progress/q.max)*100)}%"></div></div>
+          <div class="quest-meta"><span>${q.progress}/${q.max}</span><span>${q.desc}</span></div>
+        </div>
+        <div class="quest-reward">
+          <img src="bean.png" alt="" style="width:14px;height:14px;object-fit:contain;" onerror="this.style.display='none'"/>
+          ${q.reward}
+        </div>
+      </div>
+    `).join('');
+  }
+  renderQuests();
+
+  // ── TOAST ──
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+  window.showToast = showToast;
+
+  // ── UTILS ──
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+</script>
+
+</body>
+</html>

@@ -1,51 +1,11 @@
 {
+  "cleanUrls": true,
+  "trailingSlash": false,
   "rewrites": [
-    {
-      "source": "/shop",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/search",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/quests",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/profile",
-      "destination": "/index.html"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/bean.png",
-      "dest": "/bean.png"
-    },
-    {
-      "src": "/favicon.ico",
-      "dest": "/favicon.ico"
-    },
-    {
-      "src": "/fonts/(.*)",
-      "dest": "/fonts/$1"
-    },
-    {
-      "src": "/(.*)\\.json",
-      "dest": "/index.html",
-      "status": 302
-    },
-    {
-      "src": "/index\\.html",
-      "dest": "/index.html",
-      "status": 302,
-      "headers": {
-        "Location": "/"
-      }
-    },
-    {
-      "src": "/((?!.*\\.(png|jpg|jpeg|gif|svg|ico|webp|woff|woff2|ttf|eot|css|js|mp3|mp4|wav|ogg|zip|pdf)).*)",
-      "dest": "/index.html"
-    }
+    { "source": "/",        "destination": "/index.html" },
+    { "source": "/shop",    "destination": "/index.html" },
+    { "source": "/search",  "destination": "/index.html" },
+    { "source": "/quests",  "destination": "/index.html" },
+    { "source": "/profile", "destination": "/index.html" }
   ]
 }

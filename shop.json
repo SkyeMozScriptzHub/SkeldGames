@@ -1,34 +1,29 @@
 [
   {
-    "id": "modmenu_au",
+    "id": "modmenu_v1",
     "name": "Among Us Mod Menu",
-    "description": "Premium mod package with all the extras. Exclusive features unlocked.",
+    "description": "Premium mod package with custom roles, speed hacks, and more.",
     "price": 100,
     "image": "shop/modmenu.png",
-    "file": "downloads/modmenu.zip"
+    "file": "downloads/modmenu.zip",
+    "category": "Mods"
   },
   {
-    "id": "crewmate_pack",
-    "name": "Crewmate Skin Pack",
-    "description": "A collection of exclusive crewmate skins for your game.",
-    "price": 60,
-    "image": "shop/crewmatepack.png",
-    "file": "downloads/crewmatepack.zip"
+    "id": "crewmate_theme",
+    "name": "Crewmate Theme Pack",
+    "description": "Custom UI theme for your launcher experience.",
+    "price": 75,
+    "image": "shop/crewmate_theme.png",
+    "file": "downloads/crewmate_theme.zip",
+    "category": "Themes"
   },
   {
-    "id": "premium_theme",
-    "name": "Premium Theme",
-    "description": "Dark and sleek theme overhaul for the full Among Us experience.",
-    "price": 150,
-    "image": "shop/premiumtheme.png",
-    "file": "downloads/premiumtheme.zip"
-  },
-  {
-    "id": "map_bundle",
-    "name": "Custom Maps Bundle",
-    "description": "3 exclusive custom maps not available anywhere else.",
-    "price": 200,
-    "image": "shop/mapbundle.png",
-    "file": "downloads/mapbundle.zip"
+    "id": "premium_pack",
+    "name": "Premium Pack",
+    "description": "Bundle of exclusive tools and extras for hardcore players.",
+    "price": 250,
+    "image": "shop/premium.png",
+    "file": "downloads/premium_pack.zip",
+    "category": "Bundles"
   }
 ]

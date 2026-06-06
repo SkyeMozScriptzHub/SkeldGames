@@ -29,6 +29,9 @@
     --radius-sm: 10px;
   }
 
+  /* ── FIX 1: Hide entire page until auth is resolved ── */
+  body.auth-pending { visibility: hidden; }
+
   html, body {
     background: var(--bg);
     color: var(--text);
@@ -217,10 +220,16 @@
     transition: border-color 0.18s, transform 0.15s;
   }
   .search-item:hover { border-color: rgba(255,255,255,0.15); transform: translateX(3px); }
-  .search-item-icon { width: 44px; height: 44px; border-radius: 10px; overflow: hidden; background: var(--surface2); flex-shrink: 0; }
+  .search-item-icon { width: 44px; height: 44px; border-radius: 10px; overflow: hidden; background: var(--surface2); flex-shrink: 0; display:flex; align-items:center; justify-content:center; }
   .search-item-icon img { width: 100%; height: 100%; object-fit: cover; }
+  .search-item-icon .shop-emoji { font-size: 22px; }
   .search-item-info h3 { font-size: 14px; font-weight: 700; }
   .search-item-info p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .search-section-label {
+    font-size: 11px; font-weight: 700; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    padding: 4px 0 6px;
+  }
   .search-empty { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 14px; }
 
   /* ── SHOP PAGE ── */
@@ -247,10 +256,13 @@
     background: var(--surface2);
     display: flex; align-items: center; justify-content: center;
     font-size: 40px;
+    overflow: hidden;
   }
+  .shop-card-img img { width: 100%; height: 100%; object-fit: cover; }
   .shop-card.owned .shop-card-img { opacity: 0.5; }
   .shop-card-body { padding: 10px 12px 12px; }
   .shop-card-title { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .shop-card-desc { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .shop-card-price {
     display: flex; align-items: center; gap: 4px;
     font-size: 13px; font-weight: 800; color: var(--bean);
@@ -273,6 +285,64 @@
   .btn-buy:active:not(:disabled) { transform: scale(0.96); }
   .btn-buy:disabled { opacity: 0.5; cursor: not-allowed; }
   .btn-buy.owned-btn { background: rgba(74,222,128,0.1); border-color: rgba(74,222,128,0.3); color: var(--accent); }
+  .btn-download {
+    width: 100%;
+    background: rgba(74,222,128,0.15);
+    border: 1px solid rgba(74,222,128,0.35);
+    color: var(--accent);
+    font-family: 'Nunito', sans-serif;
+    font-size: 12px; font-weight: 700;
+    border-radius: 8px;
+    padding: 7px;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: background 0.18s, transform 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 4px;
+  }
+  .btn-download:hover { background: rgba(74,222,128,0.28); }
+  .btn-download:active { transform: scale(0.96); }
+
+  /* ── PURCHASE CONFIRM MODAL ── */
+  #confirm-overlay {
+    position: fixed; inset: 0; z-index: 160;
+    background: rgba(0,0,0,0.75);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  #confirm-overlay.open { opacity: 1; pointer-events: all; }
+  #confirm-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 20px;
+    width: 100%; max-width: 340px;
+    transform: scale(0.94);
+    transition: transform 0.22s cubic-bezier(0.32,0.72,0,1);
+    text-align: center;
+  }
+  #confirm-overlay.open #confirm-card { transform: scale(1); }
+  .confirm-title { font-size: 16px; font-weight: 800; margin-bottom: 8px; }
+  .confirm-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5; }
+  .confirm-btns { display: flex; gap: 10px; }
+  .btn-confirm-cancel {
+    flex: 1; padding: 11px;
+    background: var(--surface3); border: 1px solid var(--border);
+    color: var(--text); font-family: 'Nunito', sans-serif;
+    font-size: 13px; font-weight: 700; border-radius: 8px; cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-confirm-cancel:hover { background: var(--surface2); }
+  .btn-confirm-buy {
+    flex: 1; padding: 11px;
+    background: var(--accent); border: none;
+    color: #111; font-family: 'Nunito', sans-serif;
+    font-size: 13px; font-weight: 800; border-radius: 8px; cursor: pointer;
+    transition: background 0.15s, transform 0.15s;
+  }
+  .btn-confirm-buy:hover { background: #22c55e; }
+  .btn-confirm-buy:active { transform: scale(0.96); }
 
   /* ── QUESTS PAGE ── */
   #page-quests { padding: 20px 16px; }
@@ -391,9 +461,36 @@
     display: flex; justify-content: space-between; align-items: center;
     margin-bottom: 8px;
     font-size: 13px;
+    gap: 8px;
   }
-  .profile-info-row span:first-child { color: var(--text-muted); }
+  .profile-info-row span:first-child { color: var(--text-muted); flex-shrink: 0; }
   .profile-info-row span:last-child { font-weight: 700; }
+  /* FIX 5: UID row */
+  .uid-value-wrap {
+    display: flex; align-items: center; gap: 6px; flex: 1; justify-content: flex-end;
+  }
+  .uid-value {
+    font-size: 11px; color: var(--text-muted);
+    font-family: 'Space Mono', monospace;
+    font-weight: 400;
+    word-break: break-all;
+    text-align: right;
+  }
+  .btn-copy-uid {
+    flex-shrink: 0;
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-family: 'Nunito', sans-serif;
+    font-size: 10px; font-weight: 700;
+    border-radius: 6px;
+    padding: 4px 8px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+  }
+  .btn-copy-uid:hover { background: var(--accent); border-color: var(--accent); color: #111; }
+
   .btn-signout {
     width: 100%;
     background: rgba(248,113,113,0.1);
@@ -445,7 +542,9 @@
     align-items: center; justify-content: center;
     padding: 32px 24px;
   }
-  #auth-overlay.hidden { display: none; }
+  /* FIX 1: auth overlay starts hidden; shown only when actually signed out */
+  #auth-overlay { display: none; }
+  #auth-overlay.visible { display: flex; }
   .auth-logo {
     font-family: 'Space Mono', monospace;
     font-size: 28px; font-weight: 700;
@@ -634,9 +733,9 @@
   }
 </style>
 </head>
-<body>
+<body class="auth-pending">
 
-<!-- AUTH OVERLAY -->
+<!-- AUTH OVERLAY — FIX 1: starts hidden, shown only when signed out -->
 <div id="auth-overlay">
   <div class="auth-art">
     <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -733,7 +832,9 @@
         <span id="shop-beans">0</span>
       </div>
     </div>
-    <div class="shop-grid" id="shop-grid"></div>
+    <div class="shop-grid" id="shop-grid">
+      <div class="spinner" style="grid-column:1/-1;"></div>
+    </div>
   </div>
 
   <!-- QUESTS -->
@@ -767,7 +868,14 @@
     <div class="profile-section-title">Account Info</div>
     <div class="profile-info-row"><span>Joined</span><span id="profile-joined">—</span></div>
     <div class="profile-info-row"><span>Last Login</span><span id="profile-lastlogin">—</span></div>
-    <div class="profile-info-row"><span>UID</span><span id="profile-uid" style="font-size:11px;color:var(--text-muted);font-family:'Space Mono',monospace;">—</span></div>
+    <!-- FIX 5: UID with copy button -->
+    <div class="profile-info-row">
+      <span>UID</span>
+      <div class="uid-value-wrap">
+        <span class="uid-value" id="profile-uid">—</span>
+        <button class="btn-copy-uid" id="btn-copy-uid" onclick="copyUID()" title="Copy UID">Copy</button>
+      </div>
+    </div>
     <button class="btn-signout" onclick="signOut()">Sign Out</button>
   </div>
 
@@ -847,6 +955,18 @@
   </div>
 </div>
 
+<!-- PURCHASE CONFIRMATION MODAL (FIX 2 addition) -->
+<div id="confirm-overlay">
+  <div id="confirm-card">
+    <div class="confirm-title" id="confirm-title">Confirm Purchase</div>
+    <div class="confirm-sub" id="confirm-sub">Are you sure?</div>
+    <div class="confirm-btns">
+      <button class="btn-confirm-cancel" onclick="closeConfirm()">Cancel</button>
+      <button class="btn-confirm-buy" id="confirm-buy-btn" onclick="confirmBuy()">Buy</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div id="toast"></div>
 
@@ -911,14 +1031,19 @@
     updateAllBeanDisplays(0);
   };
 
-  // ── AUTH STATE ──
+  // ── FIX 1: AUTH STATE — page hidden until resolved ──
   onAuthStateChanged(auth, async (user) => {
+    // Reveal the page now that auth check is done
+    document.body.classList.remove('auth-pending');
+
     if (user) {
-      document.getElementById('auth-overlay').classList.add('hidden');
+      // User is signed in — keep auth overlay hidden
+      document.getElementById('auth-overlay').classList.remove('visible');
       await ensureUserDoc(user);
       await loadUserData(user.uid);
     } else {
-      document.getElementById('auth-overlay').classList.remove('hidden');
+      // User is signed out — show auth overlay
+      document.getElementById('auth-overlay').classList.add('visible');
     }
   });
 
@@ -943,7 +1068,6 @@
       });
       showToast('Welcome! You received 100 🫘 beans!');
     } else {
-      // Update login streak
       const data = snap.data();
       const today = new Date().toDateString();
       const lastDate = data.lastLoginDate;
@@ -975,7 +1099,12 @@
 
     document.getElementById('profile-name').textContent = data.displayName || 'Crewmate';
     document.getElementById('profile-email').textContent = data.email || '';
-    document.getElementById('profile-uid').textContent = uid.substring(0, 16) + '…';
+
+    // FIX 5: store full UID on element for copy
+    const uidEl = document.getElementById('profile-uid');
+    uidEl.textContent = uid.substring(0, 16) + '…';
+    uidEl.dataset.fullUid = uid;
+
     document.getElementById('stat-games').textContent = window._gamesData?.length ?? '—';
     document.getElementById('stat-played').textContent = data.gamesPlayed ?? 0;
     document.getElementById('stat-quests').textContent = data.questsCompleted ?? 0;
@@ -992,28 +1121,23 @@
       document.getElementById('header-avatar').innerHTML = `<img src="${av}" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"/>`;
     }
 
-    // Render quests with real data
     renderQuests(data);
-    // Render shop with inventory
     renderShop(data.inventory || []);
   }
 
   window._loadUserData = loadUserData;
 
-  // ── REFRESH USER FROM FIRESTORE ──
   window._refreshUser = async () => {
     const uid = window._userUid;
     if (!uid) return;
     await loadUserData(uid);
   };
 
-  // ── UPDATE BEANS ACROSS ALL DISPLAYS ──
   window.updateAllBeanDisplays = (beans) => {
     const val = Number(beans).toLocaleString();
     document.getElementById('header-beans').textContent = val;
     document.getElementById('shop-beans').textContent = val;
     document.getElementById('profile-beans').textContent = val;
-    // Bump animation
     const badge = document.getElementById('beans-badge');
     badge.classList.remove('bump');
     void badge.offsetWidth;
@@ -1021,7 +1145,6 @@
     setTimeout(() => badge.classList.remove('bump'), 400);
   };
 
-  // ── AWARD BEANS ──
   window._awardBeans = async (amount, reason) => {
     const uid = window._userUid;
     if (!uid) return;
@@ -1035,7 +1158,6 @@
     } catch (e) { console.error('Award beans error:', e); }
   };
 
-  // ── DEDUCT BEANS ──
   window._deductBeans = async (amount) => {
     const uid = window._userUid;
     if (!uid) return false;
@@ -1051,7 +1173,6 @@
     } catch (e) { console.error('Deduct beans error:', e); return false; }
   };
 
-  // ── UPDATE PLAY COUNT + AWARD BEANS ──
   window._updatePlayCount = async (gameFolder, beansEarned) => {
     const uid = window._userUid;
     if (!uid) return;
@@ -1075,12 +1196,10 @@
         updateAllBeanDisplays(window._userData.beans);
         showToast(`+${earnedBeans} 🫘 beans earned!`);
       }
-      // Check quest progress
       await checkQuestProgress('gamesPlayed', played);
     } catch (e) { console.error(e); }
   };
 
-  // ── CLAIM QUEST ──
   window._claimQuest = async (questId, reward) => {
     const uid = window._userUid;
     if (!uid) return;
@@ -1108,14 +1227,13 @@
     } catch (e) { console.error('Claim quest error:', e); }
   };
 
-  // ── CHECK QUEST PROGRESS ──
   async function checkQuestProgress(field, value) {
     if (!window._userData) return;
     window._userData[field] = value;
     renderQuests(window._userData);
   }
 
-  // ── BUY ITEM ──
+  // ── FIX 2+3: BUY ITEM — loads from shop.json, confirmation modal ──
   window.buyItem = async (id, price, name) => {
     const uid = window._userUid;
     if (!uid) { showToast('Sign in to buy items!'); return; }
@@ -1136,14 +1254,12 @@
       }
       updateAllBeanDisplays(window._userData.beans);
       showToast(`🎉 Bought ${name}!`);
-      // Re-render shop to show owned state
       renderShop(window._userData.inventory);
-      // Check shop quest
       await checkQuestProgress('visitedShop', true);
     } catch(e) { console.error(e); showToast('Purchase failed.'); }
   };
 
-  // ── LOAD GAMES ──
+  // ── FIX 3: LOAD GAMES ──
   async function loadGames() {
     try {
       const res = await fetch('game.json');
@@ -1151,7 +1267,7 @@
       const games = await res.json();
       window._gamesData = games;
       renderGameGrid(games);
-      renderSearch(games, '');
+      renderSearch(window._searchQuery || '', games, window._shopItems || []);
       document.getElementById('games-count').textContent = games.length + ' games';
       document.getElementById('stat-games').textContent = games.length;
     } catch (e) {
@@ -1161,6 +1277,21 @@
   }
   loadGames();
 
+  // ── FIX 3: LOAD SHOP FROM shop.json ──
+  async function loadShop() {
+    try {
+      const res = await fetch('shop.json');
+      if (!res.ok) throw new Error('shop.json not found');
+      const items = await res.json();
+      window._shopItems = items;
+      renderShop(window._userData?.inventory || []);
+    } catch (e) {
+      console.error('shop.json load failed:', e);
+      window._shopItems = [];
+      document.getElementById('shop-grid').innerHTML = `<p style="color:var(--text-muted);font-size:13px;padding:10px 0;grid-column:1/-1;">No shop items found. Add a shop.json file.</p>`;
+    }
+  }
+  loadShop();
 </script>
 
 <!-- ════════════════════════════════════════════════
@@ -1168,10 +1299,15 @@
 ════════════════════════════════════════════════ -->
 <script>
   window._gamesData = [];
+  window._shopItems = [];
   window._selectedGame = null;
   window._userData = null;
   window._userUid = null;
   window._currentQuestTab = 'active';
+  window._searchQuery = '';
+
+  // Pending confirm state
+  window._pendingBuy = null;
 
   // ─────────────────────────────────────────────
   // ROUTING — clean URLs, no index.html
@@ -1193,7 +1329,6 @@
   };
 
   function resolvePageFromPath(path) {
-    // Strip trailing slash except root
     const clean = path.length > 1 ? path.replace(/\/$/, '') : path;
     return PAGE_ROUTES[clean] || 'home';
   }
@@ -1212,24 +1347,20 @@
       const path = ROUTE_PATHS[page] || '/';
       history.pushState({ page }, '', path);
     }
-    // Mark shop visited for quest
     if (page === 'shop' && window._userData) {
       window._userData.visitedShop = true;
       renderQuests(window._userData);
     }
   };
 
-  // Handle browser back/forward
   window.addEventListener('popstate', (e) => {
     const page = (e.state && e.state.page) || resolvePageFromPath(location.pathname);
     navigateTo(page, false);
   });
 
-  // Initial route on load
   (function initRoute() {
     const page = resolvePageFromPath(location.pathname);
     navigateTo(page, false);
-    // Replace state so back button works
     history.replaceState({ page }, '', location.pathname);
   })();
 
@@ -1289,78 +1420,128 @@
     if (!g) return;
     const beansEarned = g.earnings || 0;
     if (window._updatePlayCount) window._updatePlayCount(g.folder, beansEarned);
-    // Navigate to game folder without showing index.html
-    const path = `/${g.folder}`;
-    window.location.href = path;
+    window.location.href = `/${g.folder}`;
   };
 
   // ─────────────────────────────────────────────
-  // SEARCH
+  // FIX 6: SEARCH — now searches BOTH games & shop items
   // ─────────────────────────────────────────────
-  function renderSearch(games, query) {
+  function renderSearch(query, games, shopItems) {
+    window._searchQuery = query;
     const container = document.getElementById('search-results');
-    const q = query.toLowerCase().trim();
+    const q = (query || '').toLowerCase().trim();
     if (!q) {
       container.innerHTML = '<div class="search-empty">Start typing to search…</div>';
       return;
     }
-    const filtered = (games || []).filter(g =>
+
+    const filteredGames = (games || []).filter(g =>
       g.name.toLowerCase().includes(q) ||
       (g.description || '').toLowerCase().includes(q) ||
       (g.developer || '').toLowerCase().includes(q)
     );
-    if (!filtered.length) {
+
+    const filteredShop = (shopItems || []).filter(s =>
+      s.name.toLowerCase().includes(q) ||
+      (s.description || '').toLowerCase().includes(q)
+    );
+
+    if (!filteredGames.length && !filteredShop.length) {
       container.innerHTML = '<div class="search-empty">No results found.</div>';
       return;
     }
-    container.innerHTML = filtered.map(g => {
-      const origIdx = (window._gamesData || []).indexOf(g);
-      return `
-        <div class="search-item" onclick="openGameModal(${origIdx});navigateTo('home');">
-          <div class="search-item-icon">
-            <img src="${g.folder}/icon.png" alt="${escHtml(g.name)}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2244%22 height=%2244%22><rect width=%2244%22 height=%2244%22 fill=%22%23222%22/><text x=%2250%25%22 y=%2255%25%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22 font-size=%2218%22 fill=%22%23555%22>?</text></svg>'"/>
+
+    let html = '';
+
+    if (filteredGames.length) {
+      html += `<div class="search-section-label">Games</div>`;
+      html += filteredGames.map(g => {
+        const origIdx = (window._gamesData || []).indexOf(g);
+        return `
+          <div class="search-item" onclick="openGameModal(${origIdx});navigateTo('home');">
+            <div class="search-item-icon">
+              <img src="${g.folder}/icon.png" alt="${escHtml(g.name)}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2244%22 height=%2244%22><rect width=%2244%22 height=%2244%22 fill=%22%23222%22/><text x=%2250%25%22 y=%2255%25%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22 font-size=%2218%22 fill=%22%23555%22>?</text></svg>'"/>
+            </div>
+            <div class="search-item-info">
+              <h3>${escHtml(g.name)}</h3>
+              <p>${escHtml(g.developer || g.description?.substring(0, 40) || '—')}</p>
+            </div>
           </div>
-          <div class="search-item-info">
-            <h3>${escHtml(g.name)}</h3>
-            <p>${escHtml(g.developer || g.description?.substring(0, 40) || '—')}</p>
+        `;
+      }).join('');
+    }
+
+    if (filteredShop.length) {
+      html += `<div class="search-section-label" style="margin-top:${filteredGames.length ? '12px' : '0'};">Shop Items</div>`;
+      html += filteredShop.map(s => {
+        const emoji = s.image ? '' : '📦';
+        const iconHtml = s.image
+          ? `<img src="${s.image}" alt="${escHtml(s.name)}" onerror="this.style.display='none';this.parentNode.innerHTML='<span class=shop-emoji>📦</span>'"/>`
+          : `<span class="shop-emoji">${emoji}</span>`;
+        return `
+          <div class="search-item" onclick="navigateTo('shop');">
+            <div class="search-item-icon">${iconHtml}</div>
+            <div class="search-item-info">
+              <h3>${escHtml(s.name)}</h3>
+              <p>${escHtml(s.description?.substring(0, 40) || '')} · ${s.price} 🫘</p>
+            </div>
           </div>
-        </div>
-      `;
-    }).join('');
+        `;
+      }).join('');
+    }
+
+    container.innerHTML = html;
   }
   window.renderSearch = renderSearch;
-  window.onSearch = function(val) { renderSearch(window._gamesData, val); };
+  window.onSearch = function(val) {
+    renderSearch(val, window._gamesData, window._shopItems);
+  };
 
   // ─────────────────────────────────────────────
-  // SHOP
+  // FIX 2+3: SHOP — loads from shop.json, file marketplace
   // ─────────────────────────────────────────────
-  const SHOP_ITEMS = [
-    { id: 'hat_crewmate',  name: 'Crewmate Hat',       price: 50,  emoji: '🪖' },
-    { id: 'skin_red',      name: 'Red Skin',            price: 80,  emoji: '🔴' },
-    { id: 'pet_mini',      name: 'Mini Crewmate Pet',   price: 200, emoji: '👶' },
-    { id: 'hat_party',     name: 'Party Hat',           price: 60,  emoji: '🎉' },
-    { id: 'skin_ghost',    name: 'Ghost Skin',          price: 120, emoji: '👻' },
-    { id: 'boost_2x',      name: '2× Bean Boost',       price: 150, emoji: '⚡' },
-  ];
-  window.SHOP_ITEMS = SHOP_ITEMS;
-
   function renderShop(inventory) {
     const inv = inventory || window._userData?.inventory || [];
+    const items = window._shopItems || [];
     const grid = document.getElementById('shop-grid');
-    grid.innerHTML = SHOP_ITEMS.map(item => {
+
+    if (!items.length) {
+      // Don't overwrite the loading spinner if items haven't loaded yet
+      if (window._shopItems !== undefined && window._shopItems.length === 0) {
+        // Only show empty if we know shop.json loaded (or failed)
+        // Keep existing spinner/message from fetch handler
+      }
+      return;
+    }
+
+    grid.innerHTML = items.map(item => {
       const owned = inv.includes(item.id);
+      const imgHtml = item.image
+        ? `<img src="${item.image}" alt="${escHtml(item.name)}" onerror="this.style.display='none';this.parentNode.innerHTML='<span style=font-size:40px>📦</span>'"/>`
+        : `<span style="font-size:40px;">📦</span>`;
+
       return `
         <div class="shop-card${owned ? ' owned' : ''}">
-          <div class="shop-card-img">${item.emoji}</div>
+          <div class="shop-card-img">${imgHtml}</div>
           <div class="shop-card-body">
             <div class="shop-card-title">${escHtml(item.name)}</div>
+            ${item.description ? `<div class="shop-card-desc">${escHtml(item.description)}</div>` : ''}
             <div class="shop-card-price">
               <img class="bean-icon" src="bean.png" alt="🫘" onerror="this.outerHTML='<span>🫘</span>'"/>
               ${item.price}
             </div>
             ${owned
-              ? `<button class="btn-buy owned-btn" disabled>✓ Owned</button>`
-              : `<button class="btn-buy" onclick="buyItem('${item.id}', ${item.price}, '${escHtml(item.name)}')">Buy</button>`
+              ? `
+                <button class="btn-buy owned-btn" disabled>✓ Owned</button>
+                ${item.file
+                  ? `<button class="btn-download" onclick="downloadFile('${escHtml(item.file)}', '${escHtml(item.name)}')">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                      Download
+                    </button>`
+                  : ''
+                }
+              `
+              : `<button class="btn-buy" onclick="showBuyConfirm('${escHtml(item.id)}', ${item.price}, '${escHtml(item.name)}')">Buy</button>`
             }
           </div>
         </div>
@@ -1370,8 +1551,73 @@
   window.renderShop = renderShop;
   renderShop([]);
 
+  // ── FIX 2: Purchase confirmation modal ──
+  window.showBuyConfirm = function(id, price, name) {
+    window._pendingBuy = { id, price, name };
+    document.getElementById('confirm-title').textContent = `Buy "${name}"`;
+    document.getElementById('confirm-sub').textContent = `This will cost you ${price} 🫘 beans. Are you sure?`;
+    document.getElementById('confirm-overlay').classList.add('open');
+  };
+
+  window.closeConfirm = function() {
+    window._pendingBuy = null;
+    document.getElementById('confirm-overlay').classList.remove('open');
+  };
+
+  window.confirmBuy = async function() {
+    const pending = window._pendingBuy;
+    if (!pending) return;
+    document.getElementById('confirm-overlay').classList.remove('open');
+    window._pendingBuy = null;
+    if (window.buyItem) await window.buyItem(pending.id, pending.price, pending.name);
+  };
+
+  // Close confirm on backdrop click
+  document.getElementById('confirm-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closeConfirm();
+  });
+
+  // ── Download helper ──
+  window.downloadFile = function(filePath, name) {
+    const a = document.createElement('a');
+    a.href = filePath;
+    a.download = name || 'download';
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    showToast(`⬇ Downloading ${name}…`);
+  };
+
   // ─────────────────────────────────────────────
-  // QUESTS — fully dynamic based on user data
+  // FIX 5: COPY UID
+  // ─────────────────────────────────────────────
+  window.copyUID = function() {
+    const uidEl = document.getElementById('profile-uid');
+    const fullUid = uidEl.dataset.fullUid || uidEl.textContent;
+    if (!fullUid || fullUid === '—') { showToast('No UID to copy.'); return; }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(fullUid).then(() => {
+        showToast('UID copied!');
+      }).catch(() => fallbackCopy(fullUid));
+    } else {
+      fallbackCopy(fullUid);
+    }
+  };
+
+  function fallbackCopy(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;top:-999px;left:-999px;opacity:0;';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    try { document.execCommand('copy'); showToast('UID copied!'); }
+    catch(e) { showToast('Could not copy UID.'); }
+    document.body.removeChild(ta);
+  }
+
+  // ─────────────────────────────────────────────
+  // QUESTS
   // ─────────────────────────────────────────────
   function getQuestDefs(userData) {
     const gamesPlayed = userData?.gamesPlayed || 0;
@@ -1437,7 +1683,7 @@
       {
         id: 'q_beans500',
         title: 'Earn 500 Beans',
-        desc: 'Accumulate 500 beans total (incl. start)',
+        desc: 'Accumulate 500 beans total',
         reward: 80,
         progress: Math.min(beans, 500),
         max: 500,
@@ -1453,7 +1699,6 @@
     const tab = window._currentQuestTab;
 
     const filtered = quests.filter(q => {
-      const isComplete = q.progress >= q.max;
       const isClaimed = claimed.includes(q.id);
       if (tab === 'active') return !isClaimed;
       return isClaimed;
@@ -1539,4 +1784,4 @@
 </script>
 
 </body>
-</html>
+ </html>

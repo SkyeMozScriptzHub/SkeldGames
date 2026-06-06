@@ -1,38 +1,14 @@
 [
   {
-    "folder": "game1",
-    "name": "Skeld Runner",
-    "description": "Run through The Skeld map, dodge imposters, and complete tasks as fast as you can.",
-    "releaseDate": "2024-01-15",
-    "totalPlays": 14200,
-    "activeUsers": 312,
-    "difficulty": "Medium",
-    "developer": "SkeldDev",
-    "earnings": 600,
-    "tags": ["Action", "Arcade"]
-  },
-  {
-    "folder": "game2",
-    "name": "Vote or Die",
-    "description": "Swipe left or right to vote out the imposter. Speed and accuracy earn more beans.",
-    "releaseDate": "2024-03-01",
-    "totalPlays": 9800,
-    "activeUsers": 201,
+    "name": "My Game",
+    "folder": "my-game",
+    "description": "A fun mini-game",
+    "developer": "Dev Name",
+    "tags": ["action"],
     "difficulty": "Easy",
-    "developer": "CrewmateLabs",
-    "earnings": 400,
-    "tags": ["Card", "Puzzle"]
-  },
-  {
-    "folder": "game3",
-    "name": "Reactor Meltdown",
-    "description": "Fix the reactor before time runs out. Chain combos for bonus beans.",
-    "releaseDate": "2024-05-20",
-    "totalPlays": 5600,
-    "activeUsers": 145,
-    "difficulty": "Hard",
-    "developer": "SkeldDev",
-    "earnings": 900,
-    "tags": ["Strategy", "Timed"]
+    "earnings": 600,
+    "totalPlays": 1200,
+    "activeUsers": 34,
+    "releaseDate": "2025"
   }
 ]

@@ -43,6 +43,33 @@
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 4px; }
 
+  /* ── AUTH LOADING SCREEN (shown BEFORE firebase resolves) ── */
+  #auth-init-screen {
+    position: fixed; inset: 0; z-index: 300;
+    background: var(--bg);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 16px;
+    transition: opacity 0.3s ease;
+  }
+  #auth-init-screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .init-logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 26px; font-weight: 700;
+    color: var(--text); letter-spacing: -1px;
+  }
+  .init-logo span { color: var(--accent); }
+  .init-spinner {
+    width: 32px; height: 32px;
+    border: 3px solid var(--surface3);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+
   /* ── HEADER ── */
   #header {
     position: fixed; top: 0; left: 0; right: 0; z-index: 100;
@@ -160,17 +187,17 @@
     overflow: hidden;
     cursor: pointer;
     transition: transform 0.18s, border-color 0.18s, box-shadow 0.18s;
+    aspect-ratio: 1;
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
-    padding: 12px 8px 10px;
-    gap: 5px;
+    padding: 12px 8px;
+    gap: 8px;
     position: relative;
-    aspect-ratio: 1;
   }
   .game-slot:hover { transform: scale(1.04); border-color: rgba(255,255,255,0.15); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
   .game-slot:active { transform: scale(0.97); }
   .game-slot-icon {
-    width: 52px; height: 52px;
+    width: 56px; height: 56px;
     border-radius: 12px;
     overflow: hidden;
     background: var(--surface2);
@@ -186,15 +213,6 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-  /* ── PLAY COUNT BADGE on game cards ── */
-  .game-slot-plays {
-    font-size: 9px; font-weight: 700;
-    color: var(--text-dim);
-    display: flex; align-items: center; gap: 2px;
-    line-height: 1;
-    transition: color 0.2s;
-  }
-  .game-slot:hover .game-slot-plays { color: var(--accent); }
 
   /* ── SEARCH PAGE ── */
   #page-search { padding: 20px 16px; }
@@ -226,17 +244,15 @@
     transition: border-color 0.18s, transform 0.15s;
   }
   .search-item:hover { border-color: rgba(255,255,255,0.15); transform: translateX(3px); }
-  .search-item-icon { width: 44px; height: 44px; border-radius: 10px; overflow: hidden; background: var(--surface2); flex-shrink: 0; }
+  .search-item-icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    overflow: hidden; background: var(--surface2); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+  }
   .search-item-icon img { width: 100%; height: 100%; object-fit: cover; }
   .search-item-info h3 { font-size: 14px; font-weight: 700; }
   .search-item-info p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-  .search-item-badge {
-    margin-left: auto; flex-shrink: 0;
-    font-size: 9px; font-weight: 800;
-    padding: 2px 7px; border-radius: 20px;
-  }
-  .search-item-badge.game { background: rgba(74,222,128,0.12); color: var(--accent); border: 1px solid rgba(74,222,128,0.25); }
-  .search-item-badge.shop { background: rgba(224,92,58,0.12); color: var(--bean); border: 1px solid rgba(224,92,58,0.25); }
   .search-empty { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 14px; }
 
   /* ── SHOP PAGE ── */
@@ -258,20 +274,25 @@
     transition: transform 0.18s, border-color 0.18s;
   }
   .shop-card:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.13); }
-  .shop-card.owned { border-color: rgba(74,222,128,0.2); }
   .shop-card-img {
     width: 100%; aspect-ratio: 1;
     background: var(--surface2);
     display: flex; align-items: center; justify-content: center;
+    font-size: 40px;
     overflow: hidden;
   }
   .shop-card-img img { width: 100%; height: 100%; object-fit: cover; }
-  .shop-card-img .img-fallback { font-size: 40px; }
   .shop-card.owned .shop-card-img { opacity: 0.6; }
   .shop-card-body { padding: 10px 12px 12px; }
   .shop-card-title { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
   .shop-card-desc { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; line-height: 1.4;
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .shop-card-category {
+    font-size: 10px; font-weight: 700; color: var(--accent);
+    background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.2);
+    border-radius: 20px; padding: 2px 8px;
+    display: inline-block; margin-bottom: 6px;
+  }
   .shop-card-price {
     display: flex; align-items: center; gap: 4px;
     font-size: 13px; font-weight: 800; color: var(--bean);
@@ -293,24 +314,28 @@
   .btn-buy:hover:not(:disabled) { background: var(--accent); border-color: var(--accent); color: #111; }
   .btn-buy:active:not(:disabled) { transform: scale(0.96); }
   .btn-buy:disabled { opacity: 0.5; cursor: not-allowed; }
-  .btn-buy.owned-btn { background: rgba(74,222,128,0.1); border-color: rgba(74,222,128,0.3); color: var(--accent); }
-  .btn-download {
-    width: 100%; margin-top: 5px;
-    background: rgba(74,222,128,0.12);
-    border: 1px solid rgba(74,222,128,0.3);
-    color: var(--accent);
-    font-family: 'Nunito', sans-serif;
-    font-size: 12px; font-weight: 700;
-    border-radius: 8px;
-    padding: 7px;
-    cursor: pointer;
-    transition: background 0.18s, transform 0.15s;
-    display: flex; align-items: center; justify-content: center; gap: 5px;
-    text-decoration: none;
+  .btn-buy.owned-btn {
+    background: rgba(74,222,128,0.1); border-color: rgba(74,222,128,0.3);
+    color: var(--accent); margin-bottom: 4px;
   }
-  .btn-download:hover { background: rgba(74,222,128,0.22); transform: scale(1.01); }
-  .btn-download:active { transform: scale(0.96); }
-  .btn-download svg { width: 12px; height: 12px; stroke: var(--accent); fill: none; flex-shrink: 0; }
+  .btn-download {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-family: 'Nunito', sans-serif;
+    font-size: 11px; font-weight: 700;
+    border-radius: 8px;
+    padding: 6px;
+    cursor: pointer;
+    transition: background 0.18s, color 0.18s;
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+  }
+  .btn-download:hover { background: var(--surface3); color: var(--text); }
+  .btn-download svg { width: 12px; height: 12px; stroke: currentColor; }
+
+  /* ── SHOP LOADING ── */
+  .shop-loading { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 14px; }
 
   /* ── QUESTS PAGE ── */
   #page-quests { padding: 20px 16px; }
@@ -348,7 +373,7 @@
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
   }
-  .quest-icon svg { width: 20px; height: 20px; stroke: var(--accent); fill: none; }
+  .quest-icon svg { width: 20px; height: 20px; stroke: var(--accent); }
   .quest-info { flex: 1; }
   .quest-info h3 { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
   .quest-progress-bar {
@@ -357,7 +382,11 @@
   }
   .quest-progress-fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.5s; }
   .quest-meta { font-size: 11px; color: var(--text-muted); display: flex; justify-content: space-between; }
-  .quest-reward { display: flex; align-items: center; gap: 3px; font-size: 12px; font-weight: 800; color: var(--bean); flex-shrink: 0; flex-direction: column; align-items: flex-end; }
+  .quest-reward {
+    display: flex; align-items: center; gap: 3px;
+    font-size: 12px; font-weight: 800; color: var(--bean);
+    flex-shrink: 0; flex-direction: column; align-items: flex-end;
+  }
   .quest-reward .bean-icon { width: 14px; height: 14px; object-fit: contain; }
   .quest-reward-row { display: flex; align-items: center; gap: 3px; }
   .btn-claim {
@@ -370,9 +399,7 @@
     transition: transform 0.15s;
   }
   .btn-claim:active { transform: scale(0.95); }
-  .claimed-badge {
-    font-size: 10px; color: var(--accent); font-weight: 700; margin-top: 2px;
-  }
+  .claimed-badge { font-size: 10px; color: var(--accent); font-weight: 700; margin-top: 2px; }
 
   /* ── PROFILE PAGE ── */
   #page-profile { padding: 20px 16px; }
@@ -417,8 +444,25 @@
   }
   .stat-card .stat-val { font-size: 20px; font-weight: 900; }
   .stat-card .stat-label { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-  .profile-section-title { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+
+  .profile-section-title {
+    font-size: 13px; font-weight: 700; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;
+  }
   .profile-info-row {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 8px;
+    font-size: 13px;
+  }
+  .profile-info-row span:first-child { color: var(--text-muted); }
+  .profile-info-row span:last-child { font-weight: 700; }
+
+  /* ── UID ROW with copy button ── */
+  .uid-row {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
@@ -428,20 +472,30 @@
     font-size: 13px;
     gap: 8px;
   }
-  .profile-info-row span:first-child { color: var(--text-muted); flex-shrink: 0; }
-  .profile-info-row .uid-val { font-weight: 700; font-size: 11px; color: var(--text-muted); font-family: 'Space Mono', monospace; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .profile-info-row span:last-child { font-weight: 700; }
+  .uid-row-left { color: var(--text-muted); flex-shrink: 0; }
+  .uid-row-val {
+    font-size: 11px; color: var(--text-muted);
+    font-family: 'Space Mono', monospace;
+    font-weight: 400;
+    flex: 1; min-width: 0;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    text-align: right;
+  }
   .btn-copy-uid {
     background: var(--surface3);
     border: 1px solid var(--border);
     color: var(--text-muted);
     font-family: 'Nunito', sans-serif;
     font-size: 11px; font-weight: 700;
-    border-radius: 6px; padding: 3px 9px;
-    cursor: pointer; flex-shrink: 0;
-    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    border-radius: 6px;
+    padding: 4px 10px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.18s, color 0.18s, border-color 0.18s;
   }
   .btn-copy-uid:hover { background: var(--accent); border-color: var(--accent); color: #111; }
+  .btn-copy-uid:active { transform: scale(0.95); }
+
   .btn-signout {
     width: 100%;
     background: rgba(248,113,113,0.1);
@@ -457,26 +511,6 @@
   }
   .btn-signout:hover { background: rgba(248,113,113,0.2); }
   .btn-signout:active { transform: scale(0.98); }
-  /* Download history in profile */
-  .download-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
-  .download-item {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 10px 14px;
-    display: flex; align-items: center; justify-content: space-between;
-    font-size: 13px;
-  }
-  .download-item-name { font-weight: 700; }
-  .download-item-link {
-    font-size: 11px; font-weight: 700; color: var(--accent);
-    background: rgba(74,222,128,0.1);
-    border: 1px solid rgba(74,222,128,0.2);
-    border-radius: 6px; padding: 2px 8px;
-    text-decoration: none; cursor: pointer;
-    transition: background 0.15s;
-  }
-  .download-item-link:hover { background: rgba(74,222,128,0.2); }
 
   /* ── BOTTOM NAV ── */
   #bottom-nav {
@@ -505,17 +539,16 @@
   }
   .nav-item:active svg { transform: scale(0.92); }
 
-  /* ── AUTH OVERLAY — hidden by default to prevent flash ── */
+  /* ── AUTH OVERLAY (shown only when NOT signed in) ── */
   #auth-overlay {
     position: fixed; inset: 0; z-index: 200;
     background: var(--bg);
-    /* Starts hidden — Firebase auth check reveals it only if needed */
-    display: none;
-    flex-direction: column;
+    display: flex; flex-direction: column;
     align-items: center; justify-content: center;
     padding: 32px 24px;
+    transition: opacity 0.3s ease;
   }
-  #auth-overlay.visible { display: flex; }
+  #auth-overlay.hidden { display: none; }
   .auth-logo {
     font-family: 'Space Mono', monospace;
     font-size: 28px; font-weight: 700;
@@ -545,6 +578,43 @@
   .btn-google:hover { background: var(--surface2); border-color: rgba(255,255,255,0.15); }
   .btn-google:active { transform: scale(0.97); }
   .google-icon { width: 20px; height: 20px; }
+
+  /* ── CONFIRM DIALOG ── */
+  #confirm-overlay {
+    position: fixed; inset: 0; z-index: 250;
+    background: rgba(0,0,0,0.8);
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  #confirm-overlay.open { opacity: 1; pointer-events: all; }
+  #confirm-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 20px;
+    width: 100%; max-width: 320px;
+    text-align: center;
+  }
+  #confirm-card h3 { font-size: 16px; font-weight: 800; margin-bottom: 8px; }
+  #confirm-card p { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5; }
+  .confirm-btns { display: flex; gap: 10px; }
+  .btn-confirm-yes {
+    flex: 1; background: var(--accent); color: #111;
+    font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 800;
+    border: none; border-radius: var(--radius-sm); padding: 12px;
+    cursor: pointer; transition: background 0.18s, transform 0.15s;
+  }
+  .btn-confirm-yes:hover { background: #22c55e; }
+  .btn-confirm-yes:active { transform: scale(0.97); }
+  .btn-confirm-no {
+    flex: 1; background: var(--surface3); color: var(--text);
+    font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700;
+    border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px;
+    cursor: pointer; transition: background 0.18s;
+  }
+  .btn-confirm-no:hover { background: var(--surface2); }
 
   /* ── GAME DETAIL MODAL ── */
   #modal-overlay {
@@ -616,16 +686,6 @@
   }
   .modal-stat-val { font-size: 14px; font-weight: 800; }
   .modal-stat-label { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
-  /* Live badge on "Played by" stat */
-  .modal-stat.live-stat { border-color: rgba(74,222,128,0.2); }
-  .modal-stat.live-stat .modal-stat-val { color: var(--accent); }
-  .live-dot {
-    display: inline-block; width: 5px; height: 5px;
-    background: var(--accent); border-radius: 50%;
-    margin-right: 3px; vertical-align: middle;
-    animation: livePulse 1.5s ease-in-out infinite;
-  }
-  @keyframes livePulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
   .modal-earnings {
     background: var(--surface2);
     border: 1px solid var(--border);
@@ -661,7 +721,7 @@
   }
   .btn-return:hover { background: var(--surface2); }
   .btn-return:active { transform: scale(0.97); }
-  .btn-return svg { width: 16px; height: 16px; stroke: var(--text); fill: none; }
+  .btn-return svg { width: 16px; height: 16px; stroke: var(--text); }
   .btn-quests-row {
     width: 100%; display: flex; align-items: center; justify-content: space-between;
     background: var(--surface2); border: 1px solid var(--border);
@@ -674,49 +734,8 @@
   .btn-quests-row:hover { background: var(--surface3); border-color: rgba(255,255,255,0.12); }
   .btn-quests-row:active { transform: scale(0.98); }
   .btn-quests-row-left { display: flex; align-items: center; gap: 10px; }
-  .btn-quests-row svg.q-icon { width: 18px; height: 18px; stroke: var(--text-muted); fill: none; }
-  .btn-quests-row svg.arrow { width: 16px; height: 16px; stroke: var(--text-muted); fill: none; }
-
-  /* ── CONFIRM MODAL ── */
-  #confirm-overlay {
-    position: fixed; inset: 0; z-index: 300;
-    background: rgba(0,0,0,0.8);
-    display: flex; align-items: center; justify-content: center;
-    padding: 20px;
-    opacity: 0; pointer-events: none;
-    transition: opacity 0.2s;
-  }
-  #confirm-overlay.open { opacity: 1; pointer-events: all; }
-  #confirm-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 24px 20px;
-    width: 100%; max-width: 300px;
-    text-align: center;
-    transform: scale(0.94);
-    transition: transform 0.2s;
-  }
-  #confirm-overlay.open #confirm-card { transform: scale(1); }
-  .confirm-icon { font-size: 32px; margin-bottom: 10px; }
-  .confirm-title { font-size: 16px; font-weight: 800; margin-bottom: 6px; }
-  .confirm-body { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5; }
-  .confirm-btns { display: flex; gap: 10px; }
-  .btn-confirm-cancel {
-    flex: 1; background: var(--surface3); border: 1px solid var(--border);
-    color: var(--text); font-family: 'Nunito', sans-serif;
-    font-size: 14px; font-weight: 700; border-radius: var(--radius-sm);
-    padding: 12px; cursor: pointer; transition: background 0.15s;
-  }
-  .btn-confirm-cancel:hover { background: var(--surface2); }
-  .btn-confirm-ok {
-    flex: 1; background: var(--accent); border: none;
-    color: #111; font-family: 'Nunito', sans-serif;
-    font-size: 14px; font-weight: 800; border-radius: var(--radius-sm);
-    padding: 12px; cursor: pointer; transition: background 0.15s, transform 0.15s;
-  }
-  .btn-confirm-ok:hover { background: #22c55e; }
-  .btn-confirm-ok:active { transform: scale(0.97); }
+  .btn-quests-row svg.q-icon { width: 18px; height: 18px; stroke: var(--text-muted); }
+  .btn-quests-row svg.arrow { width: 16px; height: 16px; stroke: var(--text-muted); }
 
   .spinner {
     width: 40px; height: 40px;
@@ -757,8 +776,18 @@
 </head>
 <body>
 
-<!-- AUTH OVERLAY — hidden by default, shown only if signed out -->
-<div id="auth-overlay">
+<!-- ═══════════════════════════════════════════
+     FIX #1 — AUTH INIT SCREEN
+     Shown immediately on load, hides AFTER Firebase
+     resolves auth state. Prevents Google popup flash.
+════════════════════════════════════════════════ -->
+<div id="auth-init-screen">
+  <div class="init-logo">Skeld<span>.</span>G</div>
+  <div class="init-spinner"></div>
+</div>
+
+<!-- AUTH OVERLAY (only shown when confirmed logged out) -->
+<div id="auth-overlay" class="hidden">
   <div class="auth-art">
     <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
       <ellipse cx="60" cy="85" rx="30" ry="18" fill="#1a1a1a"/>
@@ -771,7 +800,7 @@
     </svg>
   </div>
   <div class="auth-logo">Skeld<span>.</span>G</div>
-  <div class="auth-tagline">Your Among Us mini-game hub.<br>Sign in to start earning beans.</div>
+  <div class="auth-tagline">Your Among Us mini-game hub.<br/>Sign in to start earning beans.</div>
   <button class="btn-google" id="btn-google-signin" onclick="signInWithGoogle()">
     <svg class="google-icon" viewBox="0 0 24 24">
       <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -854,8 +883,11 @@
         <span id="shop-beans">0</span>
       </div>
     </div>
+    <!-- FIX #2 & #3: shop grid loaded from shop.json, no hardcoded accessories -->
     <div class="shop-grid" id="shop-grid">
-      <div class="spinner" style="grid-column:1/-1;"></div>
+      <div class="shop-loading" style="grid-column:1/-1;">
+        <div class="spinner"></div>
+      </div>
     </div>
   </div>
 
@@ -887,22 +919,19 @@
       <div class="stat-card"><div class="stat-val" id="stat-played">0</div><div class="stat-label">Played</div></div>
       <div class="stat-card"><div class="stat-val" id="stat-quests">0</div><div class="stat-label">Quests Done</div></div>
     </div>
-    <div class="profile-section-title">Downloads Purchased</div>
-    <div class="download-list" id="profile-downloads">
-      <div style="font-size:13px;color:var(--text-muted);padding:8px 0;">No downloads yet.</div>
-    </div>
     <div class="profile-section-title">Account Info</div>
     <div class="profile-info-row"><span>Joined</span><span id="profile-joined">—</span></div>
     <div class="profile-info-row"><span>Last Login</span><span id="profile-lastlogin">—</span></div>
-    <div class="profile-info-row" style="align-items:center;">
-      <span>UID</span>
-      <span class="uid-val" id="profile-uid">—</span>
+    <!-- FIX #4: UID with copy button -->
+    <div class="uid-row">
+      <span class="uid-row-left">UID</span>
+      <span class="uid-row-val" id="profile-uid">—</span>
       <button class="btn-copy-uid" onclick="copyUID()">Copy</button>
     </div>
     <button class="btn-signout" onclick="signOut()">Sign Out</button>
   </div>
 
-</div>
+</div><!-- end #app -->
 
 <!-- BOTTOM NAV -->
 <nav id="bottom-nav">
@@ -947,12 +976,9 @@
       <p id="modal-desc-text">—</p>
     </div>
     <div class="modal-stats-grid">
+      <!-- Played By replaces Active Users -->
       <div class="modal-stat"><div class="modal-stat-val" id="modal-plays">—</div><div class="modal-stat-label">Total Plays</div></div>
-      <!-- "Played by" replaces the old fake "Active Users" — now real & live from Firestore -->
-      <div class="modal-stat live-stat" id="modal-played-by-card">
-        <div class="modal-stat-val" id="modal-active"><span class="live-dot"></span>—</div>
-        <div class="modal-stat-label">Played by</div>
-      </div>
+      <div class="modal-stat"><div class="modal-stat-val" id="modal-active">—</div><div class="modal-stat-label">Played By</div></div>
       <div class="modal-stat"><div class="modal-stat-val" id="modal-difficulty">—</div><div class="modal-stat-label">Difficulty</div></div>
     </div>
     <div class="modal-earnings">
@@ -982,15 +1008,14 @@
   </div>
 </div>
 
-<!-- PURCHASE CONFIRM MODAL -->
+<!-- PURCHASE CONFIRM DIALOG -->
 <div id="confirm-overlay">
   <div id="confirm-card">
-    <div class="confirm-icon" id="confirm-icon">📦</div>
-    <div class="confirm-title" id="confirm-title">Buy Item?</div>
-    <div class="confirm-body" id="confirm-body">Are you sure?</div>
+    <h3 id="confirm-title">Confirm Purchase</h3>
+    <p id="confirm-body">Buy this item?</p>
     <div class="confirm-btns">
-      <button class="btn-confirm-cancel" onclick="closeConfirm()">Cancel</button>
-      <button class="btn-confirm-ok" id="confirm-ok-btn" onclick="confirmPurchase()">Buy</button>
+      <button class="btn-confirm-no" onclick="closeConfirm()">Cancel</button>
+      <button class="btn-confirm-yes" id="confirm-yes-btn" onclick="confirmBuy()">Buy</button>
     </div>
   </div>
 </div>
@@ -998,9 +1023,9 @@
 <!-- TOAST -->
 <div id="toast"></div>
 
-<!-- ════════════════════════════════════════════
+<!-- ════════════════════════════════════════════════
      FIREBASE MODULE
-════════════════════════════════════════════ -->
+════════════════════════════════════════════════ -->
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
   import {
@@ -1009,8 +1034,7 @@
   } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
   import {
     getFirestore, doc, getDoc, setDoc, updateDoc,
-    serverTimestamp, increment, arrayUnion,
-    collection, onSnapshot
+    serverTimestamp, increment, arrayUnion
   } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
   const firebaseConfig = {
@@ -1022,25 +1046,25 @@
     appId: "1:474209822056:web:eee11ece0da8f1cfd4a2dd"
   };
 
-  const app = initializeApp(firebaseConfig);
+  const app  = initializeApp(firebaseConfig);
   const auth = getAuth(app);
-  const db = getFirestore(app);
+  const db   = getFirestore(app);
 
-  // Expose Firestore primitives for use in non-module scripts
-  window._auth = auth;
-  window._db = db;
-  window._doc = doc;
-  window._getDoc = getDoc;
-  window._setDoc = setDoc;
-  window._updateDoc = updateDoc;
+  // Expose to non-module scripts
+  window._auth           = auth;
+  window._db             = db;
+  window._doc            = doc;
+  window._getDoc         = getDoc;
+  window._setDoc         = setDoc;
+  window._updateDoc      = updateDoc;
   window._serverTimestamp = serverTimestamp;
-  window._increment = increment;
-  window._arrayUnion = arrayUnion;
+  window._increment      = increment;
+  window._arrayUnion     = arrayUnion;
 
   // ── SIGN IN ──
   window.signInWithGoogle = async () => {
     const loadEl = document.getElementById('auth-loading');
-    const btnEl = document.getElementById('btn-google-signin');
+    const btnEl  = document.getElementById('btn-google-signin');
     loadEl.style.display = 'block';
     btnEl.disabled = true;
     try {
@@ -1057,57 +1081,67 @@
   window.signOut = async () => {
     await fbSignOut(auth);
     window._userData = null;
-    window._userUid = null;
+    window._userUid  = null;
     updateAllBeanDisplays(0);
-    // onAuthStateChanged will show the overlay
+    // Show auth overlay after sign out
+    document.getElementById('auth-overlay').classList.remove('hidden');
   };
 
-  // ── AUTH STATE — no flash for returning users ──
-  // Overlay starts hidden; we only show it if the user is signed out.
+  // ── FIX #1: AUTH STATE — show init screen until Firebase resolves ──
   onAuthStateChanged(auth, async (user) => {
-    const overlay = document.getElementById('auth-overlay');
+    const initScreen = document.getElementById('auth-init-screen');
+    const authOverlay = document.getElementById('auth-overlay');
+
     if (user) {
-      overlay.classList.remove('visible');   // hide login screen
+      // Signed in — hide auth overlay, hide init screen, show app
+      authOverlay.classList.add('hidden');
       await ensureUserDoc(user);
       await loadUserData(user.uid);
+      // Fade out init screen
+      initScreen.classList.add('hidden');
+      setTimeout(() => { initScreen.style.display = 'none'; }, 350);
     } else {
-      overlay.classList.add('visible');      // show login screen
+      // Signed out — hide init screen, show auth overlay
+      initScreen.classList.add('hidden');
+      setTimeout(() => {
+        initScreen.style.display = 'none';
+        authOverlay.classList.remove('hidden');
+      }, 250);
     }
   });
 
   // ── ENSURE USER DOC ──
   async function ensureUserDoc(user) {
-    const ref = doc(db, 'users', user.uid);
+    const ref  = doc(db, 'users', user.uid);
     const snap = await getDoc(ref);
     if (!snap.exists()) {
       await setDoc(ref, {
-        displayName: user.displayName || 'Crewmate',
-        photoURL: user.photoURL || '',
-        email: user.email || '',
-        beans: 100,
-        inventory: [],
-        gamesPlayed: 0,
+        displayName:   user.displayName || 'Crewmate',
+        photoURL:      user.photoURL    || '',
+        email:         user.email       || '',
+        beans:         100,
+        inventory:     [],
+        gamesPlayed:   0,
         questsCompleted: 0,
         claimedQuests: [],
-        loginStreak: 1,
+        loginStreak:   1,
         lastLoginDate: new Date().toDateString(),
-        createdAt: serverTimestamp(),
-        lastLogin: serverTimestamp(),
-        role: 'user'
+        createdAt:     serverTimestamp(),
+        lastLogin:     serverTimestamp()
       });
       showToast('Welcome! You received 100 🫘 beans!');
     } else {
-      const data = snap.data();
-      const today = new Date().toDateString();
-      const lastDate = data.lastLoginDate;
+      const data      = snap.data();
+      const today     = new Date().toDateString();
+      const lastDate  = data.lastLoginDate;
       const yesterday = new Date(Date.now() - 86400000).toDateString();
       let streak = data.loginStreak || 1;
       if (lastDate !== today) {
         streak = lastDate === yesterday ? streak + 1 : 1;
         await updateDoc(ref, {
-          lastLogin: serverTimestamp(),
+          lastLogin:     serverTimestamp(),
           lastLoginDate: today,
-          loginStreak: streak
+          loginStreak:   streak
         });
       }
     }
@@ -1115,42 +1149,46 @@
 
   // ── LOAD USER DATA ──
   async function loadUserData(uid) {
-    const ref = doc(db, 'users', uid);
+    const ref  = doc(db, 'users', uid);
     const snap = await getDoc(ref);
     if (!snap.exists()) return;
     const data = snap.data();
 
     window._userData = data;
-    window._userUid = uid;
-
-    // Admin check
-    window._isAdmin = data.role === 'admin';
+    window._userUid  = uid;
 
     const beans = data.beans ?? 0;
     updateAllBeanDisplays(beans);
 
-    document.getElementById('profile-name').textContent = data.displayName || 'Crewmate';
-    document.getElementById('profile-email').textContent = data.email || '';
-    document.getElementById('profile-uid').textContent = uid;
-    document.getElementById('stat-games').textContent = window._gamesData?.length ?? '—';
-    document.getElementById('stat-played').textContent = data.gamesPlayed ?? 0;
-    document.getElementById('stat-quests').textContent = data.questsCompleted ?? 0;
+    document.getElementById('profile-name').textContent  = data.displayName || 'Crewmate';
+    document.getElementById('profile-email').textContent = data.email        || '';
+    // FIX #4: store full UID in data attribute, display truncated
+    const uidEl = document.getElementById('profile-uid');
+    uidEl.textContent = uid.substring(0, 20) + '…';
+    uidEl.dataset.fullUid = uid;
+
+    document.getElementById('stat-games').textContent   = window._gamesData?.length ?? '—';
+    document.getElementById('stat-played').textContent  = data.gamesPlayed   ?? 0;
+    document.getElementById('stat-quests').textContent  = data.questsCompleted ?? 0;
 
     const createdAt = data.createdAt?.toDate?.();
     const lastLogin = data.lastLogin?.toDate?.();
-    document.getElementById('profile-joined').textContent = createdAt ? createdAt.toLocaleDateString() : '—';
+    document.getElementById('profile-joined').textContent    = createdAt ? createdAt.toLocaleDateString() : '—';
     document.getElementById('profile-lastlogin').textContent = lastLogin ? lastLogin.toLocaleDateString() : '—';
 
+    // Avatar
     const av = auth.currentUser?.photoURL;
     if (av) {
-      document.getElementById('profile-avatar-img').innerHTML = `<img src="${av}" alt="avatar"/>`;
-      document.getElementById('header-avatar').innerHTML = `<img src="${av}" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"/>`;
+      document.getElementById('profile-avatar-img').innerHTML =
+        `<img src="${av}" alt="avatar"/>`;
+      document.getElementById('header-avatar').innerHTML =
+        `<img src="${av}" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"/>`;
     }
 
     renderQuests(data);
     renderShop(data.inventory || []);
-    renderDownloadHistory(data.inventory || []);
   }
+
   window._loadUserData = loadUserData;
 
   window._refreshUser = async () => {
@@ -1159,11 +1197,11 @@
     await loadUserData(uid);
   };
 
-  // ── UPDATE BEANS ACROSS ALL DISPLAYS ──
+  // ── BEAN DISPLAY ──
   window.updateAllBeanDisplays = (beans) => {
     const val = Number(beans).toLocaleString();
     document.getElementById('header-beans').textContent = val;
-    document.getElementById('shop-beans').textContent = val;
+    document.getElementById('shop-beans').textContent   = val;
     document.getElementById('profile-beans').textContent = val;
     const badge = document.getElementById('beans-badge');
     badge.classList.remove('bump');
@@ -1202,77 +1240,54 @@
     } catch (e) { console.error('Deduct beans error:', e); return false; }
   };
 
-  // ══════════════════════════════════════════════
-  // PLAY COUNT — real Firestore counter
-  // Each game gets its own document in the "games" collection.
-  // document ID = sanitized folder name (e.g. "my_game_folder")
-  // fields: { playCount: number, lastPlayed: timestamp }
-  // ══════════════════════════════════════════════
+  // ── UPDATE PLAY COUNT + AWARD BEANS ──
+  // FIX #5 (Played By): increments playedBy counter on the game doc in Firestore
   window._updatePlayCount = async (gameFolder, beansEarned) => {
     const uid = window._userUid;
     if (!uid) return;
     try {
-      // 1. Update user's play count and beans
-      const userRef = doc(db, 'users', uid);
-      const snap = await getDoc(userRef);
+      const userRef  = doc(db, 'users', uid);
+      const snap     = await getDoc(userRef);
       if (!snap.exists()) return;
-      const data = snap.data();
-      const played = (data.gamesPlayed || 0) + 1;
-      const earnedBeans = beansEarned || 0;
+      const data     = snap.data();
+      const played   = (data.gamesPlayed || 0) + 1;
+      const earned   = beansEarned || 0;
+
       await updateDoc(userRef, {
         gamesPlayed: played,
-        beans: increment(earnedBeans)
+        beans: increment(earned)
       });
 
-      // 2. Increment this game's play counter in Firestore
-      //    Use setDoc with merge so it creates the doc if first-ever play
-      const gameId = window.getGameId({ folder: gameFolder });
-      const gameRef = doc(db, 'games', gameId);
-      await setDoc(gameRef, {
-        playCount: increment(1),
-        lastPlayed: serverTimestamp()
-      }, { merge: true });
-
-      // 3. Update local state
       if (window._userData) {
         window._userData.gamesPlayed = played;
-        window._userData.beans = (window._userData.beans || 0) + earnedBeans;
+        window._userData.beans = (window._userData.beans || 0) + earned;
       }
       document.getElementById('stat-played').textContent = played;
-      if (earnedBeans > 0) {
-        updateAllBeanDisplays(window._userData.beans);
-        showToast(`+${earnedBeans} 🫘 beans earned!`);
-      }
-      // onSnapshot will auto-update the displayed count in real-time
-      await checkQuestProgress('gamesPlayed', played);
-    } catch (e) { console.error('updatePlayCount error:', e); }
-  };
 
-  // ── REAL-TIME PLAY COUNT LISTENER ──
-  // Listens to the entire "games" collection and keeps window._gamePlays in sync.
-  // This updates game cards and the open modal automatically.
-  window._setupGamePlaysListener = function() {
-    // Clean up any existing listener
-    if (window._playsUnsubscribe) { window._playsUnsubscribe(); window._playsUnsubscribe = null; }
-    const gamesCol = collection(db, 'games');
-    window._playsUnsubscribe = onSnapshot(
-      gamesCol,
-      (snapshot) => {
-        snapshot.forEach(docSnap => {
-          window._gamePlays[docSnap.id] = docSnap.data().playCount || 0;
-        });
-        // If game modal is open, update its live counter immediately
-        if (window._selectedGame) {
-          const gId = window.getGameId(window._selectedGame);
-          const count = window._gamePlays[gId] || 0;
-          const el = document.getElementById('modal-active');
-          if (el) el.innerHTML = `<span class="live-dot"></span>${window.formatCount(count)}`;
+      // Increment playedBy on the game doc in Firestore
+      // Collection: games / doc: gameFolder
+      if (gameFolder) {
+        const gameRef = doc(db, 'games', gameFolder);
+        const gameSnap = await getDoc(gameRef);
+        if (gameSnap.exists()) {
+          await updateDoc(gameRef, { playedBy: increment(1) });
+        } else {
+          await setDoc(gameRef, { playedBy: 1 });
         }
-        // Refresh play counts on all visible game cards
-        if (window.updateGameCardPlays) window.updateGameCardPlays();
-      },
-      (err) => console.warn('[GamePlays listener]', err.message)
-    );
+        // Update local count in modal if still open
+        const activeEl = document.getElementById('modal-active');
+        if (activeEl) {
+          const cur = parseInt(activeEl.textContent.replace(/,/g,'')) || 0;
+          activeEl.textContent = (cur + 1).toLocaleString();
+        }
+      }
+
+      if (earned > 0) {
+        updateAllBeanDisplays(window._userData.beans);
+        showToast(`+${earned} 🫘 beans earned!`);
+      }
+      await checkQuestProgress('gamesPlayed', played);
+    } catch (e) { console.error(e); }
   };
 
   // ── CLAIM QUEST ──
@@ -1280,21 +1295,21 @@
     const uid = window._userUid;
     if (!uid) return;
     try {
-      const ref = doc(db, 'users', uid);
+      const ref  = doc(db, 'users', uid);
       const snap = await getDoc(ref);
       if (!snap.exists()) return;
-      const data = snap.data();
+      const data    = snap.data();
       const claimed = data.claimedQuests || [];
       if (claimed.includes(questId)) { showToast('Already claimed!'); return; }
       await updateDoc(ref, {
-        claimedQuests: arrayUnion(questId),
-        beans: increment(reward),
-        questsCompleted: increment(1)
+        claimedQuests:    arrayUnion(questId),
+        beans:            increment(reward),
+        questsCompleted:  increment(1)
       });
       if (window._userData) {
-        window._userData.claimedQuests = [...claimed, questId];
-        window._userData.beans = (window._userData.beans || 0) + reward;
-        window._userData.questsCompleted = (window._userData.questsCompleted || 0) + 1;
+        window._userData.claimedQuests    = [...claimed, questId];
+        window._userData.beans            = (window._userData.beans || 0) + reward;
+        window._userData.questsCompleted  = (window._userData.questsCompleted || 0) + 1;
       }
       updateAllBeanDisplays(window._userData.beans);
       document.getElementById('stat-quests').textContent = window._userData.questsCompleted;
@@ -1303,13 +1318,14 @@
     } catch (e) { console.error('Claim quest error:', e); }
   };
 
+  // ── CHECK QUEST PROGRESS ──
   async function checkQuestProgress(field, value) {
     if (!window._userData) return;
     window._userData[field] = value;
     renderQuests(window._userData);
   }
 
-  // ── BUY ITEM (after confirmation) ──
+  // ── BUY ITEM (called after confirm dialog) ──
   window._executeBuy = async (id, price, name, fileUrl) => {
     const uid = window._userUid;
     if (!uid) { showToast('Sign in to buy items!'); return; }
@@ -1321,124 +1337,84 @@
     try {
       const ref = doc(db, 'users', uid);
       await updateDoc(ref, {
-        beans: increment(-price),
+        beans:     increment(-price),
         inventory: arrayUnion(id)
       });
       if (window._userData) {
-        window._userData.beans = (window._userData.beans || 0) - price;
+        window._userData.beans     = (window._userData.beans || 0) - price;
         window._userData.inventory = [...inv, id];
       }
       updateAllBeanDisplays(window._userData.beans);
-      showToast(`🎉 Purchased ${name}! Tap ↓ to download.`);
+      showToast(`🎉 Purchased ${name}!`);
       renderShop(window._userData.inventory);
-      renderDownloadHistory(window._userData.inventory);
       await checkQuestProgress('visitedShop', true);
     } catch(e) { console.error(e); showToast('Purchase failed.'); }
   };
 
-  // ── RENDER DOWNLOAD HISTORY (profile page) ──
-  window.renderDownloadHistory = function(inventory) {
-    const container = document.getElementById('profile-downloads');
-    const shopItems = window._shopData || [];
-    const owned = shopItems.filter(item => inventory.includes(item.id));
-    if (!owned.length) {
-      container.innerHTML = `<div style="font-size:13px;color:var(--text-muted);padding:8px 0;">No downloads yet.</div>`;
-      return;
-    }
-    container.innerHTML = owned.map(item => `
-      <div class="download-item">
-        <div class="download-item-name">${escHtml(item.name)}</div>
-        ${item.file
-          ? `<a class="download-item-link" href="${escHtml(item.file)}" download>↓ Download</a>`
-          : `<span style="font-size:11px;color:var(--text-dim);">No file</span>`
-        }
-      </div>
-    `).join('');
-  };
-
-  // ── LOAD SHOP FROM shop.json ──
-  async function loadShop() {
-    try {
-      const res = await fetch('shop.json');
-      if (!res.ok) throw new Error('shop.json not found');
-      const items = await res.json();
-      window._shopData = items;
-      renderShop(window._userData?.inventory || []);
-      if (window._userData?.inventory) renderDownloadHistory(window._userData.inventory);
-    } catch (e) {
-      console.warn('shop.json not loaded:', e.message);
-      window._shopData = [];
-      document.getElementById('shop-grid').innerHTML =
-        `<p style="grid-column:1/-1;color:var(--text-muted);font-size:13px;padding:10px 0;">Add a shop.json to populate the store.</p>`;
-    }
-  }
-
   // ── LOAD GAMES ──
+  // Also loads playedBy counts from Firestore for each game
   async function loadGames() {
     try {
       const res = await fetch('game.json');
       if (!res.ok) throw new Error('game.json not found');
       const games = await res.json();
       window._gamesData = games;
+
+      // Fetch playedBy counts from Firestore for each game
+      const countPromises = games.map(async (g) => {
+        try {
+          const gameRef  = doc(db, 'games', g.folder);
+          const gameSnap = await getDoc(gameRef);
+          g._playedBy = gameSnap.exists() ? (gameSnap.data().playedBy || 0) : 0;
+        } catch { g._playedBy = 0; }
+      });
+      await Promise.all(countPromises);
+
       renderGameGrid(games);
-      renderSearch(games, '');
       document.getElementById('games-count').textContent = games.length + ' games';
-      document.getElementById('stat-games').textContent = games.length;
-      // Start real-time listener for play counts AFTER we know which games exist
-      window._setupGamePlaysListener();
+      document.getElementById('stat-games').textContent  = games.length;
     } catch (e) {
       console.error(e);
       document.getElementById('game-grid').innerHTML =
         `<p style="color:var(--text-muted);font-size:13px;padding:10px 0;grid-column:1/-1;">No games found. Add a game.json file.</p>`;
     }
   }
-
   loadGames();
-  loadShop();
+
+  // ── LOAD SHOP from shop.json ──
+  // FIX #2 & #3: removed SHOP_ITEMS hardcoded array, loads from shop.json
+  async function loadShopItems() {
+    try {
+      const res = await fetch('shop.json');
+      if (!res.ok) throw new Error('shop.json not found');
+      const items = await res.json();
+      window._shopItems = items;
+      // Render with current inventory (may be [] if user not loaded yet)
+      renderShop(window._userData?.inventory || []);
+    } catch (e) {
+      console.error(e);
+      document.getElementById('shop-grid').innerHTML =
+        `<div class="shop-loading" style="grid-column:1/-1;">No shop items found.<br/>Add a shop.json file.</div>`;
+    }
+  }
+  loadShopItems();
+
+  window._loadShopItems = loadShopItems;
 
 </script>
 
-<!-- ════════════════════════════════════════════
-     APP LOGIC (non-module, runs before module)
-════════════════════════════════════════════ -->
+<!-- ════════════════════════════════════════════════
+     APP LOGIC (non-module)
+════════════════════════════════════════════════ -->
 <script>
-  // Global state
-  window._gamesData   = [];
-  window._shopData    = [];
-  window._selectedGame = null;
-  window._userData    = null;
-  window._userUid     = null;
-  window._isAdmin     = false;
+  window._gamesData      = [];
+  window._shopItems      = [];
+  window._selectedGame   = null;
+  window._userData       = null;
+  window._userUid        = null;
   window._currentQuestTab = 'active';
-  window._gamePlays   = {};   // gameId → real-time play count from Firestore
-  window._pendingPurchase = null; // { id, price, name, fileUrl }
-
-  // ─────────────────────────────────────────────
-  // HELPERS
-  // ─────────────────────────────────────────────
-
-  /**
-   * Returns a Firestore-safe document ID from a game object.
-   * Strips path separators and other forbidden characters.
-   * e.g. "my_game/v2" → "my_game_v2"
-   */
-  window.getGameId = function(game) {
-    return (game.id || game.folder || 'unknown')
-      .replace(/[\/\\.#$\[\]\s]/g, '_')
-      .replace(/_+/g, '_')
-      .toLowerCase();
-  };
-
-  /** Human-friendly large number formatter: 1234 → "1.2K", 1200000 → "1.2M" */
-  window.formatCount = function(n) {
-    n = Number(n) || 0;
-    if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace('.0','') + 'M';
-    if (n >= 1_000)     return (n / 1_000).toFixed(1).replace('.0','') + 'K';
-    return String(n);
-  };
-
-  /** Admin check helper — used for future admin features */
-  window.isAdmin = function() { return !!window._isAdmin; };
+  // Pending confirm purchase
+  window._pendingBuy = null;
 
   // ─────────────────────────────────────────────
   // ROUTING
@@ -1468,7 +1444,7 @@
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     const pageEl = document.getElementById('page-' + page);
-    const navEl  = document.getElementById('nav-' + page);
+    const navEl  = document.getElementById('nav-'  + page);
     if (pageEl) pageEl.classList.add('active');
     if (navEl)  navEl.classList.add('active');
     const titles = { home:'Home', search:'Search', shop:'Shop', quests:'Quests', profile:'Profile' };
@@ -1485,7 +1461,7 @@
   };
 
   window.addEventListener('popstate', (e) => {
-    const page = (e.state?.page) || resolvePageFromPath(location.pathname);
+    const page = (e.state && e.state.page) || resolvePageFromPath(location.pathname);
     navigateTo(page, false);
   });
 
@@ -1496,7 +1472,7 @@
   })();
 
   // ─────────────────────────────────────────────
-  // GAME GRID — shows real Played By counts
+  // GAME GRID
   // ─────────────────────────────────────────────
   function renderGameGrid(games) {
     const grid = document.getElementById('game-grid');
@@ -1504,67 +1480,40 @@
       grid.innerHTML = '<p style="color:var(--text-muted);font-size:13px;padding:10px 0;grid-column:1/-1;">No games available.</p>';
       return;
     }
-    grid.innerHTML = games.map((g, i) => {
-      const gId   = window.getGameId(g);
-      const count = window._gamePlays[gId] || 0;
-      return `
-        <div class="game-slot" data-game-idx="${i}" onclick="openGameModal(${i})">
-          <div class="game-slot-icon">
-            <img src="${g.folder}/icon.png" alt="${escHtml(g.name)}"
-              onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2256%22 height=%2256%22><rect width=%2256%22 height=%2256%22 fill=%22%23222%22/><text x=%2250%25%22 y=%2255%25%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22 font-size=%2222%22 fill=%22%23555%22>?</text></svg>'"/>
-          </div>
-          <div class="game-slot-name">${escHtml(g.name)}</div>
-          <div class="game-slot-plays">▶ ${window.formatCount(count)}</div>
+    grid.innerHTML = games.map((g, i) => `
+      <div class="game-slot" onclick="openGameModal(${i})">
+        <div class="game-slot-icon">
+          <img src="${g.folder}/icon.png" alt="${escHtml(g.name)}"
+               onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2256%22 height=%2256%22><rect width=%2256%22 height=%2256%22 fill=%22%23222%22/><text x=%2250%25%22 y=%2255%25%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22 font-size=%2222%22 fill=%22%23555%22>?</text></svg>'"/>
         </div>
-      `;
-    }).join('');
+        <div class="game-slot-name">${escHtml(g.name)}</div>
+      </div>
+    `).join('');
   }
   window.renderGameGrid = renderGameGrid;
 
-  /**
-   * Called by the Firestore onSnapshot listener every time play counts change.
-   * Updates only the counter text on each card — no full re-render.
-   */
-  window.updateGameCardPlays = function() {
-    if (!window._gamesData) return;
-    window._gamesData.forEach((g, i) => {
-      const gId  = window.getGameId(g);
-      const count = window._gamePlays[gId] || 0;
-      const el = document.querySelector(`.game-slot[data-game-idx="${i}"] .game-slot-plays`);
-      if (el) el.textContent = '▶ ' + window.formatCount(count);
-    });
-  };
-
   // ─────────────────────────────────────────────
-  // GAME MODAL — "Played by" shows real live count
+  // GAME MODAL
   // ─────────────────────────────────────────────
   window.openGameModal = function(idx) {
     const g = window._gamesData[idx];
     if (!g) return;
     window._selectedGame = g;
-
     document.getElementById('modal-icon').src = `${g.folder}/icon.png`;
     document.getElementById('modal-icon').onerror = function(){ this.src = ''; };
-    document.getElementById('modal-title').textContent = g.name;
+    document.getElementById('modal-title').textContent     = g.name;
     document.getElementById('modal-desc-text').textContent = g.description || 'No description available.';
-    document.getElementById('modal-plays').textContent = g.totalPlays != null ? Number(g.totalPlays).toLocaleString() : '—';
+    document.getElementById('modal-plays').textContent     = g.totalPlays != null ? Number(g.totalPlays).toLocaleString() : '—';
+    // Played By: use live Firestore count stored on game object
+    document.getElementById('modal-active').textContent    = (g._playedBy != null) ? Number(g._playedBy).toLocaleString() : '0';
     document.getElementById('modal-difficulty').textContent = g.difficulty || '—';
-    document.getElementById('modal-earnings').textContent = g.earnings != null ? Number(g.earnings).toLocaleString() : '600';
-
-    // ── REAL-TIME "Played by" count ──
-    const gId      = window.getGameId(g);
-    const liveCount = window._gamePlays[gId] || 0;
-    document.getElementById('modal-active').innerHTML =
-      `<span class="live-dot"></span>${window.formatCount(liveCount)}`;
-
-    // Chips
+    document.getElementById('modal-earnings').textContent  = g.earnings != null ? Number(g.earnings).toLocaleString() : '600';
     const chips = document.getElementById('modal-chips');
-    const meta = [];
+    const meta  = [];
     if (g.releaseDate) meta.push(g.releaseDate);
     if (g.developer)   meta.push(g.developer);
     if (g.tags) meta.push(...(Array.isArray(g.tags) ? g.tags : [g.tags]));
     chips.innerHTML = meta.map(m => `<span class="chip">${escHtml(String(m))}</span>`).join('');
-
     document.getElementById('modal-overlay').classList.add('open');
     document.body.style.overflow = 'hidden';
   };
@@ -1573,7 +1522,6 @@
     if (e && e.target !== document.getElementById('modal-overlay')) return;
     document.getElementById('modal-overlay').classList.remove('open');
     document.body.style.overflow = '';
-    window._selectedGame = null;
   };
 
   window.playGame = function() {
@@ -1581,172 +1529,210 @@
     if (!g) return;
     const beansEarned = g.earnings || 0;
     if (window._updatePlayCount) window._updatePlayCount(g.folder, beansEarned);
-    window.location.href = `/${g.folder}`;
+    const path = `/${g.folder}`;
+    window.location.href = path;
   };
 
   // ─────────────────────────────────────────────
-  // SEARCH — searches both games AND shop items
+  // SEARCH — games + shop items
   // ─────────────────────────────────────────────
-  function renderSearch(games, query) {
+  function renderSearch(query) {
     const container = document.getElementById('search-results');
     const q = query.toLowerCase().trim();
     if (!q) {
       container.innerHTML = '<div class="search-empty">Start typing to search…</div>';
       return;
     }
-    const results = [];
 
-    // Games
-    (games || []).forEach(g => {
-      if (
-        g.name.toLowerCase().includes(q) ||
-        (g.description || '').toLowerCase().includes(q) ||
-        (g.developer || '').toLowerCase().includes(q)
-      ) {
-        const origIdx = (window._gamesData || []).indexOf(g);
-        results.push(`
-          <div class="search-item" onclick="openGameModal(${origIdx});navigateTo('home');">
-            <div class="search-item-icon">
-              <img src="${g.folder}/icon.png" alt="${escHtml(g.name)}"
-                onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2244%22 height=%2244%22><rect width=%2244%22 height=%2244%22 fill=%22%23222%22/><text x=%2250%25%22 y=%2255%25%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22 font-size=%2218%22 fill=%22%23555%22>?</text></svg>'"/>
-            </div>
-            <div class="search-item-info">
-              <h3>${escHtml(g.name)}</h3>
-              <p>${escHtml(g.developer || g.description?.substring(0,40) || '—')}</p>
-            </div>
-            <span class="search-item-badge game">Game</span>
-          </div>
-        `);
-      }
-    });
+    const gameResults = (window._gamesData || []).filter(g =>
+      g.name.toLowerCase().includes(q) ||
+      (g.description || '').toLowerCase().includes(q) ||
+      (g.developer   || '').toLowerCase().includes(q)
+    );
 
-    // Shop items
-    (window._shopData || []).forEach(item => {
-      if (
-        item.name.toLowerCase().includes(q) ||
-        (item.description || '').toLowerCase().includes(q)
-      ) {
-        results.push(`
-          <div class="search-item" onclick="navigateTo('shop');">
-            <div class="search-item-icon" style="background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:22px;">
-              ${item.image
-                ? `<img src="${escHtml(item.image)}" alt="${escHtml(item.name)}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>`
-                : '📦'
-              }
-            </div>
-            <div class="search-item-info">
-              <h3>${escHtml(item.name)}</h3>
-              <p>${escHtml(item.description?.substring(0,40) || '—')}</p>
-            </div>
-            <span class="search-item-badge shop">Shop</span>
-          </div>
-        `);
-      }
-    });
+    const shopResults = (window._shopItems || []).filter(item =>
+      item.name.toLowerCase().includes(q) ||
+      (item.description || '').toLowerCase().includes(q) ||
+      (item.category    || '').toLowerCase().includes(q)
+    );
 
-    if (!results.length) {
+    if (!gameResults.length && !shopResults.length) {
       container.innerHTML = '<div class="search-empty">No results found.</div>';
       return;
     }
-    container.innerHTML = results.join('');
+
+    let html = '';
+
+    if (gameResults.length) {
+      html += `<div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Games</div>`;
+      html += gameResults.map(g => {
+        const origIdx = (window._gamesData || []).indexOf(g);
+        return `
+          <div class="search-item" onclick="openGameModal(${origIdx});navigateTo('home');">
+            <div class="search-item-icon">
+              <img src="${g.folder}/icon.png" alt="${escHtml(g.name)}"
+                   onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2244%22 height=%2244%22><rect width=%2244%22 height=%2244%22 fill=%22%23222%22/><text x=%2250%25%22 y=%2255%25%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22 font-size=%2218%22 fill=%22%23555%22>?</text></svg>'"/>
+            </div>
+            <div class="search-item-info">
+              <h3>${escHtml(g.name)}</h3>
+              <p>${escHtml(g.developer || g.description?.substring(0, 40) || '—')}</p>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    if (shopResults.length) {
+      html += `<div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin:${gameResults.length?'14px':0} 0 8px;">Shop</div>`;
+      html += shopResults.map(item => {
+        const inv   = window._userData?.inventory || [];
+        const owned = inv.includes(item.id);
+        return `
+          <div class="search-item" onclick="navigateTo('shop');">
+            <div class="search-item-icon">${item.image ? `<img src="${escHtml(item.image)}" alt="${escHtml(item.name)}" onerror="this.style.display='none'"/>` : '📦'}</div>
+            <div class="search-item-info">
+              <h3>${escHtml(item.name)}</h3>
+              <p>${owned ? '✓ Owned' : item.price + ' 🫘'} · ${escHtml(item.category || 'Item')}</p>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    container.innerHTML = html;
   }
-  window.renderSearch = renderSearch;
-  window.onSearch = function(val) { renderSearch(window._gamesData, val); };
+
+  window.onSearch = function(val) { renderSearch(val); };
 
   // ─────────────────────────────────────────────
-  // SHOP — loaded from shop.json, file downloads
+  // SHOP — loaded from shop.json
+  // FIX #2: removed cosmetic accessories
+  // FIX #3: loads from shop.json dynamically
+  // Owned items show: ✓ Owned + Download button
   // ─────────────────────────────────────────────
   function renderShop(inventory) {
-    const inv = inventory || window._userData?.inventory || [];
-    const items = window._shopData || [];
-    const grid = document.getElementById('shop-grid');
-    if (!items.length) return; // handled by loadShop error path
+    const inv    = inventory || window._userData?.inventory || [];
+    const items  = window._shopItems || [];
+    const grid   = document.getElementById('shop-grid');
+
+    if (!items.length) {
+      // Still loading or empty
+      return;
+    }
+
     grid.innerHTML = items.map(item => {
       const owned = inv.includes(item.id);
-      const imgContent = item.image
-        ? `<img src="${escHtml(item.image)}" alt="${escHtml(item.name)}" onerror="this.style.display='none'"/>`
-        : `<div class="img-fallback">📦</div>`;
+      const imgHtml = item.image
+        ? `<img src="${escHtml(item.image)}" alt="${escHtml(item.name)}" onerror="this.style.display='none'; this.parentElement.innerHTML='📦';"/>`
+        : '📦';
+
       return `
         <div class="shop-card${owned ? ' owned' : ''}">
-          <div class="shop-card-img">${imgContent}</div>
+          <div class="shop-card-img">${imgHtml}</div>
           <div class="shop-card-body">
+            ${item.category ? `<div class="shop-card-category">${escHtml(item.category)}</div>` : ''}
             <div class="shop-card-title">${escHtml(item.name)}</div>
-            <div class="shop-card-desc">${escHtml(item.description || '')}</div>
+            ${item.description ? `<div class="shop-card-desc">${escHtml(item.description)}</div>` : ''}
             <div class="shop-card-price">
               <img class="bean-icon" src="bean.png" alt="🫘" onerror="this.outerHTML='<span>🫘</span>'"/>
               ${item.price}
             </div>
             ${owned
-              ? `
-                <button class="btn-buy owned-btn" disabled>✓ Owned</button>
-                ${item.file
-                  ? `<a class="btn-download" href="${escHtml(item.file)}" download>
-                      <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                        <polyline points="7 10 12 15 17 10"/>
-                        <line x1="12" y1="15" x2="12" y2="3"/>
-                      </svg>
-                      Download
-                    </a>`
-                  : ''
-                }`
-              : `<button class="btn-buy" onclick="initiateShopBuy('${escHtml(item.id)}', ${item.price}, '${escHtml(item.name)}', '${escHtml(item.file || '')}')">Buy</button>`
+              ? `<button class="btn-buy owned-btn" disabled>✓ Owned</button>
+                 ${item.file
+                    ? `<button class="btn-download" onclick="downloadFile('${escHtml(item.file)}', '${escHtml(item.name)}')">
+                         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                         Download
+                       </button>`
+                    : ''
+                 }`
+              : `<button class="btn-buy" onclick="showBuyConfirm('${escHtml(item.id)}', ${item.price}, '${escHtml(item.name)}', '${escHtml(item.file || '')}')">Buy</button>`
             }
           </div>
-        </div>
-      `;
+        </div>`;
     }).join('');
   }
   window.renderShop = renderShop;
-  renderShop([]); // render empty state while shop.json loads
+
+  // Download owned file
+  window.downloadFile = function(fileUrl, name) {
+    if (!fileUrl) { showToast('No file attached.'); return; }
+    const a = document.createElement('a');
+    a.href = fileUrl;
+    a.download = name || 'download';
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    showToast('⬇ Download started!');
+  };
 
   // ─────────────────────────────────────────────
-  // PURCHASE CONFIRMATION MODAL
+  // PURCHASE CONFIRM DIALOG
   // ─────────────────────────────────────────────
-  window.initiateShopBuy = function(id, price, name, fileUrl) {
-    if (!window._userUid) { showToast('Sign in to buy items!'); return; }
-    const inv = window._userData?.inventory || [];
-    if (inv.includes(id)) { showToast('Already owned!'); return; }
-    if ((window._userData?.beans || 0) < price) { showToast('Not enough beans! 🫘'); return; }
-    window._pendingPurchase = { id, price, name, fileUrl };
-    document.getElementById('confirm-title').textContent = `Buy "${name}"?`;
-    document.getElementById('confirm-body').innerHTML =
-      `This will cost <strong style="color:var(--bean);">${price} 🫘 beans</strong>.<br/>You currently have ${(window._userData?.beans||0).toLocaleString()} beans.`;
+  window.showBuyConfirm = function(id, price, name, fileUrl) {
+    window._pendingBuy = { id, price, name, fileUrl };
+    document.getElementById('confirm-title').textContent = 'Confirm Purchase';
+    document.getElementById('confirm-body').textContent  =
+      `Buy "${name}" for ${price} 🫘 beans?`;
     document.getElementById('confirm-overlay').classList.add('open');
   };
 
   window.closeConfirm = function() {
     document.getElementById('confirm-overlay').classList.remove('open');
-    window._pendingPurchase = null;
+    window._pendingBuy = null;
   };
 
-  window.confirmPurchase = function() {
-    const p = window._pendingPurchase;
+  window.confirmBuy = function() {
+    const p = window._pendingBuy;
     if (!p) return;
     closeConfirm();
     if (window._executeBuy) window._executeBuy(p.id, p.price, p.name, p.fileUrl);
   };
 
-  // Keep old window.buyItem name working too (search results etc.)
-  window.buyItem = window.initiateShopBuy;
+  // Legacy buyItem shim (in case anything still calls it)
+  window.buyItem = function(id, price, name) {
+    showBuyConfirm(id, price, name, '');
+  };
+
+  // ─────────────────────────────────────────────
+  // FIX #4: COPY UID
+  // ─────────────────────────────────────────────
+  window.copyUID = function() {
+    const uidEl  = document.getElementById('profile-uid');
+    const fullUid = uidEl.dataset.fullUid || uidEl.textContent;
+    if (!fullUid || fullUid === '—') { showToast('No UID to copy.'); return; }
+    navigator.clipboard.writeText(fullUid).then(() => {
+      showToast('✓ UID copied!');
+    }).catch(() => {
+      // Fallback for older browsers
+      const ta = document.createElement('textarea');
+      ta.value = fullUid;
+      ta.style.position = 'fixed';
+      ta.style.opacity  = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast('✓ UID copied!');
+    });
+  };
 
   // ─────────────────────────────────────────────
   // QUESTS
   // ─────────────────────────────────────────────
   function getQuestDefs(userData) {
-    const gamesPlayed  = userData?.gamesPlayed  || 0;
-    const beans        = userData?.beans        || 0;
-    const loginStreak  = userData?.loginStreak  || 0;
-    const visitedShop  = userData?.visitedShop  || false;
-    const invCount     = (userData?.inventory   || []).length;
+    const gamesPlayed    = userData?.gamesPlayed    || 0;
+    const beans          = userData?.beans           || 0;
+    const loginStreak    = userData?.loginStreak     || 0;
+    const visitedShop    = userData?.visitedShop     || false;
+    const inventoryCount = (userData?.inventory || []).length;
     return [
-      { id:'q_play5',    title:'Play 5 Games',     desc:'Play any 5 mini-games',           reward:50,  progress:Math.min(gamesPlayed,5),  max:5,  icon:'play'  },
-      { id:'q_play20',   title:'Play 20 Games',    desc:'True crewmate grind',             reward:150, progress:Math.min(gamesPlayed,20), max:20, icon:'play'  },
-      { id:'q_login3',   title:'Login 3 Days',     desc:'Log in 3 days in a row',         reward:60,  progress:Math.min(loginStreak,3),  max:3,  icon:'cal'   },
-      { id:'q_shop',     title:'Visit the Shop',   desc:'Browse the store',               reward:20,  progress:visitedShop?1:0,          max:1,  icon:'shop'  },
-      { id:'q_buy1',     title:'Buy an Item',      desc:'Purchase from the shop',         reward:40,  progress:Math.min(invCount,1),     max:1,  icon:'shop'  },
-      { id:'q_buy3',     title:'Collect 3 Items',  desc:'Build your collection',          reward:100, progress:Math.min(invCount,3),     max:3,  icon:'shop'  },
-      { id:'q_beans500', title:'Earn 500 Beans',   desc:'Accumulate 500 beans total',     reward:80,  progress:Math.min(beans,500),      max:500,icon:'bean'  },
+      { id:'q_play5',    title:'Play 5 Games',      desc:'Play any 5 mini-games',                   reward:50,  progress:Math.min(gamesPlayed,5),    max:5,   icon:'play'  },
+      { id:'q_play20',   title:'Play 20 Games',     desc:'True crewmate grind',                     reward:150, progress:Math.min(gamesPlayed,20),   max:20,  icon:'play'  },
+      { id:'q_login3',   title:'Login 3 Days',      desc:'Log in 3 days in a row',                  reward:60,  progress:Math.min(loginStreak,3),    max:3,   icon:'cal'   },
+      { id:'q_shop',     title:'Visit the Shop',    desc:'Browse the store',                        reward:20,  progress:visitedShop?1:0,            max:1,   icon:'shop'  },
+      { id:'q_buy1',     title:'Buy an Item',       desc:'Purchase from the shop',                  reward:40,  progress:Math.min(inventoryCount,1), max:1,   icon:'shop'  },
+      { id:'q_buy3',     title:'Collect 3 Items',   desc:'Build your collection',                   reward:100, progress:Math.min(inventoryCount,3), max:3,   icon:'shop'  },
+      { id:'q_beans500', title:'Earn 500 Beans',    desc:'Accumulate 500 beans (incl. start)',      reward:80,  progress:Math.min(beans,500),        max:500, icon:'bean'  },
     ];
   }
 
@@ -1762,27 +1748,26 @@
     });
 
     if (!filtered.length) {
-      list.innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--text-muted);font-size:14px;">${tab === 'completed' ? 'No completed quests yet.' : 'All quests done! 🎉'}</div>`;
+      list.innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--text-muted);font-size:14px;">${tab==='completed'?'No completed quests yet.':'All quests done! 🎉'}</div>`;
       return;
     }
 
-    const icons = {
+    const iconPaths = {
       play:  '<path d="M8 5v14l11-7z"/>',
-      trophy:'<path d="M8 21h8M12 17v4M7 4H4a1 1 0 0 0-1 1v2a4 4 0 0 0 4 4h10a4 4 0 0 0 4-4V5a1 1 0 0 0-1-1h-3"/><rect x="7" y="2" width="10" height="12" rx="2"/>',
       shop:  '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>',
       cal:   '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
-      bean:  '<ellipse cx="12" cy="12" rx="7" ry="9"/><path d="M9 6c0 3 6 3 6 6s-6 3-6 6"/>',
+      bean:  '<ellipse cx="12" cy="12" rx="7" ry="9" fill="none"/><path d="M9 6c0 3 6 3 6 6s-6 3-6 6"/>',
     };
 
     list.innerHTML = filtered.map(q => {
       const pct       = Math.min(100, (q.progress / q.max) * 100);
       const isComplete = q.progress >= q.max;
       const isClaimed  = claimed.includes(q.id);
-      const svgPath    = icons[q.icon] || '<circle cx="12" cy="12" r="10"/>';
+      const svg        = iconPaths[q.icon] || '<circle cx="12" cy="12" r="10"/>';
       return `
-        <div class="quest-item${isComplete ? ' completed' : ''}">
+        <div class="quest-item${isComplete?' completed':''}">
           <div class="quest-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${svgPath}</svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${svg}</svg>
           </div>
           <div class="quest-info">
             <h3>${escHtml(q.title)}</h3>
@@ -1795,14 +1780,13 @@
               ${q.reward}
             </div>
             ${isComplete && !isClaimed
-              ? `<button class="btn-claim" onclick="claimQuest('${q.id}', ${q.reward})">CLAIM</button>`
+              ? `<button class="btn-claim" onclick="claimQuest('${q.id}',${q.reward})">CLAIM</button>`
               : isClaimed
               ? `<div class="claimed-badge">✓ Done</div>`
               : ''
             }
           </div>
-        </div>
-      `;
+        </div>`;
     }).join('');
   }
   window.renderQuests = renderQuests;
@@ -1813,35 +1797,10 @@
 
   window.switchQuestTab = function(tab) {
     window._currentQuestTab = tab;
-    document.getElementById('tab-active').classList.toggle('active', tab === 'active');
-    document.getElementById('tab-completed').classList.toggle('active', tab === 'completed');
+    document.getElementById('tab-active').classList.toggle('active', tab==='active');
+    document.getElementById('tab-completed').classList.toggle('active', tab==='completed');
     renderQuests(window._userData);
   };
-
-  // ─────────────────────────────────────────────
-  // COPY UID
-  // ─────────────────────────────────────────────
-  window.copyUID = function() {
-    const uid = window._userUid;
-    if (!uid) { showToast('No UID to copy.'); return; }
-    if (navigator.clipboard?.writeText) {
-      navigator.clipboard.writeText(uid)
-        .then(() => showToast('✓ UID copied!'))
-        .catch(() => fallbackCopy(uid));
-    } else {
-      fallbackCopy(uid);
-    }
-  };
-  function fallbackCopy(text) {
-    const el = document.createElement('textarea');
-    el.value = text;
-    el.style.cssText = 'position:fixed;left:-9999px;';
-    document.body.appendChild(el);
-    el.select();
-    try { document.execCommand('copy'); showToast('✓ UID copied!'); }
-    catch { showToast('Copy failed.'); }
-    document.body.removeChild(el);
-  }
 
   // ─────────────────────────────────────────────
   // TOAST
@@ -1859,14 +1818,13 @@
   // ─────────────────────────────────────────────
   function escHtml(s) {
     return String(s)
-      .replace(/&/g,'&amp;')
-      .replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;')
-      .replace(/"/g,'&quot;')
-      .replace(/'/g,'&#039;');
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
   }
-  window.escHtml = escHtml;
 </script>
 
 </body>
 </html>
+ 

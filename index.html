@@ -29,7 +29,7 @@
     --radius-sm: 10px;
   }
 
-  /* ── FIX 1: Hide entire page until auth is resolved ── */
+  /* FIX 1 — Hide entire page until auth check completes */
   body.auth-pending { visibility: hidden; }
 
   html, body {
@@ -220,15 +220,17 @@
     transition: border-color 0.18s, transform 0.15s;
   }
   .search-item:hover { border-color: rgba(255,255,255,0.15); transform: translateX(3px); }
-  .search-item-icon { width: 44px; height: 44px; border-radius: 10px; overflow: hidden; background: var(--surface2); flex-shrink: 0; display:flex; align-items:center; justify-content:center; }
+  .search-item-icon { width: 44px; height: 44px; border-radius: 10px; overflow: hidden; background: var(--surface2); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 22px; }
   .search-item-icon img { width: 100%; height: 100%; object-fit: cover; }
-  .search-item-icon .shop-emoji { font-size: 22px; }
   .search-item-info h3 { font-size: 14px; font-weight: 700; }
   .search-item-info p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-  .search-section-label {
-    font-size: 11px; font-weight: 700; color: var(--text-muted);
-    text-transform: uppercase; letter-spacing: 0.08em;
-    padding: 4px 0 6px;
+  .search-item-badge {
+    font-size: 9px; font-weight: 700; padding: 2px 6px;
+    border-radius: 10px; background: var(--surface3);
+    color: var(--text-muted); margin-left: 6px;
+    border: 1px solid var(--border);
+    vertical-align: middle;
   }
   .search-empty { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 14px; }
 
@@ -255,14 +257,14 @@
     width: 100%; aspect-ratio: 1;
     background: var(--surface2);
     display: flex; align-items: center; justify-content: center;
-    font-size: 40px;
-    overflow: hidden;
+    font-size: 40px; overflow: hidden;
   }
   .shop-card-img img { width: 100%; height: 100%; object-fit: cover; }
   .shop-card.owned .shop-card-img { opacity: 0.5; }
   .shop-card-body { padding: 10px 12px 12px; }
   .shop-card-title { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
-  .shop-card-desc { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .shop-card-desc { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; line-height: 1.4;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .shop-card-price {
     display: flex; align-items: center; gap: 4px;
     font-size: 13px; font-weight: 800; color: var(--bean);
@@ -284,65 +286,21 @@
   .btn-buy:hover:not(:disabled) { background: var(--accent); border-color: var(--accent); color: #111; }
   .btn-buy:active:not(:disabled) { transform: scale(0.96); }
   .btn-buy:disabled { opacity: 0.5; cursor: not-allowed; }
-  .btn-buy.owned-btn { background: rgba(74,222,128,0.1); border-color: rgba(74,222,128,0.3); color: var(--accent); }
+  .btn-buy.owned-btn { background: rgba(74,222,128,0.1); border-color: rgba(74,222,128,0.3); color: var(--accent); cursor: default; }
   .btn-download {
-    width: 100%;
-    background: rgba(74,222,128,0.15);
-    border: 1px solid rgba(74,222,128,0.35);
-    color: var(--accent);
+    width: 100%; margin-top: 6px;
+    background: rgba(96,165,250,0.12);
+    border: 1px solid rgba(96,165,250,0.3);
+    color: #60a5fa;
     font-family: 'Nunito', sans-serif;
     font-size: 12px; font-weight: 700;
-    border-radius: 8px;
-    padding: 7px;
+    border-radius: 8px; padding: 7px;
     cursor: pointer;
-    margin-top: 4px;
     transition: background 0.18s, transform 0.15s;
-    display: flex; align-items: center; justify-content: center; gap: 4px;
+    display: flex; align-items: center; justify-content: center; gap: 5px;
   }
-  .btn-download:hover { background: rgba(74,222,128,0.28); }
+  .btn-download:hover { background: rgba(96,165,250,0.22); }
   .btn-download:active { transform: scale(0.96); }
-
-  /* ── PURCHASE CONFIRM MODAL ── */
-  #confirm-overlay {
-    position: fixed; inset: 0; z-index: 160;
-    background: rgba(0,0,0,0.75);
-    display: flex; align-items: center; justify-content: center;
-    padding: 20px;
-    opacity: 0; pointer-events: none;
-    transition: opacity 0.2s;
-  }
-  #confirm-overlay.open { opacity: 1; pointer-events: all; }
-  #confirm-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 24px 20px;
-    width: 100%; max-width: 340px;
-    transform: scale(0.94);
-    transition: transform 0.22s cubic-bezier(0.32,0.72,0,1);
-    text-align: center;
-  }
-  #confirm-overlay.open #confirm-card { transform: scale(1); }
-  .confirm-title { font-size: 16px; font-weight: 800; margin-bottom: 8px; }
-  .confirm-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5; }
-  .confirm-btns { display: flex; gap: 10px; }
-  .btn-confirm-cancel {
-    flex: 1; padding: 11px;
-    background: var(--surface3); border: 1px solid var(--border);
-    color: var(--text); font-family: 'Nunito', sans-serif;
-    font-size: 13px; font-weight: 700; border-radius: 8px; cursor: pointer;
-    transition: background 0.15s;
-  }
-  .btn-confirm-cancel:hover { background: var(--surface2); }
-  .btn-confirm-buy {
-    flex: 1; padding: 11px;
-    background: var(--accent); border: none;
-    color: #111; font-family: 'Nunito', sans-serif;
-    font-size: 13px; font-weight: 800; border-radius: 8px; cursor: pointer;
-    transition: background 0.15s, transform 0.15s;
-  }
-  .btn-confirm-buy:hover { background: #22c55e; }
-  .btn-confirm-buy:active { transform: scale(0.96); }
 
   /* ── QUESTS PAGE ── */
   #page-quests { padding: 20px 16px; }
@@ -381,7 +339,6 @@
     flex-shrink: 0;
   }
   .quest-icon svg { width: 20px; height: 20px; stroke: var(--accent); }
-  .quest-item.completed .quest-icon svg { stroke: var(--accent); }
   .quest-info { flex: 1; }
   .quest-info h3 { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
   .quest-progress-bar {
@@ -389,7 +346,6 @@
     border-radius: 4px; overflow: hidden; margin-bottom: 4px;
   }
   .quest-progress-fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.5s; }
-  .quest-item.completed .quest-progress-fill { background: var(--accent); }
   .quest-meta { font-size: 11px; color: var(--text-muted); display: flex; justify-content: space-between; }
   .quest-reward { display: flex; align-items: center; gap: 3px; font-size: 12px; font-weight: 800; color: var(--bean); flex-shrink: 0; flex-direction: column; align-items: flex-end; }
   .quest-reward .bean-icon { width: 14px; height: 14px; object-fit: contain; }
@@ -461,35 +417,28 @@
     display: flex; justify-content: space-between; align-items: center;
     margin-bottom: 8px;
     font-size: 13px;
-    gap: 8px;
   }
-  .profile-info-row span:first-child { color: var(--text-muted); flex-shrink: 0; }
+  .profile-info-row span:first-child { color: var(--text-muted); }
   .profile-info-row span:last-child { font-weight: 700; }
-  /* FIX 5: UID row */
-  .uid-value-wrap {
-    display: flex; align-items: center; gap: 6px; flex: 1; justify-content: flex-end;
+  /* FIX 5 — UID copy row */
+  .uid-row {
+    display: flex; align-items: center; gap: 8px;
   }
-  .uid-value {
+  .uid-text {
     font-size: 11px; color: var(--text-muted);
     font-family: 'Space Mono', monospace;
-    font-weight: 400;
-    word-break: break-all;
-    text-align: right;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    max-width: 160px;
   }
   .btn-copy-uid {
-    flex-shrink: 0;
-    background: var(--surface3);
-    border: 1px solid var(--border);
-    color: var(--text-muted);
-    font-family: 'Nunito', sans-serif;
+    background: var(--surface3); border: 1px solid var(--border);
+    color: var(--text-muted); font-family: 'Nunito', sans-serif;
     font-size: 10px; font-weight: 700;
-    border-radius: 6px;
-    padding: 4px 8px;
-    cursor: pointer;
-    transition: background 0.15s, color 0.15s, border-color 0.15s;
-    white-space: nowrap;
+    border-radius: 6px; padding: 3px 8px; cursor: pointer;
+    transition: background 0.18s, color 0.18s;
+    white-space: nowrap; flex-shrink: 0;
   }
-  .btn-copy-uid:hover { background: var(--accent); border-color: var(--accent); color: #111; }
+  .btn-copy-uid:hover { background: var(--accent); color: #111; border-color: var(--accent); }
 
   .btn-signout {
     width: 100%;
@@ -506,6 +455,45 @@
   }
   .btn-signout:hover { background: rgba(248,113,113,0.2); }
   .btn-signout:active { transform: scale(0.98); }
+
+  /* ── CONFIRMATION MODAL ── */
+  #confirm-overlay {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,0.75);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  #confirm-overlay.open { opacity: 1; pointer-events: all; }
+  #confirm-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 20px;
+    width: 100%; max-width: 340px;
+    transform: scale(0.94);
+    transition: transform 0.2s;
+  }
+  #confirm-overlay.open #confirm-card { transform: scale(1); }
+  .confirm-title { font-size: 16px; font-weight: 800; margin-bottom: 8px; }
+  .confirm-body { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5; }
+  .confirm-btns { display: flex; gap: 10px; }
+  .btn-confirm-cancel {
+    flex: 1; background: var(--surface3); border: 1px solid var(--border);
+    color: var(--text); font-family: 'Nunito', sans-serif;
+    font-size: 14px; font-weight: 700; border-radius: var(--radius-sm);
+    padding: 12px; cursor: pointer; transition: background 0.18s;
+  }
+  .btn-confirm-cancel:hover { background: var(--surface2); }
+  .btn-confirm-ok {
+    flex: 1; background: var(--accent); border: none; color: #111;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px; font-weight: 800; border-radius: var(--radius-sm);
+    padding: 12px; cursor: pointer; transition: background 0.18s, transform 0.15s;
+  }
+  .btn-confirm-ok:hover { background: #22c55e; }
+  .btn-confirm-ok:active { transform: scale(0.97); }
 
   /* ── BOTTOM NAV ── */
   #bottom-nav {
@@ -541,10 +529,9 @@
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
     padding: 32px 24px;
+    transition: opacity 0.2s;
   }
-  /* FIX 1: auth overlay starts hidden; shown only when actually signed out */
-  #auth-overlay { display: none; }
-  #auth-overlay.visible { display: flex; }
+  #auth-overlay.hidden { display: none; }
   .auth-logo {
     font-family: 'Space Mono', monospace;
     font-size: 28px; font-weight: 700;
@@ -733,10 +720,11 @@
   }
 </style>
 </head>
+<!-- FIX 1: body starts with auth-pending class to prevent flash -->
 <body class="auth-pending">
 
-<!-- AUTH OVERLAY — FIX 1: starts hidden, shown only when signed out -->
-<div id="auth-overlay">
+<!-- AUTH OVERLAY -->
+<div id="auth-overlay" class="hidden">
   <div class="auth-art">
     <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
       <ellipse cx="60" cy="85" rx="30" ry="18" fill="#1a1a1a"/>
@@ -816,17 +804,17 @@
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
       </svg>
-      <input type="text" id="search-input" placeholder="Search games &amp; items…" oninput="onSearch(this.value)"/>
+      <input type="text" id="search-input" placeholder="Search games &amp; shop items…" oninput="onSearch(this.value)"/>
     </div>
     <div class="search-results" id="search-results">
       <div class="search-empty">Start typing to search…</div>
     </div>
   </div>
 
-  <!-- SHOP -->
+  <!-- SHOP — FIX 2: downloadable files marketplace -->
   <div class="page" id="page-shop">
     <div class="shop-header-row">
-      <h2 style="font-size:16px;font-weight:800;">Shop</h2>
+      <h2 style="font-size:16px;font-weight:800;">Downloads</h2>
       <div class="beans-badge">
         <img class="bean-icon" src="bean.png" alt="🫘" onerror="this.outerHTML='<span style=\'font-size:13px\'>🫘</span>'"/>
         <span id="shop-beans">0</span>
@@ -868,12 +856,12 @@
     <div class="profile-section-title">Account Info</div>
     <div class="profile-info-row"><span>Joined</span><span id="profile-joined">—</span></div>
     <div class="profile-info-row"><span>Last Login</span><span id="profile-lastlogin">—</span></div>
-    <!-- FIX 5: UID with copy button -->
+    <!-- FIX 5 — Copyable UID -->
     <div class="profile-info-row">
       <span>UID</span>
-      <div class="uid-value-wrap">
-        <span class="uid-value" id="profile-uid">—</span>
-        <button class="btn-copy-uid" id="btn-copy-uid" onclick="copyUID()" title="Copy UID">Copy</button>
+      <div class="uid-row">
+        <span class="uid-text" id="profile-uid">—</span>
+        <button class="btn-copy-uid" onclick="copyUID()">Copy</button>
       </div>
     </div>
     <button class="btn-signout" onclick="signOut()">Sign Out</button>
@@ -925,7 +913,8 @@
     </div>
     <div class="modal-stats-grid">
       <div class="modal-stat"><div class="modal-stat-val" id="modal-plays">—</div><div class="modal-stat-label">Total Plays</div></div>
-      <div class="modal-stat"><div class="modal-stat-val" id="modal-active">—</div><div class="modal-stat-label">Active Users</div></div>
+      <!-- REPLACED: Active Users → real Played By counter -->
+      <div class="modal-stat"><div class="modal-stat-val" id="modal-active">—</div><div class="modal-stat-label">Played By</div></div>
       <div class="modal-stat"><div class="modal-stat-val" id="modal-difficulty">—</div><div class="modal-stat-label">Difficulty</div></div>
     </div>
     <div class="modal-earnings">
@@ -955,14 +944,14 @@
   </div>
 </div>
 
-<!-- PURCHASE CONFIRMATION MODAL (FIX 2 addition) -->
+<!-- PURCHASE CONFIRMATION MODAL -->
 <div id="confirm-overlay">
   <div id="confirm-card">
     <div class="confirm-title" id="confirm-title">Confirm Purchase</div>
-    <div class="confirm-sub" id="confirm-sub">Are you sure?</div>
+    <div class="confirm-body" id="confirm-body">Are you sure?</div>
     <div class="confirm-btns">
       <button class="btn-confirm-cancel" onclick="closeConfirm()">Cancel</button>
-      <button class="btn-confirm-buy" id="confirm-buy-btn" onclick="confirmBuy()">Buy</button>
+      <button class="btn-confirm-ok" id="confirm-ok-btn" onclick="confirmPurchase()">Buy</button>
     </div>
   </div>
 </div>
@@ -1029,21 +1018,23 @@
     window._userData = null;
     window._userUid = null;
     updateAllBeanDisplays(0);
+    // Show auth overlay again on sign out
+    document.getElementById('auth-overlay').classList.remove('hidden');
   };
 
-  // ── FIX 1: AUTH STATE — page hidden until resolved ──
+  // ── FIX 1: AUTH STATE — reveal page only after check completes ──
   onAuthStateChanged(auth, async (user) => {
-    // Reveal the page now that auth check is done
+    // Reveal the page (remove pending class) regardless of sign-in status
     document.body.classList.remove('auth-pending');
 
     if (user) {
-      // User is signed in — keep auth overlay hidden
-      document.getElementById('auth-overlay').classList.remove('visible');
+      // Ensure overlay is hidden for signed-in users
+      document.getElementById('auth-overlay').classList.add('hidden');
       await ensureUserDoc(user);
       await loadUserData(user.uid);
     } else {
-      // User is signed out — show auth overlay
-      document.getElementById('auth-overlay').classList.add('visible');
+      // Not signed in — show auth overlay
+      document.getElementById('auth-overlay').classList.remove('hidden');
     }
   });
 
@@ -1099,12 +1090,9 @@
 
     document.getElementById('profile-name').textContent = data.displayName || 'Crewmate';
     document.getElementById('profile-email').textContent = data.email || '';
-
-    // FIX 5: store full UID on element for copy
-    const uidEl = document.getElementById('profile-uid');
-    uidEl.textContent = uid.substring(0, 16) + '…';
-    uidEl.dataset.fullUid = uid;
-
+    // FIX 5 — store full UID for copy, display truncated
+    window._fullUID = uid;
+    document.getElementById('profile-uid').textContent = uid.substring(0, 20) + '…';
     document.getElementById('stat-games').textContent = window._gamesData?.length ?? '—';
     document.getElementById('stat-played').textContent = data.gamesPlayed ?? 0;
     document.getElementById('stat-quests').textContent = data.questsCompleted ?? 0;
@@ -1114,7 +1102,6 @@
     document.getElementById('profile-joined').textContent = createdAt ? createdAt.toLocaleDateString() : '—';
     document.getElementById('profile-lastlogin').textContent = lastLogin ? lastLogin.toLocaleDateString() : '—';
 
-    // Avatar
     const av = auth.currentUser?.photoURL;
     if (av) {
       document.getElementById('profile-avatar-img').innerHTML = `<img src="${av}" alt="avatar"/>`;
@@ -1126,7 +1113,6 @@
   }
 
   window._loadUserData = loadUserData;
-
   window._refreshUser = async () => {
     const uid = window._userUid;
     if (!uid) return;
@@ -1173,17 +1159,25 @@
     } catch (e) { console.error('Deduct beans error:', e); return false; }
   };
 
+  // ── PLAY COUNT + REAL PLAYED-BY COUNTER ──
+  // Each game in Firestore: games/{gameId}/playCount (incremented on play)
+  // Also increments user's gamesPlayed
   window._updatePlayCount = async (gameFolder, beansEarned) => {
     const uid = window._userUid;
     if (!uid) return;
     try {
-      const ref = doc(db, 'users', uid);
-      const snap = await getDoc(ref);
+      // 1. Increment per-game play counter in Firestore
+      const gameRef = doc(db, 'games', gameFolder);
+      await setDoc(gameRef, { playCount: increment(1) }, { merge: true });
+
+      // 2. Update user play count + beans
+      const userRef = doc(db, 'users', uid);
+      const snap = await getDoc(userRef);
       if (!snap.exists()) return;
       const data = snap.data();
       const played = (data.gamesPlayed || 0) + 1;
       const earnedBeans = beansEarned || 0;
-      await updateDoc(ref, {
+      await updateDoc(userRef, {
         gamesPlayed: played,
         beans: increment(earnedBeans)
       });
@@ -1198,6 +1192,18 @@
       }
       await checkQuestProgress('gamesPlayed', played);
     } catch (e) { console.error(e); }
+  };
+
+  // ── FETCH REAL PLAY COUNT FOR A GAME ──
+  window._getGamePlayCount = async (gameFolder) => {
+    try {
+      const gameRef = doc(db, 'games', gameFolder);
+      const snap = await getDoc(gameRef);
+      if (snap.exists()) {
+        return snap.data().playCount || 0;
+      }
+      return 0;
+    } catch(e) { return 0; }
   };
 
   window._claimQuest = async (questId, reward) => {
@@ -1233,8 +1239,10 @@
     renderQuests(window._userData);
   }
 
-  // ── FIX 2+3: BUY ITEM — loads from shop.json, confirmation modal ──
-  window.buyItem = async (id, price, name) => {
+  // ── FIX 2+3: BUY ITEM — now works with shop.json file items ──
+  // Triggers confirmation modal first (FEATURE 2)
+  window._pendingPurchase = null;
+  window.buyItem = function(id, price, name) {
     const uid = window._userUid;
     if (!uid) { showToast('Sign in to buy items!'); return; }
     const userData = window._userData;
@@ -1242,40 +1250,40 @@
     const inv = userData.inventory || [];
     if (inv.includes(id)) { showToast('Already owned!'); return; }
     if ((userData.beans || 0) < price) { showToast('Not enough beans! 🫘'); return; }
+    // Show confirmation modal
+    window._pendingPurchase = { id, price, name };
+    document.getElementById('confirm-title').textContent = `Buy "${name}"?`;
+    document.getElementById('confirm-body').textContent = `This will cost you ${price} Beans. Are you sure?`;
+    document.getElementById('confirm-overlay').classList.add('open');
+  };
+
+  window.closeConfirm = function() {
+    document.getElementById('confirm-overlay').classList.remove('open');
+    window._pendingPurchase = null;
+  };
+
+  window.confirmPurchase = async function() {
+    const p = window._pendingPurchase;
+    if (!p) return;
+    closeConfirm();
+    const uid = window._userUid;
+    const userData = window._userData;
     try {
       const ref = doc(db, 'users', uid);
       await updateDoc(ref, {
-        beans: increment(-price),
-        inventory: arrayUnion(id)
+        beans: increment(-p.price),
+        inventory: arrayUnion(p.id)
       });
       if (window._userData) {
-        window._userData.beans = (window._userData.beans || 0) - price;
-        window._userData.inventory = [...inv, id];
+        window._userData.beans = (window._userData.beans || 0) - p.price;
+        window._userData.inventory = [...(userData.inventory || []), p.id];
       }
       updateAllBeanDisplays(window._userData.beans);
-      showToast(`🎉 Bought ${name}!`);
+      showToast(`🎉 Bought ${p.name}!`);
       renderShop(window._userData.inventory);
       await checkQuestProgress('visitedShop', true);
     } catch(e) { console.error(e); showToast('Purchase failed.'); }
   };
-
-  // ── FIX 3: LOAD GAMES ──
-  async function loadGames() {
-    try {
-      const res = await fetch('game.json');
-      if (!res.ok) throw new Error('game.json not found');
-      const games = await res.json();
-      window._gamesData = games;
-      renderGameGrid(games);
-      renderSearch(window._searchQuery || '', games, window._shopItems || []);
-      document.getElementById('games-count').textContent = games.length + ' games';
-      document.getElementById('stat-games').textContent = games.length;
-    } catch (e) {
-      console.error(e);
-      document.getElementById('game-grid').innerHTML = `<p style="color:var(--text-muted);font-size:13px;padding:10px 0;grid-column:1/-1;">No games found. Add a game.json file.</p>`;
-    }
-  }
-  loadGames();
 
   // ── FIX 3: LOAD SHOP FROM shop.json ──
   async function loadShop() {
@@ -1285,13 +1293,33 @@
       const items = await res.json();
       window._shopItems = items;
       renderShop(window._userData?.inventory || []);
-    } catch (e) {
-      console.error('shop.json load failed:', e);
+    } catch(e) {
+      console.error('Shop load error:', e);
       window._shopItems = [];
-      document.getElementById('shop-grid').innerHTML = `<p style="color:var(--text-muted);font-size:13px;padding:10px 0;grid-column:1/-1;">No shop items found. Add a shop.json file.</p>`;
+      document.getElementById('shop-grid').innerHTML = `<p style="color:var(--text-muted);font-size:13px;padding:10px;grid-column:1/-1;">No items available. Add a shop.json file.</p>`;
     }
   }
+  window._loadShop = loadShop;
   loadShop();
+
+  // ── LOAD GAMES ──
+  async function loadGames() {
+    try {
+      const res = await fetch('game.json');
+      if (!res.ok) throw new Error('game.json not found');
+      const games = await res.json();
+      window._gamesData = games;
+      renderGameGrid(games);
+      renderSearch(games, document.getElementById('search-input').value);
+      document.getElementById('games-count').textContent = games.length + ' games';
+      document.getElementById('stat-games').textContent = games.length;
+    } catch (e) {
+      console.error(e);
+      document.getElementById('game-grid').innerHTML = `<p style="color:var(--text-muted);font-size:13px;padding:10px 0;grid-column:1/-1;">No games found. Add a game.json file.</p>`;
+    }
+  }
+  loadGames();
+
 </script>
 
 <!-- ════════════════════════════════════════════════
@@ -1303,14 +1331,11 @@
   window._selectedGame = null;
   window._userData = null;
   window._userUid = null;
+  window._fullUID = null;
   window._currentQuestTab = 'active';
-  window._searchQuery = '';
-
-  // Pending confirm state
-  window._pendingBuy = null;
 
   // ─────────────────────────────────────────────
-  // ROUTING — clean URLs, no index.html
+  // ROUTING
   // ─────────────────────────────────────────────
   const PAGE_ROUTES = {
     '':        'home',
@@ -1385,28 +1410,38 @@
   window.renderGameGrid = renderGameGrid;
 
   // ─────────────────────────────────────────────
-  // GAME MODAL
+  // GAME MODAL — with real play count fetch
   // ─────────────────────────────────────────────
-  window.openGameModal = function(idx) {
+  window.openGameModal = async function(idx) {
     const g = window._gamesData[idx];
     if (!g) return;
     window._selectedGame = g;
+    window._selectedGameIdx = idx;
+
     document.getElementById('modal-icon').src = `${g.folder}/icon.png`;
     document.getElementById('modal-icon').onerror = function(){ this.src = ''; };
     document.getElementById('modal-title').textContent = g.name;
     document.getElementById('modal-desc-text').textContent = g.description || 'No description available.';
     document.getElementById('modal-plays').textContent = g.totalPlays != null ? Number(g.totalPlays).toLocaleString() : '—';
-    document.getElementById('modal-active').textContent = g.activeUsers != null ? Number(g.activeUsers).toLocaleString() : '—';
+    document.getElementById('modal-active').textContent = '…';  // loading
     document.getElementById('modal-difficulty').textContent = g.difficulty || '—';
     document.getElementById('modal-earnings').textContent = g.earnings != null ? Number(g.earnings).toLocaleString() : '600';
+
     const chips = document.getElementById('modal-chips');
     const meta = [];
     if (g.releaseDate) meta.push(g.releaseDate);
     if (g.developer) meta.push(g.developer);
     if (g.tags) meta.push(...(Array.isArray(g.tags) ? g.tags : [g.tags]));
     chips.innerHTML = meta.map(m => `<span class="chip">${escHtml(String(m))}</span>`).join('');
+
     document.getElementById('modal-overlay').classList.add('open');
     document.body.style.overflow = 'hidden';
+
+    // Fetch real play count from Firestore asynchronously
+    if (window._getGamePlayCount) {
+      const count = await window._getGamePlayCount(g.folder);
+      document.getElementById('modal-active').textContent = Number(count).toLocaleString();
+    }
   };
 
   window.closeModal = function(e) {
@@ -1415,35 +1450,44 @@
     document.body.style.overflow = '';
   };
 
+  // Overload for direct close (Return button)
+  document.querySelector('.btn-return')?.addEventListener('click', () => {
+    document.getElementById('modal-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+  });
+
   window.playGame = function() {
     const g = window._selectedGame;
     if (!g) return;
     const beansEarned = g.earnings || 0;
     if (window._updatePlayCount) window._updatePlayCount(g.folder, beansEarned);
-    window.location.href = `/${g.folder}`;
+    const path = `/${g.folder}`;
+    window.location.href = path;
   };
 
   // ─────────────────────────────────────────────
-  // FIX 6: SEARCH — now searches BOTH games & shop items
+  // FIX 6: SEARCH — games + shop items
   // ─────────────────────────────────────────────
-  function renderSearch(query, games, shopItems) {
-    window._searchQuery = query;
+  function renderSearch(games, query) {
     const container = document.getElementById('search-results');
-    const q = (query || '').toLowerCase().trim();
+    const q = query.toLowerCase().trim();
     if (!q) {
       container.innerHTML = '<div class="search-empty">Start typing to search…</div>';
       return;
     }
 
+    // Search games
     const filteredGames = (games || []).filter(g =>
       g.name.toLowerCase().includes(q) ||
       (g.description || '').toLowerCase().includes(q) ||
       (g.developer || '').toLowerCase().includes(q)
     );
 
-    const filteredShop = (shopItems || []).filter(s =>
-      s.name.toLowerCase().includes(q) ||
-      (s.description || '').toLowerCase().includes(q)
+    // FIX 6: Search shop items too
+    const shopItems = window._shopItems || [];
+    const filteredShop = shopItems.filter(item =>
+      (item.name || '').toLowerCase().includes(q) ||
+      (item.description || '').toLowerCase().includes(q)
     );
 
     if (!filteredGames.length && !filteredShop.length) {
@@ -1451,54 +1495,43 @@
       return;
     }
 
-    let html = '';
-
-    if (filteredGames.length) {
-      html += `<div class="search-section-label">Games</div>`;
-      html += filteredGames.map(g => {
-        const origIdx = (window._gamesData || []).indexOf(g);
-        return `
-          <div class="search-item" onclick="openGameModal(${origIdx});navigateTo('home');">
-            <div class="search-item-icon">
-              <img src="${g.folder}/icon.png" alt="${escHtml(g.name)}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2244%22 height=%2244%22><rect width=%2244%22 height=%2244%22 fill=%22%23222%22/><text x=%2250%25%22 y=%2255%25%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22 font-size=%2218%22 fill=%22%23555%22>?</text></svg>'"/>
-            </div>
-            <div class="search-item-info">
-              <h3>${escHtml(g.name)}</h3>
-              <p>${escHtml(g.developer || g.description?.substring(0, 40) || '—')}</p>
-            </div>
+    const gameResults = filteredGames.map(g => {
+      const origIdx = (window._gamesData || []).indexOf(g);
+      return `
+        <div class="search-item" onclick="openGameModal(${origIdx});navigateTo('home');">
+          <div class="search-item-icon">
+            <img src="${g.folder}/icon.png" alt="${escHtml(g.name)}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2244%22 height=%2244%22><rect width=%2244%22 height=%2244%22 fill=%22%23222%22/><text x=%2250%25%22 y=%2255%25%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22 font-size=%2218%22 fill=%22%23555%22>?</text></svg>'"/>
           </div>
-        `;
-      }).join('');
-    }
-
-    if (filteredShop.length) {
-      html += `<div class="search-section-label" style="margin-top:${filteredGames.length ? '12px' : '0'};">Shop Items</div>`;
-      html += filteredShop.map(s => {
-        const emoji = s.image ? '' : '📦';
-        const iconHtml = s.image
-          ? `<img src="${s.image}" alt="${escHtml(s.name)}" onerror="this.style.display='none';this.parentNode.innerHTML='<span class=shop-emoji>📦</span>'"/>`
-          : `<span class="shop-emoji">${emoji}</span>`;
-        return `
-          <div class="search-item" onclick="navigateTo('shop');">
-            <div class="search-item-icon">${iconHtml}</div>
-            <div class="search-item-info">
-              <h3>${escHtml(s.name)}</h3>
-              <p>${escHtml(s.description?.substring(0, 40) || '')} · ${s.price} 🫘</p>
-            </div>
+          <div class="search-item-info">
+            <h3>${escHtml(g.name)}<span class="search-item-badge">GAME</span></h3>
+            <p>${escHtml(g.developer || g.description?.substring(0, 40) || '—')}</p>
           </div>
-        `;
-      }).join('');
-    }
+        </div>
+      `;
+    });
 
-    container.innerHTML = html;
+    const shopResults = filteredShop.map(item => {
+      const imgTag = item.image
+        ? `<img src="${escHtml(item.image)}" alt="${escHtml(item.name)}" onerror="this.style.display='none';this.parentNode.textContent='📦'"/>`
+        : '📦';
+      return `
+        <div class="search-item" onclick="navigateTo('shop');">
+          <div class="search-item-icon">${imgTag}</div>
+          <div class="search-item-info">
+            <h3>${escHtml(item.name)}<span class="search-item-badge">SHOP</span></h3>
+            <p>${escHtml(item.description?.substring(0, 40) || '—')} · ${item.price} 🫘</p>
+          </div>
+        </div>
+      `;
+    });
+
+    container.innerHTML = [...gameResults, ...shopResults].join('');
   }
   window.renderSearch = renderSearch;
-  window.onSearch = function(val) {
-    renderSearch(val, window._gamesData, window._shopItems);
-  };
+  window.onSearch = function(val) { renderSearch(window._gamesData, val); };
 
   // ─────────────────────────────────────────────
-  // FIX 2+3: SHOP — loads from shop.json, file marketplace
+  // FIX 2+3: SHOP — downloadable files from shop.json
   // ─────────────────────────────────────────────
   function renderShop(inventory) {
     const inv = inventory || window._userData?.inventory || [];
@@ -1506,26 +1539,22 @@
     const grid = document.getElementById('shop-grid');
 
     if (!items.length) {
-      // Don't overwrite the loading spinner if items haven't loaded yet
-      if (window._shopItems !== undefined && window._shopItems.length === 0) {
-        // Only show empty if we know shop.json loaded (or failed)
-        // Keep existing spinner/message from fetch handler
-      }
+      // Still loading or no items
       return;
     }
 
     grid.innerHTML = items.map(item => {
       const owned = inv.includes(item.id);
-      const imgHtml = item.image
-        ? `<img src="${item.image}" alt="${escHtml(item.name)}" onerror="this.style.display='none';this.parentNode.innerHTML='<span style=font-size:40px>📦</span>'"/>`
-        : `<span style="font-size:40px;">📦</span>`;
+      const imgContent = item.image
+        ? `<img src="${escHtml(item.image)}" alt="${escHtml(item.name)}" onerror="this.style.display='none';this.parentNode.textContent='📦'"/>`
+        : '📦';
 
       return `
         <div class="shop-card${owned ? ' owned' : ''}">
-          <div class="shop-card-img">${imgHtml}</div>
+          <div class="shop-card-img">${imgContent}</div>
           <div class="shop-card-body">
             <div class="shop-card-title">${escHtml(item.name)}</div>
-            ${item.description ? `<div class="shop-card-desc">${escHtml(item.description)}</div>` : ''}
+            <div class="shop-card-desc">${escHtml(item.description || '')}</div>
             <div class="shop-card-price">
               <img class="bean-icon" src="bean.png" alt="🫘" onerror="this.outerHTML='<span>🫘</span>'"/>
               ${item.price}
@@ -1533,15 +1562,12 @@
             ${owned
               ? `
                 <button class="btn-buy owned-btn" disabled>✓ Owned</button>
-                ${item.file
-                  ? `<button class="btn-download" onclick="downloadFile('${escHtml(item.file)}', '${escHtml(item.name)}')">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                      Download
-                    </button>`
-                  : ''
-                }
+                <button class="btn-download" onclick="downloadFile('${escHtml(item.file || '')}', '${escHtml(item.name)}')">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Download
+                </button>
               `
-              : `<button class="btn-buy" onclick="showBuyConfirm('${escHtml(item.id)}', ${item.price}, '${escHtml(item.name)}')">Buy</button>`
+              : `<button class="btn-buy" onclick="buyItem('${escHtml(item.id)}', ${item.price}, '${escHtml(item.name)}')">Buy</button>`
             }
           </div>
         </div>
@@ -1549,70 +1575,42 @@
     }).join('');
   }
   window.renderShop = renderShop;
-  renderShop([]);
 
-  // ── FIX 2: Purchase confirmation modal ──
-  window.showBuyConfirm = function(id, price, name) {
-    window._pendingBuy = { id, price, name };
-    document.getElementById('confirm-title').textContent = `Buy "${name}"`;
-    document.getElementById('confirm-sub').textContent = `This will cost you ${price} 🫘 beans. Are you sure?`;
-    document.getElementById('confirm-overlay').classList.add('open');
-  };
-
-  window.closeConfirm = function() {
-    window._pendingBuy = null;
-    document.getElementById('confirm-overlay').classList.remove('open');
-  };
-
-  window.confirmBuy = async function() {
-    const pending = window._pendingBuy;
-    if (!pending) return;
-    document.getElementById('confirm-overlay').classList.remove('open');
-    window._pendingBuy = null;
-    if (window.buyItem) await window.buyItem(pending.id, pending.price, pending.name);
-  };
-
-  // Close confirm on backdrop click
-  document.getElementById('confirm-overlay').addEventListener('click', function(e) {
-    if (e.target === this) closeConfirm();
-  });
-
-  // ── Download helper ──
-  window.downloadFile = function(filePath, name) {
+  // Download owned file
+  window.downloadFile = function(fileUrl, name) {
+    if (!fileUrl) { showToast('No file available.'); return; }
     const a = document.createElement('a');
-    a.href = filePath;
+    a.href = fileUrl;
     a.download = name || 'download';
     a.target = '_blank';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    showToast(`⬇ Downloading ${name}…`);
+    showToast(`⬇️ Downloading ${name}…`);
   };
 
   // ─────────────────────────────────────────────
-  // FIX 5: COPY UID
+  // FIX 5 — COPY UID
   // ─────────────────────────────────────────────
   window.copyUID = function() {
-    const uidEl = document.getElementById('profile-uid');
-    const fullUid = uidEl.dataset.fullUid || uidEl.textContent;
-    if (!fullUid || fullUid === '—') { showToast('No UID to copy.'); return; }
+    const uid = window._fullUID;
+    if (!uid) { showToast('UID not available.'); return; }
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(fullUid).then(() => {
-        showToast('UID copied!');
-      }).catch(() => fallbackCopy(fullUid));
+      navigator.clipboard.writeText(uid).then(() => {
+        showToast('✅ UID copied!');
+      }).catch(() => fallbackCopy(uid));
     } else {
-      fallbackCopy(fullUid);
+      fallbackCopy(uid);
     }
   };
-
   function fallbackCopy(text) {
     const ta = document.createElement('textarea');
     ta.value = text;
-    ta.style.cssText = 'position:fixed;top:-999px;left:-999px;opacity:0;';
+    ta.style.position = 'fixed'; ta.style.opacity = '0';
     document.body.appendChild(ta);
-    ta.focus(); ta.select();
-    try { document.execCommand('copy'); showToast('UID copied!'); }
-    catch(e) { showToast('Could not copy UID.'); }
+    ta.select();
+    try { document.execCommand('copy'); showToast('✅ UID copied!'); }
+    catch(e) { showToast('Copy failed. See console.'); }
     document.body.removeChild(ta);
   }
 
@@ -1626,69 +1624,13 @@
     const visitedShop = userData?.visitedShop || false;
     const inventoryCount = (userData?.inventory || []).length;
     return [
-      {
-        id: 'q_play5',
-        title: 'Play 5 Games',
-        desc: 'Play any 5 mini-games',
-        reward: 50,
-        progress: Math.min(gamesPlayed, 5),
-        max: 5,
-        icon: 'play',
-      },
-      {
-        id: 'q_play20',
-        title: 'Play 20 Games',
-        desc: 'True crewmate grind',
-        reward: 150,
-        progress: Math.min(gamesPlayed, 20),
-        max: 20,
-        icon: 'play',
-      },
-      {
-        id: 'q_login3',
-        title: 'Login 3 Days',
-        desc: 'Log in 3 days in a row',
-        reward: 60,
-        progress: Math.min(loginStreak, 3),
-        max: 3,
-        icon: 'cal',
-      },
-      {
-        id: 'q_shop',
-        title: 'Visit the Shop',
-        desc: 'Browse the store',
-        reward: 20,
-        progress: visitedShop ? 1 : 0,
-        max: 1,
-        icon: 'shop',
-      },
-      {
-        id: 'q_buy1',
-        title: 'Buy an Item',
-        desc: 'Purchase from the shop',
-        reward: 40,
-        progress: Math.min(inventoryCount, 1),
-        max: 1,
-        icon: 'shop',
-      },
-      {
-        id: 'q_buy3',
-        title: 'Collect 3 Items',
-        desc: 'Build your collection',
-        reward: 100,
-        progress: Math.min(inventoryCount, 3),
-        max: 3,
-        icon: 'shop',
-      },
-      {
-        id: 'q_beans500',
-        title: 'Earn 500 Beans',
-        desc: 'Accumulate 500 beans total',
-        reward: 80,
-        progress: Math.min(beans, 500),
-        max: 500,
-        icon: 'bean',
-      },
+      { id:'q_play5',   title:'Play 5 Games',     desc:'Play any 5 mini-games',              reward:50,  progress:Math.min(gamesPlayed,5),    max:5,   icon:'play' },
+      { id:'q_play20',  title:'Play 20 Games',    desc:'True crewmate grind',                reward:150, progress:Math.min(gamesPlayed,20),   max:20,  icon:'play' },
+      { id:'q_login3',  title:'Login 3 Days',     desc:'Log in 3 days in a row',             reward:60,  progress:Math.min(loginStreak,3),    max:3,   icon:'cal'  },
+      { id:'q_shop',    title:'Visit the Shop',   desc:'Browse the store',                   reward:20,  progress:visitedShop?1:0,            max:1,   icon:'shop' },
+      { id:'q_buy1',    title:'Buy an Item',      desc:'Purchase from the shop',             reward:40,  progress:Math.min(inventoryCount,1), max:1,   icon:'shop' },
+      { id:'q_buy3',    title:'Collect 3 Items',  desc:'Build your collection',              reward:100, progress:Math.min(inventoryCount,3), max:3,   icon:'shop' },
+      { id:'q_beans500',title:'Earn 500 Beans',   desc:'Accumulate 500 beans total',         reward:80,  progress:Math.min(beans,500),        max:500, icon:'bean' },
     ];
   }
 
@@ -1700,8 +1642,7 @@
 
     const filtered = quests.filter(q => {
       const isClaimed = claimed.includes(q.id);
-      if (tab === 'active') return !isClaimed;
-      return isClaimed;
+      return tab === 'active' ? !isClaimed : isClaimed;
     });
 
     if (filtered.length === 0) {
@@ -1714,11 +1655,11 @@
       const isComplete = q.progress >= q.max;
       const isClaimed = claimed.includes(q.id);
       const iconSvg = {
-        play:   '<path d="M8 5v14l11-7z"/>',
-        trophy: '<path d="M8 21h8M12 17v4M7 4H4a1 1 0 0 0-1 1v2a4 4 0 0 0 4 4h10a4 4 0 0 0 4-4V5a1 1 0 0 0-1-1h-3"/><rect x="7" y="2" width="10" height="12" rx="2"/>',
-        shop:   '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>',
-        cal:    '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
-        bean:   '<ellipse cx="12" cy="12" rx="7" ry="9" fill="none"/><path d="M9 6c0 3 6 3 6 6s-6 3-6 6"/>',
+        play:  '<path d="M8 5v14l11-7z"/>',
+        trophy:'<path d="M8 21h8M12 17v4M7 4H4a1 1 0 0 0-1 1v2a4 4 0 0 0 4 4h10a4 4 0 0 0 4-4V5a1 1 0 0 0-1-1h-3"/><rect x="7" y="2" width="10" height="12" rx="2"/>',
+        shop:  '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>',
+        cal:   '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+        bean:  '<ellipse cx="12" cy="12" rx="7" ry="9" fill="none"/><path d="M9 6c0 3 6 3 6 6s-6 3-6 6"/>',
       }[q.icon] || '<circle cx="12" cy="12" r="10"/>';
 
       return `
@@ -1738,10 +1679,7 @@
             </div>
             ${isComplete && !isClaimed
               ? `<button class="btn-claim" onclick="claimQuest('${q.id}', ${q.reward})">CLAIM</button>`
-              : isClaimed
-              ? `<div class="claimed-badge">✓ Done</div>`
-              : ''
-            }
+              : isClaimed ? `<div class="claimed-badge">✓ Done</div>` : ''}
           </div>
         </div>
       `;
@@ -1784,4 +1722,4 @@
 </script>
 
 </body>
- </html>
+</html>

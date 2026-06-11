@@ -1,9 +1,11 @@
-{
-  "id": "Lobby",
-  "name": "Marathon",
-  "description": "",
-  "price": 550,
-  "image": "shop/marathon.png",
-  "file": "downloads/marathon/Marathon.zip",
-  "category": "Extreme"
-}
+[
+  {
+    "id": "Lobby",
+    "name": "Marathon",
+    "description": "",
+    "price": 550,
+    "image": "shop/marathon.png",
+    "file": "downloads/marathon/Marathon.zip",
+    "category": "Extreme"
+  }
+]

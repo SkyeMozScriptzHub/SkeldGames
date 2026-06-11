@@ -1,7 +1,27 @@
 {
   "redirects": [
     {
-      "source": "/(.*)",
+      "source": "/search",
+      "destination": "https://skeldgames.vercel.app",
+      "permanent": true
+    },
+    {
+      "source": "/shop",
+      "destination": "https://skeldgames.vercel.app",
+      "permanent": true
+    },
+    {
+      "source": "/games",
+      "destination": "https://skeldgames.vercel.app",
+      "permanent": true
+    },
+    {
+      "source": "/profile",
+      "destination": "https://skeldgames.vercel.app",
+      "permanent": true
+    },
+    {
+      "source": "/quests",
       "destination": "https://skeldgames.vercel.app",
       "permanent": true
     }

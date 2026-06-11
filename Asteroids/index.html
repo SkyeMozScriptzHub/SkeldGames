@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Asteroid Beans</title>
+<style>
+  :root{
+    --bg:#050607;
+    --panel:#0c0f12;
+    --panel2:#101418;
+    --text:#eef2f4;
+    --muted:#9ca3af;
+    --line:#222a31;
+    --accent:#cbd5e1;
+    --btn:#f3f4f6;
+    --btnText:#0b0d10;
+    --danger:#ef4444;
+    --success:#22c55e;
+  }
+
+  *{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    -webkit-tap-highlight-color:transparent;
+  }
+
+  html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(255,255,255,0.05), transparent 16%),
+      radial-gradient(circle at 80% 30%, rgba(255,255,255,0.04), transparent 18%),
+      linear-gradient(180deg, #090a0c 0%, #040506 100%);
+    font-family: Inter, Arial, sans-serif;
+  }
+
+  canvas{
+    display:block;
+    width:100vw;
+    height:100vh;
+  }
+
+  #claimBtn{
+    position:fixed;
+    left:50%;
+    bottom:22px;
+    transform:translateX(-50%);
+    z-index:20;
+    border:1px solid rgba(255,255,255,0.10);
+    background:linear-gradient(180deg, #f7f7f7 0%, #dfe3e8 100%);
+    color:var(--btnText);
+    font-size:16px;
+    font-weight:800;
+    letter-spacing:0.3px;
+    padding:14px 26px;
+    border-radius:14px;
+    min-width:180px;
+    cursor:pointer;
+    box-shadow:0 8px 22px rgba(0,0,0,0.35);
+    transition:transform .15s ease, opacity .15s ease, filter .15s ease;
+  }
+
+  #claimBtn:hover{
+    transform:translateX(-50%) translateY(-1px);
+  }
+
+  #claimBtn:active{
+    transform:translateX(-50%) translateY(1px);
+  }
+
+  #claimBtn:disabled{
+    cursor:not-allowed;
+    opacity:0.72;
+    filter:saturate(0.75);
+  }
+
+  #toastWrap{
+    position:fixed;
+    top:16px;
+    right:16px;
+    z-index:100;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    pointer-events:none;
+  }
+
+  .toast{
+    min-width:220px;
+    max-width:min(380px, calc(100vw - 32px));
+    padding:10px 12px;
+    border-radius:12px;
+    background:rgba(13,16,20,0.96);
+    color:var(--text);
+    border:1px solid rgba(255,255,255,0.08);
+    box-shadow:0 6px 18px rgba(0,0,0,0.28);
+    font-size:13px;
+    line-height:1.35;
+    opacity:0;
+    transform:translateY(-8px);
+    animation:toastIn .16s ease forwards;
+  }
+
+  .toast.success{ border-color: rgba(34,197,94,0.26); }
+  .toast.error{ border-color: rgba(239,68,68,0.28); }
+  .toast.info{ border-color: rgba(148,163,184,0.22); }
+
+  @keyframes toastIn{
+    to{ opacity:1; transform:translateY(0); }
+  }
+
+  @media (max-width: 520px){
+    #claimBtn{
+      width:calc(100vw - 32px);
+      min-width:unset;
+      max-width:420px;
+      bottom:18px;
+      padding:15px 18px;
+    }
+    .toast{
+      min-width:unset;
+      width:min(340px, calc(100vw - 32px));
+    }
+  }
+</style>
+</head>
+<body>
+
+<div id="toastWrap"></div>
+<button id="claimBtn">Redeem</button>
+<canvas id="game"></canvas>
+
+<audio id="shootSfx" src="shoot.mp3" preload="auto"></audio>
+<audio id="hitSfx" src="hit.mp3" preload="auto"></audio>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCIkS8aU3NyKPH2EWqLNLjKxxg7y7kKu8M",
+    authDomain: "skeld-g.firebaseapp.com",
+    projectId: "skeld-g",
+    storageBucket: "skeld-g.appspot.com",
+    messagingSenderId: "474209822056",
+    appId: "1:474209822056:web:eee11ece0da8f1cfd4a2dd"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const canvas = document.getElementById("game");
+  const ctx = canvas.getContext("2d");
+  const claimBtn = document.getElementById("claimBtn");
+  const toastWrap = document.getElementById("toastWrap");
+  const shootSfx = document.getElementById("shootSfx");
+  const hitSfx = document.getElementById("hitSfx");
+
+  const UID_KEY = "asteroidBeans_uid";
+  const COOLDOWN_SECONDS = 60;
+
+  const asteroids = [];
+  const particles = [];
+  const starDots = [];
+
+  let uid = localStorage.getItem(UID_KEY) || "";
+  let unlocked = false;
+  let score = 0;
+  let cooldownTimer = null;
+  let cooldownRemaining = 0;
+
+  const rewardTable = [
+    // Asteroid is the common result, while the actual bean rewards are rare.
+    // The file field follows the requested naming style: red.png, yellow.png, etc.
+    { name: "Asteroid", file: "icon.png", beans: 0, chance: 98.0, weight: 980000 },
+    { name: "Red", file: "red.png", beans: 500, chance: 0.999, weight: 9990 },
+    { name: "Yellow", file: "yellow.png", beans: 120, chance: 3.4, weight: 34000 },
+    { name: "Blue", file: "blue.png", beans: 240, chance: 0.45, weight: 4500 },
+    { name: "Green", file: "green.png", beans: 320, chance: 0.28, weight: 2800 },
+    { name: "Purple", file: "purple.png", beans: 800, chance: 0.12, weight: 1200 },
+    { name: "Orange", file: "orange.png", beans: 60, chance: 0.80, weight: 8000 },
+    { name: "SkyeMoz", file: "skyemoz.png", beans: 99999999999, chance: 0.0000000000001, weight: 1 }
+  ];
+
+  const rewardPickPool = rewardTable.map(item => ({
+    ...item,
+    _chanceLabel: `${item.chance}%`
+  }));
+
+  let asteroidTexture = null;
+  let asteroidTextureReady = false;
+
+  function resize(){
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    canvas.width = Math.floor(innerWidth * dpr);
+    canvas.height = Math.floor(innerHeight * dpr);
+    canvas.style.width = innerWidth + "px";
+    canvas.style.height = innerHeight + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    if(starDots.length === 0){
+      const count = Math.max(70, Math.floor((innerWidth * innerHeight) / 22000));
+      for(let i = 0; i < count; i++){
+        starDots.push({
+          x: Math.random() * innerWidth,
+          y: Math.random() * innerHeight,
+          r: Math.random() * 1.4 + 0.3,
+          vx: (Math.random() - 0.5) * 0.08,
+          vy: (Math.random() - 0.5) * 0.08,
+          a: Math.random() * 0.45 + 0.18
+        });
+      }
+    }
+  }
+
+  window.addEventListener("resize", resize);
+  resize();
+
+  function random(min, max){
+    return Math.random() * (max - min) + min;
+  }
+
+  function toast(message, type = "info", duration = 2200){
+    const el = document.createElement("div");
+    el.className = `toast ${type}`;
+    el.textContent = message;
+    toastWrap.appendChild(el);
+    setTimeout(() => {
+      el.style.transition = "0.16s ease";
+      el.style.opacity = "0";
+      el.style.transform = "translateY(-6px)";
+      setTimeout(() => el.remove(), 180);
+    }, duration);
+  }
+
+  function playSound(audioEl){
+    try{
+      const s = audioEl.cloneNode();
+      s.volume = 0.65;
+      s.play().catch(() => {});
+    }catch(_){}
+  }
+
+  function makePoints(n = 9){
+    const pts = [];
+    for(let i = 0; i < n; i++){
+      pts.push(random(0.78, 1.16));
+    }
+    return pts;
+  }
+
+  function spawnAsteroid(){
+    const r = random(28, 58);
+    const edge = Math.floor(random(0, 4));
+    const pad = 90;
+    let x, y;
+
+    if(edge === 0){
+      x = random(0, innerWidth);
+      y = -pad;
+    }else if(edge === 1){
+      x = innerWidth + pad;
+      y = random(0, innerHeight);
+    }else if(edge === 2){
+      x = random(0, innerWidth);
+      y = innerHeight + pad;
+    }else{
+      x = -pad;
+      y = random(0, innerHeight);
+    }
+
+    const targetX = innerWidth / 2 + random(-180, 180);
+    const targetY = innerHeight / 2 + random(-140, 140);
+    const dx = targetX - x;
+    const dy = targetY - y;
+    const len = Math.max(1, Math.hypot(dx, dy));
+
+    asteroids.push({
+      x, y,
+      vx: (dx / len) * random(0.42, 0.95),
+      vy: (dy / len) * random(0.42, 0.95),
+      r,
+      angle: random(0, Math.PI * 2),
+      spin: random(-0.014, 0.014),
+      points: makePoints(8),
+      dots: Array.from({length: 18}, () => ({
+        ox: random(-0.48, 0.48),
+        oy: random(-0.48, 0.48),
+        r: random(0.9, 1.9),
+        phase: random(0, Math.PI * 2),
+        speed: random(0.012, 0.032),
+        drift: random(0.2, 0.75)
+      }))
+    });
+  }
+
+  function seedAsteroids(){
+    asteroids.length = 0;
+    for(let i = 0; i < 7; i++) spawnAsteroid();
+  }
+
+  function explosion(x, y){
+    for(let i = 0; i < 18; i++){
+      particles.push({
+        x, y,
+        vx: random(-4.2, 4.2),
+        vy: random(-4.2, 4.2),
+        size: random(1.4, 4.2),
+        life: random(26, 44)
+      });
+    }
+  }
+
+  function drawStars(){
+    ctx.save();
+    for(const s of starDots){
+      s.x += s.vx;
+      s.y += s.vy;
+
+      if(s.x < -5) s.x = innerWidth + 5;
+      if(s.x > innerWidth + 5) s.x = -5;
+      if(s.y < -5) s.y = innerHeight + 5;
+      if(s.y > innerHeight + 5) s.y = -5;
+
+      ctx.fillStyle = `rgba(255,255,255,${s.a})`;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function drawBackground(){
+    const w = innerWidth;
+    const h = innerHeight;
+
+    const bg = ctx.createLinearGradient(0, 0, 0, h);
+    bg.addColorStop(0, "#090a0c");
+    bg.addColorStop(1, "#040506");
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, w, h);
+
+    drawStars();
+
+    const fog = ctx.createRadialGradient(w * 0.5, h * 0.45, 20, w * 0.5, h * 0.45, Math.max(w, h) * 0.75);
+    fog.addColorStop(0, "rgba(255,255,255,0.03)");
+    fog.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.fillStyle = fog;
+    ctx.fillRect(0, 0, w, h);
+  }
+
+  function drawAsteroidShape(a){
+    ctx.save();
+    ctx.translate(a.x, a.y);
+    ctx.rotate(a.angle);
+
+    // black background like requested
+    ctx.shadowBlur = 18;
+    ctx.shadowColor = "rgba(255,255,255,0.05)";
+
+    ctx.beginPath();
+    const sides = a.points.length;
+    for(let i = 0; i < sides; i++){
+      const ang = (Math.PI * 2 / sides) * i;
+      const rad = a.r * a.points[i];
+      const px = Math.cos(ang) * rad;
+      const py = Math.sin(ang) * rad;
+      if(i === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+
+    ctx.fillStyle = "#050607";
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "rgba(255,255,255,0.08)";
+    ctx.stroke();
+
+    // moving particles dots like Among Us style
+    for(const dot of a.dots){
+      dot.phase += dot.speed;
+      const x = dot.ox * a.r * 1.15 + Math.cos(dot.phase) * dot.drift;
+      const y = dot.oy * a.r * 1.15 + Math.sin(dot.phase * 1.2) * dot.drift;
+      ctx.fillStyle = `rgba(230,233,238,${0.55 + Math.sin(dot.phase) * 0.18})`;
+      ctx.beginPath();
+      ctx.arc(x, y, dot.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.restore();
+  }
+
+  function drawAsteroidImage(a){
+    if(!asteroidTextureReady || !asteroidTexture) return drawAsteroidShape(a);
+
+    ctx.save();
+    ctx.translate(a.x, a.y);
+    ctx.rotate(a.angle);
+
+    const size = a.r * 2.15;
+    ctx.fillStyle = "#050607";
+    ctx.beginPath();
+    ctx.arc(0, 0, a.r * 1.08, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.drawImage(asteroidTexture, -size/2, -size/2, size, size);
+
+    // subtle moving dot particles on top
+    for(const dot of a.dots){
+      dot.phase += dot.speed;
+      const px = Math.cos(dot.phase * 1.15) * a.r * 0.55 + dot.ox * a.r * 0.55;
+      const py = Math.sin(dot.phase) * a.r * 0.55 + dot.oy * a.r * 0.45;
+      ctx.fillStyle = `rgba(230,233,238,${0.58 + Math.sin(dot.phase) * 0.16})`;
+      ctx.beginPath();
+      ctx.arc(px, py, dot.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.restore();
+  }
+
+  function drawParticles(){
+    for(let i = particles.length - 1; i >= 0; i--){
+      const p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.life -= 1;
+
+      const alpha = Math.max(0, p.life / 44);
+      ctx.fillStyle = `rgba(235,238,242,${alpha})`;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+
+      if(p.life <= 0) particles.splice(i, 1);
+    }
+  }
+
+  function updateAsteroids(){
+    for(const a of asteroids){
+      a.x += a.vx;
+      a.y += a.vy;
+      a.angle += a.spin;
+
+      const pad = 120;
+      if(a.x < -pad) a.x = innerWidth + pad;
+      if(a.x > innerWidth + pad) a.x = -pad;
+      if(a.y < -pad) a.y = innerHeight + pad;
+      if(a.y > innerHeight + pad) a.y = -pad;
+    }
+  }
+
+  function loop(){
+    ctx.clearRect(0, 0, innerWidth, innerHeight);
+    drawBackground();
+
+    if(unlocked){
+      updateAsteroids();
+      for(const a of asteroids){
+        drawAsteroidImage(a);
+      }
+      drawParticles();
+    }else{
+      // keep the screen clean; no extra HUDs.
+      drawParticles();
+    }
+
+    requestAnimationFrame(loop);
+  }
+
+  loop();
+
+  function preprocessIconToBlackBg(src){
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        try{
+          const c = document.createElement("canvas");
+          c.width = img.naturalWidth || img.width;
+          c.height = img.naturalHeight || img.height;
+          const cctx = c.getContext("2d");
+          cctx.drawImage(img, 0, 0);
+          const data = cctx.getImageData(0, 0, c.width, c.height);
+          const d = data.data;
+
+          // Remove/soften green background, keep the object, and make the bg black-ish/transparent.
+          for(let i = 0; i < d.length; i += 4){
+            const r = d[i], g = d[i+1], b = d[i+2];
+            const isGreenBg = g > 95 && g > r * 1.15 && g > b * 1.15 && (g - Math.max(r,b)) > 18;
+            if(isGreenBg){
+              d[i+3] = 0; // transparent so our black backdrop shows through
+            }
+          }
+          cctx.putImageData(data, 0, 0);
+          resolve(c);
+        }catch(_){
+          resolve(null);
+        }
+      };
+      img.onerror = () => resolve(null);
+      img.src = src;
+    });
+  }
+
+  async function loadAsteroidTexture(){
+    asteroidTexture = await preprocessIconToBlackBg("icon.png");
+    asteroidTextureReady = !!asteroidTexture;
+  }
+
+  function pickReward(){
+    const total = rewardTable.reduce((sum, item) => sum + item.weight, 0);
+    let roll = Math.random() * total;
+    for(const item of rewardTable){
+      roll -= item.weight;
+      if(roll <= 0) return item;
+    }
+    return rewardTable[0];
+  }
+
+  function startCooldown(){
+    cooldownRemaining = COOLDOWN_SECONDS;
+    claimBtn.disabled = true;
+    claimBtn.textContent = `Redeem (${cooldownRemaining}s)`;
+
+    clearInterval(cooldownTimer);
+    cooldownTimer = setInterval(() => {
+      cooldownRemaining -= 1;
+      if(cooldownRemaining <= 0){
+        clearInterval(cooldownTimer);
+        claimBtn.disabled = false;
+        claimBtn.textContent = "Redeem";
+        return;
+      }
+      claimBtn.textContent = `Redeem (${cooldownRemaining}s)`;
+    }, 1000);
+  }
+
+  async function ensureUid(){
+    if(uid) return uid;
+
+    const entered = prompt("Enter your UID to redeem:");
+    if(!entered || !entered.trim()){
+      throw new Error("UID required");
+    }
+
+    const clean = entered.trim();
+    const ref = doc(db, "users", clean);
+    const snap = await getDoc(ref);
+
+    if(!snap.exists()){
+      throw new Error("UID not found");
+    }
+
+    uid = clean;
+    localStorage.setItem(UID_KEY, uid);
+    return uid;
+  }
+
+  async function claimBeans(){
+    if(claimBtn.disabled && cooldownRemaining > 0) return;
+
+    claimBtn.disabled = true;
+    claimBtn.textContent = "Redeeming...";
+
+    try{
+      const cleanUid = await ensureUid();
+      const reward = pickReward();
+
+      const ref = doc(db, "users", cleanUid);
+      if(reward.beans > 0){
+        await setDoc(ref, { beans: increment(reward.beans) }, { merge: true });
+      }
+
+      if(reward.name === "Asteroid"){
+        toast("Asteroid redeemed.", "info");
+      }else{
+        toast(`${reward.name} redeemed: +${reward.beans} beans`, "success");
+      }
+
+      startCooldown();
+    }catch(err){
+      claimBtn.disabled = false;
+      claimBtn.textContent = "Redeem";
+      toast(err.message || "Redeem failed", "error", 2800);
+    }
+  }
+
+  claimBtn.addEventListener("click", claimBeans);
+
+  canvas.addEventListener("pointerdown", (e) => {
+    if(!unlocked){
+      toast("Redeem first, then play.", "info");
+      return;
+    }
+
+    playSound(shootSfx);
+
+    const mx = e.clientX;
+    const my = e.clientY;
+    let hitIndex = -1;
+
+    for(let i = asteroids.length - 1; i >= 0; i--){
+      const a = asteroids[i];
+      const dist = Math.hypot(mx - a.x, my - a.y);
+      if(dist < a.r){
+        hitIndex = i;
+        break;
+      }
+    }
+
+    if(hitIndex !== -1){
+      const a = asteroids[hitIndex];
+      playSound(hitSfx);
+      explosion(a.x, a.y);
+      asteroids.splice(hitIndex, 1);
+      score += 1;
+      spawnAsteroid();
+    }
+  });
+
+  async function autoLoadUid(){
+    if(!uid) return;
+    try{
+      const ref = doc(db, "users", uid);
+      const snap = await getDoc(ref);
+      if(!snap.exists()){
+        localStorage.removeItem(UID_KEY);
+        uid = "";
+        unlocked = false;
+        return;
+      }
+      unlocked = true;
+    }catch(_){
+      // keep silent to preserve a clean UI
+    }
+  }
+
+  seedAsteroids();
+  loadAsteroidTexture();
+  autoLoadUid();
+</script>
+</body>
+</html>

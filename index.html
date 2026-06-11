@@ -1096,7 +1096,30 @@
       // Signed in — hide auth overlay, hide init screen, show app
       authOverlay.classList.add('hidden');
       await ensureUserDoc(user);
+      
+      async function resetDailyQuests() {
+    const uid = window._userUid;
+    if (!uid) return;
+
+    const today = new Date().toDateString();
+
+    if (window._userData.lastQuestReset !== today) {
+
+        const ref = doc(db, 'users', uid);
+
+        await updateDoc(ref, {
+            claimedQuests: [],
+            lastQuestReset: today
+        });
+
+        window._userData.claimedQuests = [];
+        window._userData.lastQuestReset = today;
+
+        renderQuests(window._userData);
+    }
+}
       await loadUserData(user.uid);
+      await resetDailyQuests();
       // Fade out init screen
       initScreen.classList.add('hidden');
       setTimeout(() => { initScreen.style.display = 'none'; }, 350);

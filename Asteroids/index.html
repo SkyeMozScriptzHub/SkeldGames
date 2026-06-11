@@ -1,647 +1,902 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Asteroid Beans</title>
-<style>
-  :root{
-    --bg:#050607;
-    --panel:#0c0f12;
-    --panel2:#101418;
-    --text:#eef2f4;
-    --muted:#9ca3af;
-    --line:#222a31;
-    --accent:#cbd5e1;
-    --btn:#f3f4f6;
-    --btnText:#0b0d10;
-    --danger:#ef4444;
-    --success:#22c55e;
-  }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#050506" />
+  <title>Asteroid Beans</title>
+  <style>
+    :root{
+      --bg0:#040405;
+      --bg1:#08090b;
+      --bg2:#0d0e11;
+      --panel:#101216cc;
+      --panel2:#0b0c10f2;
+      --line:#23262d;
+      --line2:#31353d;
+      --text:#f1f3f5;
+      --muted:#a7adb6;
+      --muted2:#7d848e;
+      --btn:#f2f4f7;
+      --btnText:#0b0c0e;
+      --btnBorder:#dce1e8;
+      --danger:#cfd3da;
+      --success:#f1f3f5;
+      --info:#c3c8d0;
+      --shadow:0 16px 42px rgba(0,0,0,.45);
+      --softShadow:0 10px 24px rgba(0,0,0,.28);
+      --radius:18px;
+    }
 
-  *{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
-    -webkit-tap-highlight-color:transparent;
-  }
+    *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+    html,body{ width:100%; height:100%; overflow:hidden; background:var(--bg0); font-family:Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    body{ user-select:none; }
 
-  html,body{
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    background:
-      radial-gradient(circle at 20% 20%, rgba(255,255,255,0.05), transparent 16%),
-      radial-gradient(circle at 80% 30%, rgba(255,255,255,0.04), transparent 18%),
-      linear-gradient(180deg, #090a0c 0%, #040506 100%);
-    font-family: Inter, Arial, sans-serif;
-  }
+    #wrap{ position:fixed; inset:0; background:linear-gradient(180deg, var(--bg1) 0%, var(--bg0) 100%); }
+    canvas{ display:block; width:100vw; height:100vh; touch-action:none; }
 
-  canvas{
-    display:block;
-    width:100vw;
-    height:100vh;
-  }
+    #hud{
+      position:fixed;
+      top:14px;
+      left:14px;
+      z-index:10;
+      display:flex;
+      gap:10px;
+      padding:10px 12px;
+      border:1px solid rgba(255,255,255,.07);
+      border-radius:999px;
+      background:linear-gradient(180deg, rgba(18,20,24,.70), rgba(8,9,12,.88));
+      box-shadow:var(--softShadow);
+      backdrop-filter:blur(6px);
+      color:var(--text);
+      font-size:12px;
+      letter-spacing:.2px;
+      opacity:0;
+      transform:translateY(-6px);
+      pointer-events:none;
+      transition:opacity .2s ease, transform .2s ease;
+    }
+    #hud.show{ opacity:1; transform:translateY(0); }
+    .hudItem{ display:flex; align-items:center; gap:8px; white-space:nowrap; }
+    .hudLabel{ color:var(--muted); font-weight:600; text-transform:uppercase; font-size:10px; letter-spacing:.14em; }
+    .hudValue{ color:var(--text); font-weight:700; }
+    .hudDot{ width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.7); box-shadow:0 0 0 2px rgba(255,255,255,.08); }
 
-  #claimBtn{
-    position:fixed;
-    left:50%;
-    bottom:22px;
-    transform:translateX(-50%);
-    z-index:20;
-    border:1px solid rgba(255,255,255,0.10);
-    background:linear-gradient(180deg, #f7f7f7 0%, #dfe3e8 100%);
-    color:var(--btnText);
-    font-size:16px;
-    font-weight:800;
-    letter-spacing:0.3px;
-    padding:14px 26px;
-    border-radius:14px;
-    min-width:180px;
-    cursor:pointer;
-    box-shadow:0 8px 22px rgba(0,0,0,0.35);
-    transition:transform .15s ease, opacity .15s ease, filter .15s ease;
-  }
-
-  #claimBtn:hover{
-    transform:translateX(-50%) translateY(-1px);
-  }
-
-  #claimBtn:active{
-    transform:translateX(-50%) translateY(1px);
-  }
-
-  #claimBtn:disabled{
-    cursor:not-allowed;
-    opacity:0.72;
-    filter:saturate(0.75);
-  }
-
-  #toastWrap{
-    position:fixed;
-    top:16px;
-    right:16px;
-    z-index:100;
-    display:flex;
-    flex-direction:column;
-    gap:8px;
-    pointer-events:none;
-  }
-
-  .toast{
-    min-width:220px;
-    max-width:min(380px, calc(100vw - 32px));
-    padding:10px 12px;
-    border-radius:12px;
-    background:rgba(13,16,20,0.96);
-    color:var(--text);
-    border:1px solid rgba(255,255,255,0.08);
-    box-shadow:0 6px 18px rgba(0,0,0,0.28);
-    font-size:13px;
-    line-height:1.35;
-    opacity:0;
-    transform:translateY(-8px);
-    animation:toastIn .16s ease forwards;
-  }
-
-  .toast.success{ border-color: rgba(34,197,94,0.26); }
-  .toast.error{ border-color: rgba(239,68,68,0.28); }
-  .toast.info{ border-color: rgba(148,163,184,0.22); }
-
-  @keyframes toastIn{
-    to{ opacity:1; transform:translateY(0); }
-  }
-
-  @media (max-width: 520px){
-    #claimBtn{
-      width:calc(100vw - 32px);
-      min-width:unset;
-      max-width:420px;
+    #redeemBtn{
+      position:fixed;
+      left:50%;
       bottom:18px;
-      padding:15px 18px;
+      transform:translateX(-50%);
+      z-index:20;
+      min-width:184px;
+      padding:14px 22px;
+      border:1px solid var(--btnBorder);
+      border-radius:16px;
+      background:linear-gradient(180deg, #fafbfc 0%, #dde2e9 100%);
+      color:var(--btnText);
+      font-size:15px;
+      font-weight:800;
+      letter-spacing:.25px;
+      box-shadow:0 14px 30px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.5);
+      cursor:pointer;
+      transition:transform .15s ease, filter .15s ease, opacity .15s ease;
+    }
+    #redeemBtn:hover{ transform:translateX(-50%) translateY(-1px); filter:brightness(1.02); }
+    #redeemBtn:active{ transform:translateX(-50%) translateY(1px); }
+    #redeemBtn:disabled{ opacity:.72; cursor:not-allowed; filter:saturate(.72); }
+    #redeemBtn .btnSub{ display:block; margin-top:2px; font-size:11px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; opacity:.62; }
+
+    #toastStack{
+      position:fixed;
+      top:14px;
+      right:14px;
+      z-index:100;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      pointer-events:none;
+      align-items:flex-end;
     }
     .toast{
-      min-width:unset;
-      width:min(340px, calc(100vw - 32px));
+      min-width:240px;
+      max-width:min(360px, calc(100vw - 28px));
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      padding:11px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(12,13,16,.94);
+      color:var(--text);
+      box-shadow:var(--shadow);
+      transform:translateY(-8px);
+      opacity:0;
+      animation:toastIn .18s ease forwards;
     }
-  }
-</style>
+    .toast::before{
+      content:"";
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      margin-top:3px;
+      flex:0 0 auto;
+      background:rgba(255,255,255,.86);
+      box-shadow:0 0 0 3px rgba(255,255,255,.06);
+    }
+    .toast.success{ border-color:rgba(255,255,255,.12); }
+    .toast.error{ border-color:rgba(255,255,255,.12); }
+    .toast.info{ border-color:rgba(255,255,255,.10); }
+    .toast.success::before{ background:#ffffff; }
+    .toast.error::before{ background:#cfd3da; }
+    .toast.info::before{ background:#b8bec6; }
+    .toastBody{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+    .toastTitle{ font-size:12px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:#fff; }
+    .toastMsg{ font-size:13px; line-height:1.35; color:var(--text); opacity:.88; word-break:break-word; }
+    @keyframes toastIn{ to{ opacity:1; transform:translateY(0); } }
+    .toast.out{ opacity:0; transform:translateY(-6px); transition:.16s ease; }
+
+    #overlayHint{
+      position:fixed;
+      left:50%;
+      top:50%;
+      transform:translate(-50%,-50%);
+      z-index:5;
+      padding:12px 16px;
+      border-radius:999px;
+      background:rgba(9,10,12,.56);
+      border:1px solid rgba(255,255,255,.08);
+      color:var(--muted);
+      font-size:12px;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      backdrop-filter:blur(6px);
+      pointer-events:none;
+      box-shadow:var(--softShadow);
+      transition:opacity .22s ease, transform .22s ease;
+    }
+    #overlayHint.hidden{ opacity:0; transform:translate(-50%,-48%) scale(.98); }
+
+    @media (max-width: 520px){
+      #hud{ top:10px; left:10px; right:10px; justify-content:space-between; border-radius:16px; padding:10px 12px; }
+      .hudItem{ gap:6px; }
+      #redeemBtn{ width:calc(100vw - 24px); min-width:unset; bottom:12px; padding:14px 18px; }
+      #toastStack{ top:10px; right:10px; left:10px; align-items:stretch; }
+      .toast{ min-width:unset; max-width:unset; width:100%; }
+      #overlayHint{ max-width:calc(100vw - 28px); text-align:center; }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      *{ scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+    }
+  </style>
 </head>
 <body>
+  <div id="wrap">
+    <canvas id="game" aria-label="Asteroid Beans game canvas"></canvas>
+  </div>
 
-<div id="toastWrap"></div>
-<button id="claimBtn">Redeem</button>
-<canvas id="game"></canvas>
+  <div id="hud" aria-live="polite" aria-atomic="true">
+    <div class="hudItem"><span class="hudDot"></span><span class="hudLabel">Destroyed</span><span class="hudValue" id="destroyedCount">0</span></div>
+    <div class="hudItem"><span class="hudDot"></span><span class="hudLabel">Rewards</span><span class="hudValue" id="rewardCount">0</span></div>
+  </div>
 
-<audio id="shootSfx" src="shoot.mp3" preload="auto"></audio>
-<audio id="hitSfx" src="hit.mp3" preload="auto"></audio>
+  <div id="overlayHint">Redeem to unlock gameplay</div>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getFirestore, doc, getDoc, setDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  <button id="redeemBtn" type="button">Redeem <span class="btnSub">Locked</span></button>
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyCIkS8aU3NyKPH2EWqLNLjKxxg7y7kKu8M",
-    authDomain: "skeld-g.firebaseapp.com",
-    projectId: "skeld-g",
-    storageBucket: "skeld-g.appspot.com",
-    messagingSenderId: "474209822056",
-    appId: "1:474209822056:web:eee11ece0da8f1cfd4a2dd"
-  };
+  <div id="toastStack" aria-live="polite" aria-atomic="true"></div>
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+  <audio id="shootSfx" src="shoot.mp3" preload="auto"></audio>
+  <audio id="hitSfx" src="hit.mp3" preload="auto"></audio>
 
-  const canvas = document.getElementById("game");
-  const ctx = canvas.getContext("2d");
-  const claimBtn = document.getElementById("claimBtn");
-  const toastWrap = document.getElementById("toastWrap");
-  const shootSfx = document.getElementById("shootSfx");
-  const hitSfx = document.getElementById("hitSfx");
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, doc, getDoc, runTransaction, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-  const UID_KEY = "asteroidBeans_uid";
-  const COOLDOWN_SECONDS = 60;
+    const firebaseConfig = {
+      apiKey: "AIzaSyCIkS8aU3NyKPH2EWqLNLjKxxg7y7kKu8M",
+      authDomain: "skeld-g.firebaseapp.com",
+      projectId: "skeld-g",
+      storageBucket: "skeld-g.appspot.com",
+      messagingSenderId: "474209822056",
+      appId: "1:474209822056:web:eee11ece0da8f1cfd4a2dd"
+    };
 
-  const asteroids = [];
-  const particles = [];
-  const starDots = [];
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-  let uid = localStorage.getItem(UID_KEY) || "";
-  let unlocked = false;
-  let score = 0;
-  let cooldownTimer = null;
-  let cooldownRemaining = 0;
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d', { alpha: false });
+    const redeemBtn = document.getElementById('redeemBtn');
+    const toastStack = document.getElementById('toastStack');
+    const overlayHint = document.getElementById('overlayHint');
+    const hud = document.getElementById('hud');
+    const destroyedCountEl = document.getElementById('destroyedCount');
+    const rewardCountEl = document.getElementById('rewardCount');
+    const shootSfx = document.getElementById('shootSfx');
+    const hitSfx = document.getElementById('hitSfx');
 
-  const rewardTable = [
-    // Asteroid is the common result, while the actual bean rewards are rare.
-    // The file field follows the requested naming style: red.png, yellow.png, etc.
-    { name: "Asteroid", file: "icon.png", beans: 0, chance: 98.0, weight: 980000 },
-    { name: "Red", file: "red.png", beans: 500, chance: 0.999, weight: 9990 },
-    { name: "Yellow", file: "yellow.png", beans: 120, chance: 3.4, weight: 34000 },
-    { name: "Blue", file: "blue.png", beans: 240, chance: 0.45, weight: 4500 },
-    { name: "Green", file: "green.png", beans: 320, chance: 0.28, weight: 2800 },
-    { name: "Purple", file: "purple.png", beans: 800, chance: 0.12, weight: 1200 },
-    { name: "Orange", file: "orange.png", beans: 60, chance: 0.80, weight: 8000 },
-    { name: "SkyeMoz", file: "skyemoz.png", beans: 99999999999, chance: 0.0000000000001, weight: 1 }
-  ];
+    const UID_KEY = 'asteroidBeans_uid';
+    const REDDEEM_LOCK_MS = 60_000;
+    const MAX_PARTICLES = 260;
+    const MAX_ASTEROIDS = 9;
+    const DEVICE_PIXEL_CAP = 2;
+    const BG_STAR_COUNT = 120;
+    const WORLD_PADDING = 140;
+    const HIT_RADIUS_MULT = 1.12;
 
-  const rewardPickPool = rewardTable.map(item => ({
-    ...item,
-    _chanceLabel: `${item.chance}%`
-  }));
+    const state = {
+      dpr: 1,
+      unlocked: false,
+      redeemBusy: false,
+      cooldownUntil: 0,
+      uid: localStorage.getItem(UID_KEY) || '',
+      requestId: '',
+      destroyed: 0,
+      rewards: 0,
+      shake: 0,
+      shakeX: 0,
+      shakeY: 0,
+      lastFrame: performance.now(),
+      bgLayer: document.createElement('canvas'),
+      bgCtx: null,
+      stars: [],
+      asteroids: [],
+      particles: [],
+      nextSpawnAt: 0,
+      asteroidTexture: null,
+      asteroidTextureReady: false
+    };
+    state.bgCtx = state.bgLayer.getContext('2d');
 
-  let asteroidTexture = null;
-  let asteroidTextureReady = false;
+    // Exact probability model using a fixed 10^18 scale for precise tiny odds.
+    const PROB_SCALE = 10n ** 18n;
+    const rewardTable = [
+      { name: 'Asteroid', file: 'icon.png', beans: 0, chance: 99.3200000000000 },
+      { name: 'Red',      file: 'red.png',  beans: 500, chance: 0.3500000000000 },
+      { name: 'Yellow',   file: 'yellow.png', beans: 180, chance: 0.1500000000000 },
+      { name: 'Blue',     file: 'blue.png', beans: 260, chance: 0.1200000000000 },
+      { name: 'Green',    file: 'green.png', beans: 340, chance: 0.0500000000000 },
+      { name: 'SkyeMoz',  file: 'skyemoz.png', beans: 99999999999, chance: 0.0000000000001 }
+    ];
 
-  function resize(){
-    const dpr = Math.max(1, window.devicePixelRatio || 1);
-    canvas.width = Math.floor(innerWidth * dpr);
-    canvas.height = Math.floor(innerHeight * dpr);
-    canvas.style.width = innerWidth + "px";
-    canvas.style.height = innerHeight + "px";
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    function toScaledWeight(chancePercent){
+      const scaled = BigInt(Math.round(Number(chancePercent) * 1e16));
+      return scaled;
+    }
 
-    if(starDots.length === 0){
-      const count = Math.max(70, Math.floor((innerWidth * innerHeight) / 22000));
-      for(let i = 0; i < count; i++){
-        starDots.push({
-          x: Math.random() * innerWidth,
-          y: Math.random() * innerHeight,
-          r: Math.random() * 1.4 + 0.3,
-          vx: (Math.random() - 0.5) * 0.08,
-          vy: (Math.random() - 0.5) * 0.08,
-          a: Math.random() * 0.45 + 0.18
+    const rewardPool = (() => {
+      let total = 0n;
+      const list = rewardTable.map(item => {
+        const weight = toScaledWeight(item.chance);
+        total += weight;
+        return { ...item, weight };
+      });
+      // Fill the remaining probability space into Asteroid so the probabilities stay exact and overwhelmingly common.
+      const remainder = PROB_SCALE - total;
+      list[0].weight += remainder;
+      return list;
+    })();
+
+    function randomFloat(min, max){ return Math.random() * (max - min) + min; }
+    function clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
+    function lerp(a, b, t){ return a + (b - a) * t; }
+
+    function showToast(title, message, kind = 'info', duration = 2200){
+      const toast = document.createElement('div');
+      toast.className = `toast ${kind}`;
+      toast.innerHTML = `
+        <div class="toastBody">
+          <div class="toastTitle">${title}</div>
+          <div class="toastMsg">${message}</div>
+        </div>
+      `;
+      toastStack.appendChild(toast);
+      window.setTimeout(() => {
+        toast.classList.add('out');
+        window.setTimeout(() => toast.remove(), 180);
+      }, duration);
+    }
+
+    function playSound(audioEl, volume = 0.7){
+      try{
+        if(!audioEl) return;
+        const sound = audioEl.cloneNode(true);
+        sound.volume = volume;
+        sound.play().catch(() => {});
+      }catch(_err){}
+    }
+
+    function rafNow(){ return performance.now(); }
+
+    function updateHud(){
+      destroyedCountEl.textContent = String(state.destroyed);
+      rewardCountEl.textContent = String(state.rewards);
+      hud.classList.toggle('show', state.unlocked);
+      overlayHint.classList.toggle('hidden', state.unlocked);
+    }
+
+    function setRedeemButton(label, subLabel, disabled = false){
+      redeemBtn.disabled = disabled;
+      redeemBtn.innerHTML = `${label} <span class="btnSub">${subLabel}</span>`;
+    }
+
+    function updateCooldownButton(){
+      const now = Date.now();
+      const remaining = Math.max(0, state.cooldownUntil - now);
+      if(remaining <= 0){
+        if(state.redeemBusy){
+          setRedeemButton('Redeeming', 'Please wait', true);
+        }else{
+          setRedeemButton('Redeem', state.unlocked ? 'Ready' : 'Locked', false);
+        }
+        return;
+      }
+      const sec = Math.ceil(remaining / 1000);
+      setRedeemButton('Redeem', `Cooldown ${sec}s`, true);
+    }
+
+    function resize(){
+      const dpr = Math.min(DEVICE_PIXEL_CAP, window.devicePixelRatio || 1);
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      canvas.width = Math.floor(w * dpr);
+      canvas.height = Math.floor(h * dpr);
+      canvas.style.width = `${w}px`;
+      canvas.style.height = `${h}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+
+      state.bgLayer.width = Math.floor(w * dpr);
+      state.bgLayer.height = Math.floor(h * dpr);
+      state.bgCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      state.bgCtx.imageSmoothingEnabled = true;
+      state.bgCtx.imageSmoothingQuality = 'high';
+
+      paintBackground();
+    }
+
+    function paintBackground(){
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const g = state.bgCtx.createLinearGradient(0, 0, 0, h);
+      g.addColorStop(0, '#08090b');
+      g.addColorStop(1, '#040405');
+      state.bgCtx.fillStyle = g;
+      state.bgCtx.fillRect(0, 0, w, h);
+
+      const fog = state.bgCtx.createRadialGradient(w * 0.5, h * 0.44, 30, w * 0.5, h * 0.44, Math.max(w, h) * 0.84);
+      fog.addColorStop(0, 'rgba(255,255,255,0.032)');
+      fog.addColorStop(1, 'rgba(255,255,255,0)');
+      state.bgCtx.fillStyle = fog;
+      state.bgCtx.fillRect(0, 0, w, h);
+
+      state.stars.length = 0;
+      for(let i = 0; i < BG_STAR_COUNT; i++){
+        state.stars.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          r: Math.random() * 1.35 + 0.25,
+          a: Math.random() * 0.36 + 0.18,
+          tw: Math.random() * Math.PI * 2,
+          spd: randomFloat(0.003, 0.01)
         });
       }
-    }
-  }
-
-  window.addEventListener("resize", resize);
-  resize();
-
-  function random(min, max){
-    return Math.random() * (max - min) + min;
-  }
-
-  function toast(message, type = "info", duration = 2200){
-    const el = document.createElement("div");
-    el.className = `toast ${type}`;
-    el.textContent = message;
-    toastWrap.appendChild(el);
-    setTimeout(() => {
-      el.style.transition = "0.16s ease";
-      el.style.opacity = "0";
-      el.style.transform = "translateY(-6px)";
-      setTimeout(() => el.remove(), 180);
-    }, duration);
-  }
-
-  function playSound(audioEl){
-    try{
-      const s = audioEl.cloneNode();
-      s.volume = 0.65;
-      s.play().catch(() => {});
-    }catch(_){}
-  }
-
-  function makePoints(n = 9){
-    const pts = [];
-    for(let i = 0; i < n; i++){
-      pts.push(random(0.78, 1.16));
-    }
-    return pts;
-  }
-
-  function spawnAsteroid(){
-    const r = random(28, 58);
-    const edge = Math.floor(random(0, 4));
-    const pad = 90;
-    let x, y;
-
-    if(edge === 0){
-      x = random(0, innerWidth);
-      y = -pad;
-    }else if(edge === 1){
-      x = innerWidth + pad;
-      y = random(0, innerHeight);
-    }else if(edge === 2){
-      x = random(0, innerWidth);
-      y = innerHeight + pad;
-    }else{
-      x = -pad;
-      y = random(0, innerHeight);
+      drawStaticStars();
     }
 
-    const targetX = innerWidth / 2 + random(-180, 180);
-    const targetY = innerHeight / 2 + random(-140, 140);
-    const dx = targetX - x;
-    const dy = targetY - y;
-    const len = Math.max(1, Math.hypot(dx, dy));
+    function drawStaticStars(){
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      for(const s of state.stars){
+        state.bgCtx.fillStyle = `rgba(255,255,255,${s.a})`;
+        state.bgCtx.beginPath();
+        state.bgCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        state.bgCtx.fill();
+      }
 
-    asteroids.push({
-      x, y,
-      vx: (dx / len) * random(0.42, 0.95),
-      vy: (dy / len) * random(0.42, 0.95),
-      r,
-      angle: random(0, Math.PI * 2),
-      spin: random(-0.014, 0.014),
-      points: makePoints(8),
-      dots: Array.from({length: 18}, () => ({
-        ox: random(-0.48, 0.48),
-        oy: random(-0.48, 0.48),
-        r: random(0.9, 1.9),
-        phase: random(0, Math.PI * 2),
-        speed: random(0.012, 0.032),
-        drift: random(0.2, 0.75)
-      }))
-    });
-  }
+      state.bgCtx.fillStyle = 'rgba(255,255,255,0.025)';
+      state.bgCtx.fillRect(0, 0, w, h);
+    }
 
-  function seedAsteroids(){
-    asteroids.length = 0;
-    for(let i = 0; i < 7; i++) spawnAsteroid();
-  }
+    function makeAsteroidGeometry(){
+      const count = Math.floor(randomFloat(8, 11));
+      const points = [];
+      for(let i = 0; i < count; i++){
+        points.push(randomFloat(0.76, 1.18));
+      }
+      return points;
+    }
 
-  function explosion(x, y){
-    for(let i = 0; i < 18; i++){
-      particles.push({
+    function spawnAsteroid(){
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const edge = Math.floor(Math.random() * 4);
+      const pad = WORLD_PADDING;
+      let x = 0, y = 0;
+
+      if(edge === 0){ x = randomFloat(-pad, w + pad); y = -pad; }
+      if(edge === 1){ x = w + pad; y = randomFloat(-pad, h + pad); }
+      if(edge === 2){ x = randomFloat(-pad, w + pad); y = h + pad; }
+      if(edge === 3){ x = -pad; y = randomFloat(-pad, h + pad); }
+
+      const targetX = w * 0.5 + randomFloat(-220, 220);
+      const targetY = h * 0.5 + randomFloat(-180, 180);
+      const dx = targetX - x;
+      const dy = targetY - y;
+      const len = Math.max(0.001, Math.hypot(dx, dy));
+      const speed = randomFloat(1.2, 2.65);
+
+      const asteroid = {
+        x,
+        y,
+        vx: (dx / len) * speed + randomFloat(-0.22, 0.22),
+        vy: (dy / len) * speed + randomFloat(-0.22, 0.22),
+        r: randomFloat(34, 62),
+        angle: randomFloat(0, Math.PI * 2),
+        spin: randomFloat(-0.0065, 0.0065),
+        wobble: randomFloat(0.012, 0.035),
+        wobblePhase: randomFloat(0, Math.PI * 2),
+        driftPhase: randomFloat(0, Math.PI * 2),
+        driftSpeed: randomFloat(0.015, 0.03),
+        points: makeAsteroidGeometry(),
+        pulse: randomFloat(0, Math.PI * 2),
+        hitRadius: 0
+      };
+      asteroid.hitRadius = asteroid.r * HIT_RADIUS_MULT;
+      return asteroid;
+    }
+
+    function seedAsteroids(){
+      state.asteroids.length = 0;
+      const initial = 7;
+      for(let i = 0; i < initial; i++) state.asteroids.push(spawnAsteroid());
+      state.nextSpawnAt = 0;
+    }
+
+    function spawnParticles(x, y, intensity = 1){
+      const count = Math.min(MAX_PARTICLES, Math.floor(20 * intensity));
+      for(let i = 0; i < count; i++){
+        state.particles.push({
+          x,
+          y,
+          vx: randomFloat(-4.7, 4.7) * intensity,
+          vy: randomFloat(-4.7, 4.7) * intensity,
+          r: randomFloat(1.2, 3.7),
+          life: randomFloat(22, 42),
+          maxLife: 42,
+          spin: randomFloat(-0.15, 0.15),
+          hue: Math.random() > 0.4 ? 255 : 220
+        });
+      }
+      if(state.particles.length > MAX_PARTICLES){
+        state.particles.splice(0, state.particles.length - MAX_PARTICLES);
+      }
+    }
+
+    function spawnImpactRing(x, y){
+      state.particles.push({
         x, y,
-        vx: random(-4.2, 4.2),
-        vy: random(-4.2, 4.2),
-        size: random(1.4, 4.2),
-        life: random(26, 44)
+        ring: true,
+        radius: 8,
+        life: 16,
+        maxLife: 16
       });
     }
-  }
 
-  function drawStars(){
-    ctx.save();
-    for(const s of starDots){
-      s.x += s.vx;
-      s.y += s.vy;
+    function shakeCamera(amount = 6){
+      state.shake = Math.max(state.shake, amount);
+    }
 
-      if(s.x < -5) s.x = innerWidth + 5;
-      if(s.x > innerWidth + 5) s.x = -5;
-      if(s.y < -5) s.y = innerHeight + 5;
-      if(s.y > innerHeight + 5) s.y = -5;
+    function drawBackground(){
+      ctx.drawImage(state.bgLayer, 0, 0, window.innerWidth, window.innerHeight);
+    }
 
-      ctx.fillStyle = `rgba(255,255,255,${s.a})`;
+    function drawAsteroidFallback(a){
+      ctx.save();
+      ctx.translate(a.x, a.y);
+      ctx.rotate(a.angle);
+      ctx.fillStyle = '#090a0c';
+      ctx.strokeStyle = 'rgba(255,255,255,.06)';
+      ctx.lineWidth = 2;
+      ctx.shadowBlur = 18;
+      ctx.shadowColor = 'rgba(255,255,255,.06)';
       ctx.beginPath();
-      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    ctx.restore();
-  }
-
-  function drawBackground(){
-    const w = innerWidth;
-    const h = innerHeight;
-
-    const bg = ctx.createLinearGradient(0, 0, 0, h);
-    bg.addColorStop(0, "#090a0c");
-    bg.addColorStop(1, "#040506");
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, w, h);
-
-    drawStars();
-
-    const fog = ctx.createRadialGradient(w * 0.5, h * 0.45, 20, w * 0.5, h * 0.45, Math.max(w, h) * 0.75);
-    fog.addColorStop(0, "rgba(255,255,255,0.03)");
-    fog.addColorStop(1, "rgba(255,255,255,0)");
-    ctx.fillStyle = fog;
-    ctx.fillRect(0, 0, w, h);
-  }
-
-  function drawAsteroidShape(a){
-    ctx.save();
-    ctx.translate(a.x, a.y);
-    ctx.rotate(a.angle);
-
-    // black background like requested
-    ctx.shadowBlur = 18;
-    ctx.shadowColor = "rgba(255,255,255,0.05)";
-
-    ctx.beginPath();
-    const sides = a.points.length;
-    for(let i = 0; i < sides; i++){
-      const ang = (Math.PI * 2 / sides) * i;
-      const rad = a.r * a.points[i];
-      const px = Math.cos(ang) * rad;
-      const py = Math.sin(ang) * rad;
-      if(i === 0) ctx.moveTo(px, py);
-      else ctx.lineTo(px, py);
-    }
-    ctx.closePath();
-
-    ctx.fillStyle = "#050607";
-    ctx.fill();
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = "rgba(255,255,255,0.08)";
-    ctx.stroke();
-
-    // moving particles dots like Among Us style
-    for(const dot of a.dots){
-      dot.phase += dot.speed;
-      const x = dot.ox * a.r * 1.15 + Math.cos(dot.phase) * dot.drift;
-      const y = dot.oy * a.r * 1.15 + Math.sin(dot.phase * 1.2) * dot.drift;
-      ctx.fillStyle = `rgba(230,233,238,${0.55 + Math.sin(dot.phase) * 0.18})`;
-      ctx.beginPath();
-      ctx.arc(x, y, dot.r, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    ctx.restore();
-  }
-
-  function drawAsteroidImage(a){
-    if(!asteroidTextureReady || !asteroidTexture) return drawAsteroidShape(a);
-
-    ctx.save();
-    ctx.translate(a.x, a.y);
-    ctx.rotate(a.angle);
-
-    const size = a.r * 2.15;
-    ctx.fillStyle = "#050607";
-    ctx.beginPath();
-    ctx.arc(0, 0, a.r * 1.08, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.drawImage(asteroidTexture, -size/2, -size/2, size, size);
-
-    // subtle moving dot particles on top
-    for(const dot of a.dots){
-      dot.phase += dot.speed;
-      const px = Math.cos(dot.phase * 1.15) * a.r * 0.55 + dot.ox * a.r * 0.55;
-      const py = Math.sin(dot.phase) * a.r * 0.55 + dot.oy * a.r * 0.45;
-      ctx.fillStyle = `rgba(230,233,238,${0.58 + Math.sin(dot.phase) * 0.16})`;
-      ctx.beginPath();
-      ctx.arc(px, py, dot.r, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    ctx.restore();
-  }
-
-  function drawParticles(){
-    for(let i = particles.length - 1; i >= 0; i--){
-      const p = particles[i];
-      p.x += p.vx;
-      p.y += p.vy;
-      p.life -= 1;
-
-      const alpha = Math.max(0, p.life / 44);
-      ctx.fillStyle = `rgba(235,238,242,${alpha})`;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-      ctx.fill();
-
-      if(p.life <= 0) particles.splice(i, 1);
-    }
-  }
-
-  function updateAsteroids(){
-    for(const a of asteroids){
-      a.x += a.vx;
-      a.y += a.vy;
-      a.angle += a.spin;
-
-      const pad = 120;
-      if(a.x < -pad) a.x = innerWidth + pad;
-      if(a.x > innerWidth + pad) a.x = -pad;
-      if(a.y < -pad) a.y = innerHeight + pad;
-      if(a.y > innerHeight + pad) a.y = -pad;
-    }
-  }
-
-  function loop(){
-    ctx.clearRect(0, 0, innerWidth, innerHeight);
-    drawBackground();
-
-    if(unlocked){
-      updateAsteroids();
-      for(const a of asteroids){
-        drawAsteroidImage(a);
+      for(let i = 0; i < a.points.length; i++){
+        const ang = (Math.PI * 2 * i) / a.points.length;
+        const rr = a.r * a.points[i];
+        const px = Math.cos(ang) * rr;
+        const py = Math.sin(ang) * rr;
+        if(i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
       }
-      drawParticles();
-    }else{
-      // keep the screen clean; no extra HUDs.
-      drawParticles();
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
     }
 
-    requestAnimationFrame(loop);
-  }
+    function drawAsteroid(a){
+      ctx.save();
+      ctx.translate(a.x, a.y);
+      ctx.rotate(a.angle);
 
-  loop();
+      const size = a.r * 2.18;
+      const glow = 0.08 + Math.sin(a.pulse) * 0.02;
 
-  function preprocessIconToBlackBg(src){
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.onload = () => {
-        try{
-          const c = document.createElement("canvas");
-          c.width = img.naturalWidth || img.width;
-          c.height = img.naturalHeight || img.height;
-          const cctx = c.getContext("2d");
-          cctx.drawImage(img, 0, 0);
-          const data = cctx.getImageData(0, 0, c.width, c.height);
-          const d = data.data;
+      ctx.shadowBlur = 20;
+      ctx.shadowColor = `rgba(255,255,255,${glow})`;
+      ctx.globalAlpha = 0.98;
+      ctx.beginPath();
+      ctx.arc(0, 0, a.r * 1.03, 0, Math.PI * 2);
+      ctx.fillStyle = '#07080a';
+      ctx.fill();
 
-          // Remove/soften green background, keep the object, and make the bg black-ish/transparent.
-          for(let i = 0; i < d.length; i += 4){
-            const r = d[i], g = d[i+1], b = d[i+2];
-            const isGreenBg = g > 95 && g > r * 1.15 && g > b * 1.15 && (g - Math.max(r,b)) > 18;
-            if(isGreenBg){
-              d[i+3] = 0; // transparent so our black backdrop shows through
-            }
-          }
-          cctx.putImageData(data, 0, 0);
-          resolve(c);
-        }catch(_){
-          resolve(null);
-        }
-      };
-      img.onerror = () => resolve(null);
-      img.src = src;
-    });
-  }
-
-  async function loadAsteroidTexture(){
-    asteroidTexture = await preprocessIconToBlackBg("icon.png");
-    asteroidTextureReady = !!asteroidTexture;
-  }
-
-  function pickReward(){
-    const total = rewardTable.reduce((sum, item) => sum + item.weight, 0);
-    let roll = Math.random() * total;
-    for(const item of rewardTable){
-      roll -= item.weight;
-      if(roll <= 0) return item;
-    }
-    return rewardTable[0];
-  }
-
-  function startCooldown(){
-    cooldownRemaining = COOLDOWN_SECONDS;
-    claimBtn.disabled = true;
-    claimBtn.textContent = `Redeem (${cooldownRemaining}s)`;
-
-    clearInterval(cooldownTimer);
-    cooldownTimer = setInterval(() => {
-      cooldownRemaining -= 1;
-      if(cooldownRemaining <= 0){
-        clearInterval(cooldownTimer);
-        claimBtn.disabled = false;
-        claimBtn.textContent = "Redeem";
-        return;
-      }
-      claimBtn.textContent = `Redeem (${cooldownRemaining}s)`;
-    }, 1000);
-  }
-
-  async function ensureUid(){
-    if(uid) return uid;
-
-    const entered = prompt("Enter your UID to redeem:");
-    if(!entered || !entered.trim()){
-      throw new Error("UID required");
-    }
-
-    const clean = entered.trim();
-    const ref = doc(db, "users", clean);
-    const snap = await getDoc(ref);
-
-    if(!snap.exists()){
-      throw new Error("UID not found");
-    }
-
-    uid = clean;
-    localStorage.setItem(UID_KEY, uid);
-    return uid;
-  }
-
-  async function claimBeans(){
-    if(claimBtn.disabled && cooldownRemaining > 0) return;
-
-    claimBtn.disabled = true;
-    claimBtn.textContent = "Redeeming...";
-
-    try{
-      const cleanUid = await ensureUid();
-      const reward = pickReward();
-
-      const ref = doc(db, "users", cleanUid);
-      if(reward.beans > 0){
-        await setDoc(ref, { beans: increment(reward.beans) }, { merge: true });
-      }
-
-      if(reward.name === "Asteroid"){
-        toast("Asteroid redeemed.", "info");
+      if(state.asteroidTextureReady && state.asteroidTexture){
+        ctx.drawImage(state.asteroidTexture, -size / 2, -size / 2, size, size);
       }else{
-        toast(`${reward.name} redeemed: +${reward.beans} beans`, "success");
+        drawAsteroidFallback({ ...a, x: 0, y: 0 });
       }
 
-      startCooldown();
-    }catch(err){
-      claimBtn.disabled = false;
-      claimBtn.textContent = "Redeem";
-      toast(err.message || "Redeem failed", "error", 2800);
-    }
-  }
+      // Subtle surface flecks for life and depth.
+      ctx.globalAlpha = 0.74;
+      for(let i = 0; i < 5; i++){
+        const px = Math.cos(a.pulse * (1 + i * 0.1) + i) * a.r * 0.38;
+        const py = Math.sin(a.pulse * (1.14 + i * 0.05) + i * 1.7) * a.r * 0.26;
+        ctx.fillStyle = 'rgba(245,246,248,.16)';
+        ctx.beginPath();
+        ctx.arc(px, py, 1.1 + (i % 2) * 0.45, 0, Math.PI * 2);
+        ctx.fill();
+      }
 
-  claimBtn.addEventListener("click", claimBeans);
-
-  canvas.addEventListener("pointerdown", (e) => {
-    if(!unlocked){
-      toast("Redeem first, then play.", "info");
-      return;
+      ctx.restore();
     }
 
-    playSound(shootSfx);
+    function drawParticles(){
+      for(let i = state.particles.length - 1; i >= 0; i--){
+        const p = state.particles[i];
+        p.life -= 1;
+        const alpha = clamp(p.life / p.maxLife, 0, 1);
 
-    const mx = e.clientX;
-    const my = e.clientY;
-    let hitIndex = -1;
+        if(p.ring){
+          p.radius += 1.5;
+          ctx.save();
+          ctx.strokeStyle = `rgba(255,255,255,${alpha * 0.38})`;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+        }else{
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vx *= 0.985;
+          p.vy *= 0.985;
+          ctx.fillStyle = `rgba(${p.hue},${p.hue},${p.hue},${alpha})`;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
 
-    for(let i = asteroids.length - 1; i >= 0; i--){
-      const a = asteroids[i];
-      const dist = Math.hypot(mx - a.x, my - a.y);
-      if(dist < a.r){
-        hitIndex = i;
-        break;
+        if(p.life <= 0) state.particles.splice(i, 1);
       }
     }
 
-    if(hitIndex !== -1){
-      const a = asteroids[hitIndex];
-      playSound(hitSfx);
-      explosion(a.x, a.y);
-      asteroids.splice(hitIndex, 1);
-      score += 1;
-      spawnAsteroid();
-    }
-  });
+    function updateAsteroids(dt){
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      for(const a of state.asteroids){
+        a.wobblePhase += a.wobble;
+        a.driftPhase += a.driftSpeed;
+        const wobbleX = Math.sin(a.wobblePhase) * 0.08;
+        const wobbleY = Math.cos(a.wobblePhase * 0.92) * 0.08;
 
-  async function autoLoadUid(){
-    if(!uid) return;
-    try{
-      const ref = doc(db, "users", uid);
+        a.vx += wobbleX * 0.02;
+        a.vy += wobbleY * 0.02;
+        a.x += a.vx * dt;
+        a.y += a.vy * dt;
+        a.angle += a.spin * dt * 1.6;
+        a.pulse += dt * 0.04;
+
+        const pad = WORLD_PADDING;
+        if(a.x < -pad) a.x = w + pad;
+        if(a.x > w + pad) a.x = -pad;
+        if(a.y < -pad) a.y = h + pad;
+        if(a.y > h + pad) a.y = -pad;
+      }
+    }
+
+    function maintainAsteroidDensity(now){
+      if(!state.unlocked) return;
+      if(state.asteroids.length >= MAX_ASTEROIDS) return;
+      if(now < state.nextSpawnAt) return;
+      state.asteroids.push(spawnAsteroid());
+      state.nextSpawnAt = now + 550;
+    }
+
+    function screenToWorld(clientX, clientY){
+      return { x: clientX, y: clientY };
+    }
+
+    function hitTestAsteroid(x, y){
+      for(let i = state.asteroids.length - 1; i >= 0; i--){
+        const a = state.asteroids[i];
+        const dx = x - a.x;
+        const dy = y - a.y;
+        const dist = Math.hypot(dx, dy);
+        if(dist <= a.hitRadius) return i;
+      }
+      return -1;
+    }
+
+    function handleAsteroidHit(index){
+      const a = state.asteroids[index];
+      state.asteroids.splice(index, 1);
+      state.destroyed += 1;
+      destroyAsteroid(a.x, a.y, a.r);
+      spawnAsteroidReplacement();
+      shakeCamera(6.5);
+      playSound(hitSfx, 0.72);
+      updateHud();
+    }
+
+    function destroyAsteroid(x, y, radius){
+      spawnParticles(x, y, clamp(radius / 34, 0.9, 1.5));
+      spawnImpactRing(x, y);
+    }
+
+    function spawnAsteroidReplacement(){
+      if(state.asteroids.length < MAX_ASTEROIDS){
+        state.asteroids.push(spawnAsteroid());
+      }
+    }
+
+    function getRandomBigInt(maxExclusive){
+      const max = BigInt(maxExclusive);
+      if(max <= 0n) return 0n;
+      const bits = max.toString(2).length;
+      const bytes = Math.ceil(bits / 8);
+      const maxUint = (1n << BigInt(bytes * 8)) - 1n;
+      const limit = maxUint - (maxUint % max);
+      const buf = new Uint8Array(bytes);
+      while(true){
+        crypto.getRandomValues(buf);
+        let v = 0n;
+        for(const b of buf) v = (v << 8n) | BigInt(b);
+        if(v < limit) return v % max;
+      }
+    }
+
+    function pickReward(){
+      let total = 0n;
+      for(const item of rewardPool) total += item.weight;
+      const roll = getRandomBigInt(total);
+      let acc = 0n;
+      for(const item of rewardPool){
+        acc += item.weight;
+        if(roll < acc) return item;
+      }
+      return rewardPool[0];
+    }
+
+    function preprocessIcon(src){
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          try{
+            const c = document.createElement('canvas');
+            const w = img.naturalWidth || img.width;
+            const h = img.naturalHeight || img.height;
+            c.width = w;
+            c.height = h;
+            const cctx = c.getContext('2d', { willReadFrequently: true });
+            cctx.drawImage(img, 0, 0);
+            const imgData = cctx.getImageData(0, 0, w, h);
+            const d = imgData.data;
+
+            for(let i = 0; i < d.length; i += 4){
+              const r = d[i];
+              const g = d[i + 1];
+              const b = d[i + 2];
+              const alpha = d[i + 3];
+              const greenDominance = g - Math.max(r, b);
+              const greenish = g > 80 && greenDominance > 18;
+              if(greenish){
+                const factor = clamp((greenDominance - 18) / 90, 0, 1);
+                d[i + 3] = Math.round(alpha * (1 - factor));
+                d[i] = Math.round(r * 0.92);
+                d[i + 1] = Math.round(g * 0.86);
+                d[i + 2] = Math.round(b * 0.92);
+              }
+            }
+
+            // Gentle cleanup pass to keep edges smooth on dark backgrounds.
+            cctx.putImageData(imgData, 0, 0);
+            resolve(c);
+          }catch(_err){
+            resolve(null);
+          }
+        };
+        img.onerror = () => resolve(null);
+        img.src = src;
+      });
+    }
+
+    async function loadAsteroidTexture(){
+      const tex = await preprocessIcon('icon.png');
+      state.asteroidTexture = tex;
+      state.asteroidTextureReady = !!tex;
+    }
+
+    function setUnlocked(value){
+      state.unlocked = value;
+      updateHud();
+      updateCooldownButton();
+    }
+
+    async function ensureUid(){
+      if(state.uid) return state.uid;
+      const entered = window.prompt('Enter your UID to redeem:');
+      if(!entered || !entered.trim()) throw new Error('UID required');
+      const clean = entered.trim();
+      const ref = doc(db, 'users', clean);
       const snap = await getDoc(ref);
-      if(!snap.exists()){
-        localStorage.removeItem(UID_KEY);
-        uid = "";
-        unlocked = false;
+      if(!snap.exists()) throw new Error('UID not found');
+      state.uid = clean;
+      localStorage.setItem(UID_KEY, clean);
+      return clean;
+    }
+
+    function cooldownRemaining(){
+      return Math.max(0, state.cooldownUntil - Date.now());
+    }
+
+    function updateRewardBeanCount(item){
+      if(item.beans > 0) state.rewards += 1;
+    }
+
+    async function redeem(){
+      if(state.redeemBusy) return;
+      if(cooldownRemaining() > 0) return;
+      state.redeemBusy = true;
+      setRedeemButton('Redeeming', 'Loading...', true);
+
+      try{
+        const uid = await ensureUid();
+        const userRef = doc(db, 'users', uid);
+        const requestId = crypto.randomUUID();
+        const now = Date.now();
+
+        const reward = await runTransaction(db, async (tx) => {
+          const snap = await tx.get(userRef);
+          if(!snap.exists()) throw new Error('UID not found');
+
+          const data = snap.data() || {};
+          const lockUntil = Number(data.cooldownUntilMs || 0);
+          if(Number.isFinite(lockUntil) && now < lockUntil){
+            const secs = Math.ceil((lockUntil - now) / 1000);
+            throw new Error(`Cooldown active (${secs}s)`);
+          }
+
+          const picked = pickReward();
+          tx.set(userRef, {
+            beans: increment(picked.beans),
+            cooldownUntilMs: now + REDDEEM_LOCK_MS,
+            lastRedeemAtMs: now,
+            lastRedeemId: requestId,
+            lastRewardName: picked.name,
+            lastRewardBeans: picked.beans
+          }, { merge: true });
+          return picked;
+        });
+
+        state.cooldownUntil = Date.now() + REDDEEM_LOCK_MS;
+        setUnlocked(true);
+        updateRewardBeanCount(reward);
+        updateHud();
+        if(reward.name === 'Asteroid'){
+          showToast('Redeem complete', 'Asteroid dropped. Gameplay unlocked.', 'info', 2100);
+        }else{
+          showToast('Redeem success', `${reward.name} granted +${reward.beans.toLocaleString()} beans.`, 'success', 2600);
+        }
+      }catch(err){
+        showToast('Redeem failed', err?.message || 'Something went wrong.', 'error', 2800);
+      }finally{
+        state.redeemBusy = false;
+        updateCooldownButton();
+      }
+    }
+
+    function beginHit(x, y){
+      if(!state.unlocked){
+        showToast('Locked', 'Redeem first to begin.', 'info', 1600);
         return;
       }
-      unlocked = true;
-    }catch(_){
-      // keep silent to preserve a clean UI
+      playSound(shootSfx, 0.4);
+      const hitIndex = hitTestAsteroid(x, y);
+      if(hitIndex !== -1){
+        handleAsteroidHit(hitIndex);
+      }
     }
-  }
 
-  seedAsteroids();
-  loadAsteroidTexture();
-  autoLoadUid();
-</script>
+    canvas.addEventListener('pointerdown', (e) => {
+      const p = screenToWorld(e.clientX, e.clientY);
+      beginHit(p.x, p.y);
+    });
+
+    function tickButton(){
+      updateCooldownButton();
+      requestAnimationFrame(tickButton);
+    }
+
+    function render(now){
+      const dt = clamp((now - state.lastFrame) / 16.6667, 0.6, 1.35);
+      state.lastFrame = now;
+
+      if(state.shake > 0.01){
+        state.shake *= 0.88;
+        state.shakeX = (Math.random() - 0.5) * state.shake;
+        state.shakeY = (Math.random() - 0.5) * state.shake;
+      }else{
+        state.shake = 0;
+        state.shakeX = 0;
+        state.shakeY = 0;
+      }
+
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.save();
+      ctx.translate(state.shakeX, state.shakeY);
+
+      drawBackground();
+
+      if(state.unlocked){
+        updateAsteroids(dt);
+        maintainAsteroidDensity(now);
+      }
+
+      for(const a of state.asteroids) drawAsteroid(a);
+      drawParticles();
+      ctx.restore();
+
+      requestAnimationFrame(render);
+    }
+
+    async function syncExistingUid(){
+      if(!state.uid) return;
+      try{
+        const ref = doc(db, 'users', state.uid);
+        const snap = await getDoc(ref);
+        if(!snap.exists()){
+          localStorage.removeItem(UID_KEY);
+          state.uid = '';
+          setUnlocked(false);
+          setRedeemButton('Redeem', 'Locked', false);
+          return;
+        }
+        // Keep gameplay clean: if the UID exists, the game is ready, even before the first redeem.
+        // Redeem still controls the cooldown and grants the reward.
+        setRedeemButton('Redeem', 'Ready', false);
+      }catch(_err){
+        // Quiet failure keeps the presentation clean.
+      }
+    }
+
+    window.addEventListener('resize', resize, { passive: true });
+    redeemBtn.addEventListener('click', redeem);
+
+    window.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    resize();
+    seedAsteroids();
+    updateHud();
+    setRedeemButton('Redeem', state.uid ? 'Ready' : 'Locked', false);
+    loadAsteroidTexture();
+    syncExistingUid();
+    requestAnimationFrame(render);
+    requestAnimationFrame(tickButton);
+  </script>
 </body>
 </html>

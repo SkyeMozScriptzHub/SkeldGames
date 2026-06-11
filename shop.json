@@ -1,29 +1,9 @@
-[
-  {
-    "id": "modmenu_v1",
-    "name": "Among Us Mod Menu",
-    "description": "Premium mod package with custom roles, speed hacks, and more.",
-    "price": 100,
-    "image": "shop/modmenu.png",
-    "file": "downloads/modmenu.zip",
-    "category": "Mods"
-  },
-  {
-    "id": "crewmate_theme",
-    "name": "Crewmate Theme Pack",
-    "description": "Custom UI theme for your launcher experience.",
-    "price": 75,
-    "image": "shop/crewmate_theme.png",
-    "file": "downloads/crewmate_theme.zip",
-    "category": "Themes"
-  },
-  {
-    "id": "premium_pack",
-    "name": "Premium Pack",
-    "description": "Bundle of exclusive tools and extras for hardcore players.",
-    "price": 250,
-    "image": "shop/premium.png",
-    "file": "downloads/premium_pack.zip",
-    "category": "Bundles"
-  }
-]
+{
+  "id": "Lobby",
+  "name": "Marathon",
+  "description": "",
+  "price": 550,
+  "image": "shop/marathon.png",
+  "file": "downloads/marathon/Marathon.zip",
+  "category": "Extreme"
+}
